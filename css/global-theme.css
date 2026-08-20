@@ -1,0 +1,186 @@
+/* ========================================================================
+   DESIMALL GLOBAL THEME COMPATIBILITY v1
+   Keeps legacy pages readable in both light and dark mode.
+   ======================================================================== */
+
+:root {
+  --primary-hover: var(--primary-dark, #e85d00);
+  --primary-alpha: rgba(255, 107, 0, .16);
+  --dark-text: var(--text, #222);
+  --muted-text: var(--text-light, #666);
+  --border-color: var(--border, #ececec);
+  --radius-sm: 8px;
+  --radius-md: var(--radius, 12px);
+  --radius-full: 9999px;
+  --shadow-sm: 0 2px 8px rgba(0,0,0,.06);
+  --shadow-md: 0 8px 24px rgba(0,0,0,.12);
+  --transition-fast: all .2s ease;
+  --transition-normal: all .3s ease;
+  --surface: #fff;
+  --soft-surface: #f7f8fa;
+  --line: #e5e7eb;
+  --ink: #172033;
+  --muted: #667085;
+  color-scheme: light;
+}
+
+html[data-theme="dark"] {
+  --white: #1c222b;
+  --bg: #11151b;
+  --text: #f4f6f8;
+  --text-light: #aeb7c3;
+  --dark-text: #f4f6f8;
+  --muted-text: #aeb7c3;
+  --border: #36404d;
+  --border-color: #36404d;
+  --primary-light: #3a2418;
+  --surface: #1c222b;
+  --soft-surface: #242b35;
+  --line: #36404d;
+  --ink: #f4f6f8;
+  --muted: #aeb7c3;
+  color-scheme: dark;
+}
+
+html[data-theme="dark"] body {
+  background: #11151b !important;
+  color: #f4f6f8 !important;
+}
+
+/* Common page shell */
+.main-layout {
+  width: min(100% - 32px, 1400px);
+  margin-inline: auto;
+  min-width: 0;
+}
+
+.breadcrumb-container,
+.breadcrumb,
+.page-title { color: var(--dark-text) !important; }
+.breadcrumb a { color: var(--primary) !important; }
+
+/* Universal form readability */
+input, textarea, select {
+  color: var(--dark-text);
+}
+html[data-theme="dark"] input,
+html[data-theme="dark"] textarea,
+html[data-theme="dark"] select {
+  background: #2a313b !important;
+  color: #fff !important;
+  border-color: #46515f !important;
+}
+html[data-theme="dark"] input::placeholder,
+html[data-theme="dark"] textarea::placeholder { color: #aeb7c3 !important; opacity: 1; }
+html[data-theme="dark"] label { color: #e9edf2 !important; }
+html[data-theme="dark"] input:disabled,
+html[data-theme="dark"] textarea:disabled,
+html[data-theme="dark"] select:disabled {
+  background: #242a33 !important;
+  color: #d7dde5 !important;
+  opacity: 1 !important;
+}
+
+/* Profile / address pages */
+html[data-theme="dark"] .profile-sidebar,
+html[data-theme="dark"] .profile-content { color: #f4f6f8; }
+html[data-theme="dark"] .user-brief-card,
+html[data-theme="dark"] .sidebar-menu,
+html[data-theme="dark"] .profile-card,
+html[data-theme="dark"] .address-card,
+html[data-theme="dark"] .address-form-card {
+  background: #1c222b !important;
+  color: #f4f6f8 !important;
+  border-color: #36404d !important;
+  box-shadow: 0 8px 24px rgba(0,0,0,.26) !important;
+}
+html[data-theme="dark"] .user-brief-info h3,
+html[data-theme="dark"] .profile-card h2,
+html[data-theme="dark"] .profile-card h3,
+html[data-theme="dark"] .sidebar-menu a,
+html[data-theme="dark"] .btn-logout-sidebar,
+html[data-theme="dark"] .address-card h3,
+html[data-theme="dark"] .address-card p {
+  color: #f4f6f8 !important;
+}
+html[data-theme="dark"] .user-brief-info .greeting,
+html[data-theme="dark"] .profile-card p,
+html[data-theme="dark"] .address-card .muted { color: #aeb7c3 !important; }
+html[data-theme="dark"] .sidebar-menu li a,
+html[data-theme="dark"] .btn-logout-sidebar { border-color: #303946 !important; }
+html[data-theme="dark"] .sidebar-menu li a:hover,
+html[data-theme="dark"] .sidebar-menu li a.active {
+  background: rgba(255,107,0,.16) !important;
+  color: #ff8a3d !important;
+}
+html[data-theme="dark"] .avatar-preview { background: #242b35 !important; color: #ff6b00 !important; }
+
+/* My orders - supports both old inline class names and newer classes */
+html[data-theme="dark"] .orders-list,
+html[data-theme="dark"] .orders-container { color: #f4f6f8; }
+html[data-theme="dark"] .order-card,
+html[data-theme="dark"] .empty-orders,
+html[data-theme="dark"] .empty-orders-card,
+html[data-theme="dark"] .details-card {
+  background: #1c222b !important;
+  color: #f4f6f8 !important;
+  border-color: #36404d !important;
+  box-shadow: 0 8px 24px rgba(0,0,0,.24) !important;
+}
+html[data-theme="dark"] .order-header,
+html[data-theme="dark"] .order-card-header,
+html[data-theme="dark"] .order-footer,
+html[data-theme="dark"] .order-card-footer {
+  background: #242b35 !important;
+  color: #f4f6f8 !important;
+  border-color: #36404d !important;
+}
+html[data-theme="dark"] .item-name,
+html[data-theme="dark"] .order-item-title,
+html[data-theme="dark"] .total-amount,
+html[data-theme="dark"] .order-meta strong,
+html[data-theme="dark"] .card-title,
+html[data-theme="dark"] .empty-orders h3,
+html[data-theme="dark"] .empty-orders-card h2 { color: #f4f6f8 !important; }
+html[data-theme="dark"] .item-meta,
+html[data-theme="dark"] .order-item-sub,
+html[data-theme="dark"] .order-date,
+html[data-theme="dark"] .order-meta,
+html[data-theme="dark"] .order-meta-text,
+html[data-theme="dark"] .empty-orders-card p { color: #aeb7c3 !important; }
+html[data-theme="dark"] .item-row,
+html[data-theme="dark"] .order-item-row { border-color: #303946 !important; }
+html[data-theme="dark"] .item-img,
+html[data-theme="dark"] .order-item-img { background: #fff !important; border-color: #46515f !important; }
+
+/* Product / wishlist / notifications / generic cards */
+html[data-theme="dark"] .wishlist-card,
+html[data-theme="dark"] .notification-card,
+html[data-theme="dark"] .product-details-card,
+html[data-theme="dark"] .review-card,
+html[data-theme="dark"] .panel-card,
+html[data-theme="dark"] .card {
+  background: #1c222b !important;
+  color: #f4f6f8 !important;
+  border-color: #36404d !important;
+}
+
+/* Buttons that were white-on-white */
+html[data-theme="dark"] .btn-outline,
+html[data-theme="dark"] .btn-edit-toggle,
+html[data-theme="dark"] .btn-cancel-profile,
+html[data-theme="dark"] button.secondary,
+html[data-theme="dark"] .secondary-btn {
+  background: #293342 !important;
+  color: #fff !important;
+  border-color: #46515f !important;
+}
+
+/* Old standalone my-orders page light-mode cleanup */
+body > header .header-wrapper,
+body > header .container.header-wrapper { max-width: 1200px; margin-inline: auto; }
+
+@media (max-width: 767px) {
+  .main-layout { width: min(100% - 20px, 1400px); }
+  .profile-layout { grid-template-columns: 1fr !important; }
+}

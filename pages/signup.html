@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Create Account - DesiMall</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <link rel="manifest" href="../manifest.webmanifest">
+  <meta name="referrer" content="strict-origin-when-cross-origin">
+  <link rel="stylesheet" href="../css/global-theme.css">
+  <style>
+    *{box-sizing:border-box;margin:0;padding:0;font-family:'Segoe UI',Tahoma,Geneva,Verdana,sans-serif}
+    body{background-color:#f4f6f9;color:#333;display:flex;flex-direction:column;min-height:100vh}
+    .container{max-width:1200px;margin:0 auto;padding:0 15px}
+    header{background:#fff;box-shadow:0 2px 10px rgba(0,0,0,.08);padding:14px 0}
+    .logo{font-size:24px;font-weight:800;color:#ff6b00;text-decoration:none;display:flex;align-items:center;gap:6px}
+    .auth-card{max-width:440px;margin:40px auto;background:#fff;padding:30px;border-radius:12px;box-shadow:0 4px 20px rgba(0,0,0,.08)}
+    .auth-title{font-size:22px;font-weight:700;text-align:center;margin-bottom:8px;color:#222}
+    .auth-subtitle{text-align:center;color:#777;font-size:13px;margin-bottom:22px}
+    .form-group{margin-bottom:18px}
+    .form-group label{display:block;font-size:13px;font-weight:600;margin-bottom:6px;color:#444}
+    .form-group input{width:100%;padding:10px 14px;border:1px solid #ccc;border-radius:6px;font-size:14px;outline:none}
+    .form-group input:focus{border-color:#ff6b00}
+    .btn-submit{width:100%;padding:12px;background:#ff6b00;color:#fff;border:none;border-radius:6px;font-size:15px;font-weight:700;cursor:pointer}
+    .btn-submit:hover{background:#e05d00}.btn-submit:disabled{opacity:.7;cursor:not-allowed}
+    .auth-footer{text-align:center;margin-top:20px;font-size:13px;color:#666}.auth-footer a{color:#ff6b00;text-decoration:none;font-weight:600}
+    .login-message{padding:10px 12px;border-radius:6px;margin-bottom:16px;font-size:13px}.login-message.info{background:#eef5ff;color:#315b8a}.login-message.success{background:#eaf8ef;color:#216e39}.login-message.error{background:#fff0f0;color:#a12626}
+    footer{background:#1a1a1a;color:#b0b0b0;padding:20px 0;margin-top:auto;text-align:center;font-size:12px}
+  </style>
+  <link rel="stylesheet" href="../css/customer-footer.css?v=0.29.4">
+</head>
+<body>
+  <header>
+    <div class="container">
+      <a href="../index.html" class="logo"><i class="fa-solid fa-bag-shopping"></i> DesiMall</a>
+    </div>
+  </header>
+
+  <main class="container">
+    <div class="auth-card">
+      <h2 class="auth-title">Create your DesiMall account</h2>
+      <p class="auth-subtitle">Customer account for shopping, orders, returns and notifications.</p>
+      <div id="signupMessage" class="login-message info" hidden></div>
+
+      <form id="customerSignupForm">
+        <div class="form-group">
+          <label for="signupName">Full Name</label>
+          <input type="text" id="signupName" autocomplete="name" placeholder="Enter your full name" required>
+        </div>
+        <div class="form-group">
+          <label for="signupEmail">Email Address</label>
+          <input type="email" id="signupEmail" autocomplete="email" placeholder="you@example.com" required>
+        </div>
+        <div class="form-group">
+          <label for="signupMobile">10-Digit Mobile Number</label>
+          <input type="tel" id="signupMobile" inputmode="numeric" maxlength="10" autocomplete="tel" placeholder="9876543210" required>
+        </div>
+        <div class="form-group">
+          <label for="signupPassword">Password</label>
+          <input type="password" id="signupPassword" minlength="6" autocomplete="new-password" placeholder="Minimum 6 characters" required>
+        </div>
+        <div class="form-group">
+          <label for="signupConfirmPassword">Confirm Password</label>
+          <input type="password" id="signupConfirmPassword" minlength="6" autocomplete="new-password" placeholder="Re-enter password" required>
+        </div>
+        <button type="submit" class="btn-submit">Create Account</button>
+      </form>
+
+      <div class="auth-footer">
+        <p>Already have an account? <a href="login.html">Login</a></p>
+      </div>
+    </div>
+  </main>
+
+  <footer><p>© 2026 DesiMall. Powered by Riddhi Rithvi Traders (RRT). All Rights Reserved.</p></footer>
+
+  <script src="../js/auth.js"></script>
+  <script src="../js/api.js"></script>
+  <script src="../js/signup.js"></script>
+  <script src="../js/pwa.js"></script>
+  <script src="../js/ui-preferences.js"></script>
+  <script src="../js/analytics.js"></script>
+  <script src="../js/customer-footer.js?v=0.29.4"></script>
+</body>
+</html>

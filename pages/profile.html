@@ -1,0 +1,1812 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="theme-color" content="#ff6b00">
+    <meta name="referrer" content="strict-origin-when-cross-origin">
+
+    <title>My Account - DesiMall</title>
+
+    <link rel="stylesheet" href="../css/style.css">
+    <link rel="stylesheet" href="../css/global-theme.css">
+
+    <link
+        rel="stylesheet"
+        href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
+    >
+
+    <link rel="manifest" href="../manifest.webmanifest">
+
+    <style>
+        /* =========================================================
+           DESIMALL PREMIUM CUSTOMER PROFILE
+           Existing JS IDs/functions preserved
+           ========================================================= */
+
+        :root {
+            --dm-orange: #ff6500;
+            --dm-orange-dark: #e85c00;
+            --dm-orange-soft: #fff4ec;
+            --dm-orange-soft-2: #fff8f3;
+
+            --dm-navy: #223247;
+            --dm-text: #20242a;
+            --dm-muted: #697386;
+
+            --dm-bg: #f5f7fa;
+            --dm-card: #ffffff;
+            --dm-border: #e8ebef;
+
+            --dm-danger: #dc2626;
+            --dm-success: #15803d;
+
+            --dm-radius: 18px;
+            --dm-radius-sm: 12px;
+
+            --dm-shadow:
+                0 8px 30px rgba(24, 39, 75, 0.07);
+
+            --dm-shadow-hover:
+                0 12px 35px rgba(24, 39, 75, 0.11);
+        }
+
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 0;
+            background:
+                linear-gradient(
+                    180deg,
+                    #ffffff 0,
+                    #f7f8fb 160px,
+                    #f4f6f9 100%
+                );
+            color: var(--dm-text);
+        }
+
+        /* ================= HEADER ================= */
+
+        .profile-top-header {
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+            background: rgba(255,255,255,.96);
+            backdrop-filter: blur(14px);
+            border-bottom: 1px solid var(--dm-border);
+            box-shadow: 0 3px 16px rgba(0,0,0,.045);
+        }
+
+        .profile-header-inner {
+            width: min(1440px, calc(100% - 40px));
+            min-height: 74px;
+            margin: auto;
+
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 30px;
+        }
+
+        .profile-brand {
+            display: inline-flex;
+            align-items: center;
+            gap: 11px;
+
+            color: inherit;
+            text-decoration: none;
+            flex-shrink: 0;
+        }
+
+        .brand-icon {
+            width: 42px;
+            height: 42px;
+            border-radius: 12px;
+
+            display: grid;
+            place-items: center;
+
+            color: white;
+            background:
+                linear-gradient(135deg, #ff7b21, #ff5b00);
+
+            box-shadow: 0 7px 18px rgba(255,101,0,.22);
+            font-size: 19px;
+        }
+
+        .brand-name {
+            font-weight: 850;
+            font-size: 26px;
+            letter-spacing: -.8px;
+        }
+
+        .brand-name .desi {
+            color: var(--dm-orange);
+        }
+
+        .brand-name .mall {
+            color: #7246f5;
+        }
+
+        .profile-header-actions {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .profile-header-link {
+            position: relative;
+
+            min-width: 67px;
+            padding: 8px 10px;
+            border-radius: 12px;
+
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 4px;
+
+            text-decoration: none;
+            color: #52565c;
+
+            font-size: 11px;
+            transition: .2s ease;
+        }
+
+        .profile-header-link i {
+            font-size: 20px;
+        }
+
+        .profile-header-link:hover,
+        .profile-header-link.active {
+            color: var(--dm-orange);
+            background: var(--dm-orange-soft);
+        }
+
+        .profile-header-link .badge {
+            position: absolute;
+            top: 3px;
+            right: 8px;
+
+            min-width: 17px;
+            height: 17px;
+            padding: 0 4px;
+
+            border-radius: 20px;
+            background: #ef2020;
+            color: white;
+
+            display: grid;
+            place-items: center;
+
+            font-size: 10px;
+            font-weight: 800;
+        }
+
+        /* ================= PAGE ================= */
+
+        .profile-page {
+            width: min(1440px, calc(100% - 40px));
+            margin: 0 auto;
+            padding: 26px 0 45px;
+        }
+
+        .profile-breadcrumb {
+            display: flex;
+            align-items: center;
+            gap: 9px;
+
+            margin-bottom: 22px;
+
+            font-size: 13px;
+            color: var(--dm-muted);
+        }
+
+        .profile-breadcrumb a {
+            color: var(--dm-muted);
+            text-decoration: none;
+        }
+
+        .profile-breadcrumb a:hover {
+            color: var(--dm-orange);
+        }
+
+        .profile-breadcrumb .current {
+            color: var(--dm-text);
+            font-weight: 700;
+        }
+
+        /* ================= HERO ================= */
+
+        .account-hero {
+            position: relative;
+            overflow: hidden;
+
+            margin-bottom: 24px;
+            padding: 25px 28px;
+
+            background:
+                linear-gradient(
+                    120deg,
+                    #25364c 0%,
+                    #1d2b3d 58%,
+                    #ff6500 160%
+                );
+
+            color: white;
+            border-radius: 22px;
+
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 25px;
+
+            box-shadow: var(--dm-shadow);
+        }
+
+        .account-hero::after {
+            content: "";
+            position: absolute;
+            width: 280px;
+            height: 280px;
+            border-radius: 50%;
+
+            right: -100px;
+            top: -125px;
+
+            background:
+                radial-gradient(
+                    circle,
+                    rgba(255,101,0,.55),
+                    rgba(255,101,0,0) 70%
+                );
+
+            pointer-events: none;
+        }
+
+        .hero-user {
+            position: relative;
+            z-index: 1;
+
+            display: flex;
+            align-items: center;
+            gap: 17px;
+        }
+
+        .hero-avatar {
+            width: 66px;
+            height: 66px;
+            flex: 0 0 66px;
+
+            border-radius: 50%;
+            overflow: hidden;
+
+            display: grid;
+            place-items: center;
+
+            background:
+                linear-gradient(145deg, #fff, #f4f4f4);
+
+            color: var(--dm-orange);
+            font-size: 27px;
+
+            border: 3px solid rgba(255,255,255,.28);
+        }
+
+        .hero-avatar img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .hero-copy small {
+            display: block;
+            opacity: .75;
+            margin-bottom: 4px;
+            font-size: 12px;
+        }
+
+        .hero-copy h1 {
+            margin: 0 0 5px;
+            font-size: clamp(20px, 2vw, 27px);
+            line-height: 1.15;
+        }
+
+        .hero-copy p {
+            margin: 0;
+            font-size: 13px;
+            color: rgba(255,255,255,.75);
+        }
+
+        .hero-secure {
+            position: relative;
+            z-index: 1;
+
+            display: flex;
+            align-items: center;
+            gap: 10px;
+
+            padding: 11px 15px;
+            border-radius: 14px;
+
+            background: rgba(255,255,255,.1);
+            border: 1px solid rgba(255,255,255,.12);
+
+            font-size: 12px;
+            white-space: nowrap;
+        }
+
+        .hero-secure i {
+            color: #ffb27e;
+            font-size: 17px;
+        }
+
+        /* ================= LAYOUT ================= */
+
+        .profile-layout {
+            display: grid;
+            grid-template-columns: 270px minmax(0, 1fr);
+            gap: 22px;
+            align-items: start;
+        }
+
+        /* ================= SIDEBAR ================= */
+
+        .profile-sidebar {
+            position: sticky;
+            top: 100px;
+        }
+
+        .sidebar-shell {
+            border: 1px solid var(--dm-border);
+            border-radius: var(--dm-radius);
+            background: var(--dm-card);
+            box-shadow: var(--dm-shadow);
+            overflow: hidden;
+        }
+
+        .user-brief-card {
+            padding: 22px 19px 18px;
+
+            display: flex;
+            align-items: center;
+            gap: 13px;
+
+            border-bottom: 1px solid var(--dm-border);
+            background:
+                linear-gradient(
+                    135deg,
+                    #fff9f5,
+                    #ffffff 70%
+                );
+        }
+
+        .user-avatar-circle {
+            width: 48px;
+            height: 48px;
+            flex: 0 0 48px;
+
+            border-radius: 50%;
+
+            display: grid;
+            place-items: center;
+
+            background: var(--dm-orange-soft);
+            color: var(--dm-orange);
+
+            font-size: 20px;
+            overflow: hidden;
+        }
+
+        .user-avatar-circle img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .user-brief-info {
+            min-width: 0;
+        }
+
+        .user-brief-info .greeting {
+            display: block;
+            color: var(--dm-muted);
+            font-size: 11px;
+            margin-bottom: 2px;
+        }
+
+        .user-brief-info h3 {
+            margin: 0;
+            color: var(--dm-text);
+            font-size: 15px;
+            line-height: 1.25;
+
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .sidebar-menu {
+            margin: 0;
+            padding: 8px;
+            list-style: none;
+        }
+
+        .sidebar-menu li + li {
+            margin-top: 3px;
+        }
+
+        .sidebar-menu a,
+        .btn-logout-sidebar {
+            width: 100%;
+            min-height: 48px;
+
+            padding: 0 14px;
+            border-radius: 11px;
+            border: 0;
+
+            display: flex;
+            align-items: center;
+            gap: 12px;
+
+            background: transparent;
+            text-decoration: none;
+
+            color: #4b535e;
+            font-family: inherit;
+            font-size: 13px;
+            font-weight: 650;
+            text-align: left;
+
+            cursor: pointer;
+            transition: .18s ease;
+        }
+
+        .sidebar-menu a i,
+        .btn-logout-sidebar i {
+            width: 20px;
+            text-align: center;
+            font-size: 15px;
+        }
+
+        .sidebar-menu a:hover {
+            background: #f6f7f9;
+            color: var(--dm-text);
+        }
+
+        .sidebar-menu a.active {
+            color: var(--dm-orange);
+            background: var(--dm-orange-soft);
+        }
+
+        .sidebar-menu a.active i {
+            color: var(--dm-orange);
+        }
+
+        .sidebar-divider {
+            height: 1px;
+            margin: 8px 6px;
+            background: var(--dm-border);
+        }
+
+        .btn-logout-sidebar {
+            color: var(--dm-danger);
+        }
+
+        .btn-logout-sidebar:hover {
+            background: #fff1f1;
+        }
+
+        /* ================= MAIN CONTENT ================= */
+
+        .profile-content {
+            min-width: 0;
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        .profile-card {
+            border: 1px solid var(--dm-border);
+            border-radius: var(--dm-radius);
+            background: var(--dm-card);
+            box-shadow: var(--dm-shadow);
+            overflow: hidden;
+        }
+
+        .profile-card:hover {
+            box-shadow: var(--dm-shadow-hover);
+        }
+
+        .profile-card-header {
+            padding: 21px 24px;
+
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 16px;
+
+            border-bottom: 1px solid #f0f1f3;
+        }
+
+        .section-heading {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            min-width: 0;
+        }
+
+        .section-icon {
+            width: 39px;
+            height: 39px;
+            flex: 0 0 39px;
+
+            border-radius: 11px;
+
+            display: grid;
+            place-items: center;
+
+            background: var(--dm-orange-soft);
+            color: var(--dm-orange);
+
+            font-size: 16px;
+        }
+
+        .section-heading h2 {
+            margin: 0;
+            font-size: 17px;
+            color: var(--dm-text);
+        }
+
+        .section-heading p {
+            margin: 3px 0 0;
+            color: var(--dm-muted);
+            font-size: 11px;
+        }
+
+        .profile-card-body {
+            padding: 24px;
+        }
+
+        /* ================= EDIT BUTTON ================= */
+
+        .btn-edit-toggle {
+            flex-shrink: 0;
+
+            min-height: 38px;
+            padding: 0 15px;
+
+            border: 1px solid #ffd2b5;
+            border-radius: 10px;
+
+            background: var(--dm-orange-soft-2);
+            color: var(--dm-orange);
+
+            font-family: inherit;
+            font-size: 12px;
+            font-weight: 750;
+
+            cursor: pointer;
+            transition: .18s ease;
+        }
+
+        .btn-edit-toggle:hover {
+            background: var(--dm-orange);
+            color: #fff;
+            border-color: var(--dm-orange);
+        }
+
+        /* ================= PROFILE FORM ================= */
+
+        .profile-form {
+            margin: 0;
+        }
+
+        .identity-area {
+            display: flex;
+            align-items: center;
+            gap: 17px;
+
+            padding-bottom: 22px;
+            margin-bottom: 22px;
+
+            border-bottom: 1px dashed #e8e9ec;
+        }
+
+        .avatar-preview {
+            width: 76px;
+            height: 76px;
+            flex: 0 0 76px;
+
+            border-radius: 50%;
+            overflow: hidden;
+
+            display: grid;
+            place-items: center;
+
+            background:
+                linear-gradient(
+                    145deg,
+                    #fff3eb,
+                    #f3f4f6
+                );
+
+            color: var(--dm-orange);
+            font-size: 29px;
+
+            border: 3px solid white;
+            box-shadow:
+                0 0 0 1px #e8e9ed,
+                0 7px 18px rgba(0,0,0,.07);
+        }
+
+        .avatar-preview img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .identity-copy h3 {
+            margin: 0 0 5px;
+            font-size: 15px;
+        }
+
+        .identity-copy p {
+            margin: 0;
+            color: var(--dm-muted);
+            font-size: 11px;
+        }
+
+        .avatar-controls {
+            margin-top: 10px;
+        }
+
+        .btn-avatar-upload {
+            display: inline-flex;
+            align-items: center;
+            gap: 7px;
+
+            padding: 7px 11px;
+            border-radius: 9px;
+
+            background: #f4f5f7;
+            color: #49505a;
+
+            font-size: 11px;
+            font-weight: 700;
+
+            cursor: pointer;
+        }
+
+        .btn-avatar-upload:hover {
+            color: var(--dm-orange);
+            background: var(--dm-orange-soft);
+        }
+
+        .form-grid {
+            display: grid;
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+            gap: 18px;
+        }
+
+        .input-group {
+            min-width: 0;
+        }
+
+        .input-group.full-width {
+            grid-column: 1 / -1;
+        }
+
+        .input-group label {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+
+            margin-bottom: 7px;
+
+            color: #343942;
+            font-size: 12px;
+            font-weight: 700;
+        }
+
+        .input-group label i {
+            color: #9a9fa8;
+            font-size: 11px;
+        }
+
+        .input-wrap {
+            position: relative;
+        }
+
+        .input-group input,
+        .input-group textarea {
+            width: 100%;
+            min-height: 47px;
+
+            padding: 11px 14px;
+
+            border: 1px solid #dde0e5;
+            border-radius: 11px;
+
+            background: #fff;
+            color: var(--dm-text);
+
+            font-family: inherit;
+            font-size: 13px;
+
+            outline: none;
+            transition: .18s ease;
+        }
+
+        .input-group input:hover:not(:disabled) {
+            border-color: #c9cdd3;
+        }
+
+        .input-group input:focus,
+        .input-group textarea:focus {
+            border-color: var(--dm-orange);
+            box-shadow: 0 0 0 3px rgba(255,101,0,.09);
+        }
+
+        .input-group input:disabled {
+            color: #555e69;
+            background: #f8f9fb;
+            border-color: #edf0f2;
+            cursor: default;
+        }
+
+        .form-actions {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-top: 21px;
+        }
+
+        .btn-save-profile,
+        .btn-update-password {
+            border: 0;
+            border-radius: 11px;
+
+            min-height: 43px;
+            padding: 0 20px;
+
+            background:
+                linear-gradient(
+                    135deg,
+                    #ff761b,
+                    #ff5b00
+                );
+
+            color: white;
+            font-family: inherit;
+            font-size: 12px;
+            font-weight: 800;
+
+            cursor: pointer;
+            box-shadow: 0 7px 17px rgba(255,101,0,.18);
+            transition: .18s ease;
+        }
+
+        .btn-save-profile:hover,
+        .btn-update-password:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 9px 21px rgba(255,101,0,.24);
+        }
+
+        .btn-cancel-profile {
+            border: 0;
+            border-radius: 11px;
+
+            min-height: 43px;
+            padding: 0 18px;
+
+            background: #f1f3f5;
+            color: #4e5661;
+
+            font-family: inherit;
+            font-size: 12px;
+            font-weight: 700;
+
+            cursor: pointer;
+        }
+
+        /* ================= SECURITY ================= */
+
+        .security-note {
+            display: flex;
+            align-items: flex-start;
+            gap: 10px;
+
+            padding: 12px 14px;
+            margin-bottom: 20px;
+
+            border-radius: 11px;
+            background: #f8fafc;
+
+            color: #697386;
+            font-size: 11px;
+            line-height: 1.5;
+        }
+
+        .security-note i {
+            color: var(--dm-orange);
+            margin-top: 2px;
+        }
+
+        .security-actions {
+            margin-top: 20px;
+        }
+
+        .security-actions .btn-update-password {
+            min-width: 170px;
+        }
+
+        /* ================= ALERT ================= */
+
+        .profile-alert {
+            padding: 13px 16px;
+            border-radius: 12px;
+
+            background: #ecfdf3;
+            border: 1px solid #bbf7d0;
+
+            color: var(--dm-success);
+            font-size: 12px;
+            font-weight: 650;
+        }
+
+        .profile-alert.error {
+            background: #fff1f2;
+            border-color: #fecdd3;
+            color: #be123c;
+        }
+
+        .hidden {
+            display: none !important;
+        }
+
+        /* ================= FOOTER ================= */
+
+        .profile-footer {
+            margin-top: 20px;
+            padding: 23px 20px;
+
+            color: #7a828d;
+            text-align: center;
+            font-size: 11px;
+        }
+
+        /* ================= RESPONSIVE ================= */
+
+        @media (max-width: 900px) {
+            .profile-layout {
+                grid-template-columns: 1fr;
+            }
+
+            .profile-sidebar {
+                position: static;
+            }
+
+            .sidebar-menu {
+                display: grid;
+                grid-template-columns: repeat(4, 1fr);
+                gap: 5px;
+            }
+
+            .sidebar-menu li + li {
+                margin: 0;
+            }
+
+            .sidebar-menu a,
+            .btn-logout-sidebar {
+                justify-content: center;
+                padding: 10px 8px;
+                font-size: 11px;
+            }
+
+            .sidebar-menu a i,
+            .btn-logout-sidebar i {
+                width: auto;
+            }
+
+            .sidebar-divider {
+                display: none;
+            }
+        }
+
+        @media (max-width: 700px) {
+            .profile-header-inner,
+            .profile-page {
+                width: min(100% - 24px, 1440px);
+            }
+
+            .profile-header-inner {
+                min-height: 65px;
+            }
+
+            .brand-name {
+                font-size: 21px;
+            }
+
+            .brand-icon {
+                width: 36px;
+                height: 36px;
+            }
+
+            .profile-header-link {
+                min-width: 50px;
+                padding: 6px;
+            }
+
+            .profile-header-link span:not(.badge) {
+                display: none;
+            }
+
+            .account-hero {
+                padding: 21px;
+            }
+
+            .hero-secure {
+                display: none;
+            }
+
+            .form-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .profile-card-header {
+                padding: 18px;
+            }
+
+            .profile-card-body {
+                padding: 18px;
+            }
+        }
+
+        @media (max-width: 520px) {
+            .profile-page {
+                padding-top: 17px;
+            }
+
+            .profile-breadcrumb {
+                display: none;
+            }
+
+            .account-hero {
+                border-radius: 16px;
+            }
+
+            .hero-avatar {
+                width: 56px;
+                height: 56px;
+                flex-basis: 56px;
+            }
+
+            .hero-copy p {
+                display: none;
+            }
+
+            .sidebar-menu {
+                grid-template-columns: repeat(2, 1fr);
+            }
+
+            .profile-card {
+                border-radius: 15px;
+            }
+
+            .profile-card-header {
+                align-items: flex-start;
+            }
+
+            .section-heading p {
+                display: none;
+            }
+
+            .btn-edit-toggle {
+                padding: 0 11px;
+            }
+
+            .identity-area {
+                align-items: flex-start;
+            }
+
+            .form-actions {
+                flex-direction: column;
+            }
+
+            .form-actions button,
+            .security-actions .btn-update-password {
+                width: 100%;
+            }
+        }
+    </style>
+
+<style id="accountHubV023">
+.account-hub{
+  display:grid;
+  grid-template-columns:repeat(4,minmax(0,1fr));
+  gap:12px;
+  margin:0 0 18px;
+}
+.account-hub-card{
+  min-width:0;
+  display:grid;
+  grid-template-columns:42px minmax(0,1fr) auto;
+  gap:11px;
+  align-items:center;
+  padding:14px;
+  border:1px solid var(--dm-border);
+  border-radius:14px;
+  background:var(--dm-card);
+  color:var(--dm-text);
+  text-decoration:none;
+  box-shadow:var(--dm-shadow-sm);
+  transition:.18s ease;
+}
+.account-hub-card:hover{
+  transform:translateY(-2px);
+  border-color:rgba(255,101,0,.45);
+  box-shadow:var(--dm-shadow);
+}
+.account-hub-icon{
+  width:42px;height:42px;border-radius:12px;
+  display:grid;place-items:center;
+  background:var(--dm-orange-soft);
+  color:var(--dm-orange);
+  font-size:17px;
+}
+.account-hub-card>div{min-width:0}
+.account-hub-card strong{display:block;color:var(--dm-text);font-size:12px}
+.account-hub-card small{display:block;margin-top:3px;color:var(--dm-muted);font-size:9px;line-height:1.4}
+.account-hub-card>i{color:var(--dm-muted);font-size:10px}
+.account-hub-card.disabled{opacity:.72;cursor:default}
+.account-hub-card.disabled:hover{transform:none;border-color:var(--dm-border);box-shadow:var(--dm-shadow-sm)}
+.account-coming{font-size:8px;font-weight:900;padding:4px 6px;border-radius:999px;background:var(--dm-orange-soft);color:var(--dm-orange)}
+@media(max-width:1050px){.account-hub{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media(max-width:620px){
+  .account-hub{grid-template-columns:1fr;gap:8px}
+  .account-hub-card{padding:12px}
+  .profile-sidebar{display:none}
+}
+</style>
+
+
+<style id="accountHubDarkV0231">
+html[data-theme="dark"] .account-hub-card{
+  background:#1b2430!important;
+  border-color:#334155!important;
+  color:#f8fafc!important;
+  box-shadow:0 8px 20px rgba(0,0,0,.18)!important;
+}
+html[data-theme="dark"] .account-hub-card:hover{
+  background:#202b39!important;
+  border-color:rgba(255,101,0,.58)!important;
+}
+html[data-theme="dark"] .account-hub-card strong{
+  color:#f8fafc!important;
+}
+html[data-theme="dark"] .account-hub-card small{
+  color:#aab8c9!important;
+}
+html[data-theme="dark"] .account-hub-card>i{
+  color:#94a3b8!important;
+}
+html[data-theme="dark"] .account-hub-icon{
+  background:rgba(255,101,0,.14)!important;
+  color:#ff7a1a!important;
+}
+html[data-theme="dark"] .account-hub-card.disabled{
+  background:#20242b!important;
+  border-color:#3a414c!important;
+  opacity:.66!important;
+}
+html[data-theme="dark"] .account-coming{
+  background:rgba(255,101,0,.14)!important;
+  color:#ff8a3d!important;
+}
+html[data-theme="dark"] .profile-top-header{
+  background:#171f2a!important;
+  border-bottom-color:#2f3b4c!important;
+}
+html[data-theme="dark"] .profile-brand,
+html[data-theme="dark"] .profile-header-link{
+  color:#e9eef5!important;
+}
+html[data-theme="dark"] .profile-header-link.active,
+html[data-theme="dark"] .profile-header-link:hover{
+  background:rgba(255,101,0,.14)!important;
+  color:#ff7a1a!important;
+}
+</style>
+
+
+<style id="accountMobileNavV0231">
+.account-mobile-nav{display:none}
+@media(max-width:650px){
+  body{padding-bottom:66px!important}
+  .account-mobile-nav{
+    display:grid;
+    grid-template-columns:repeat(5,1fr);
+    position:fixed;
+    left:0;right:0;bottom:0;
+    height:64px;
+    z-index:3000;
+    background:#171f2a;
+    border-top:1px solid #2f3b4c;
+  }
+  .account-mobile-nav a{
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    justify-content:center;
+    gap:4px;
+    text-decoration:none;
+    color:#94a3b8;
+    font-size:9px;
+    font-weight:800;
+  }
+  .account-mobile-nav a i{font-size:17px}
+  .account-mobile-nav a.active{color:#ff6a00}
+}
+</style>
+
+  <link rel="stylesheet" href="../css/customer-footer.css?v=0.29.4">
+</head>
+
+<body>
+
+    <!-- =====================================================
+         PREMIUM HEADER
+         ===================================================== -->
+    <header class="profile-top-header">
+
+        <div class="profile-header-inner">
+
+            <a
+                href="../index.html"
+                class="profile-brand"
+                aria-label="DesiMall Home"
+            >
+                <span class="brand-icon">
+                    <i class="fa-solid fa-store"></i>
+                </span>
+
+                <span class="brand-name">
+                    <span class="desi">Desi</span><span class="mall">Mall</span>
+                </span>
+            </a>
+
+
+            <nav
+                class="profile-header-actions"
+                aria-label="Customer navigation"
+            >
+
+                <a
+                    href="profile.html"
+                    class="profile-header-link active"
+                    id="userAuthLink"
+                >
+                    <i class="fa-solid fa-circle-user"></i>
+                    <span>Account</span>
+                </a>
+
+                <a
+                    href="my-orders.html"
+                    class="profile-header-link"
+                    title="My Orders"
+                >
+                    <i class="fa-solid fa-box"></i>
+                    <span>Orders</span>
+                </a>
+<a
+                    href="support.html"
+                    class="profile-header-link"
+                    title="Help & Support"
+                >
+                    <i class="fa-solid fa-headset"></i>
+                    <span>Support</span>
+                </a>
+
+                <a
+                    href="cart.html"
+                    class="profile-header-link"
+                    title="Shopping Cart"
+                >
+                    <i class="fa-solid fa-cart-shopping"></i>
+                    <span>Cart</span>
+
+                    <span
+                        class="badge"
+                        id="cartBadge"
+                    >0</span>
+                </a>
+
+            </nav>
+
+        </div>
+
+    </header>
+
+
+    <!-- =====================================================
+         PAGE
+         ===================================================== -->
+    <main class="profile-page">
+
+
+        <!-- Breadcrumb -->
+        <div class="profile-breadcrumb">
+            <a href="../index.html">
+                <i class="fa-solid fa-house"></i>
+                Home
+            </a>
+
+            <i class="fa-solid fa-chevron-right"></i>
+
+            <span class="current">
+                My Account
+            </span>
+        </div>
+
+
+        <!-- =================================================
+             ACCOUNT HERO
+             ================================================= -->
+        <section class="account-hero">
+
+            <div class="hero-user">
+
+                <div
+                    class="hero-avatar"
+                    id="briefAvatar"
+                >
+                    <i class="fa-solid fa-user"></i>
+                </div>
+
+                <div class="hero-copy">
+
+                    <small>
+                        Welcome back
+                    </small>
+
+                    <h1 id="briefUserName">
+                        DesiMall Customer
+                    </h1>
+
+                    <p>
+                        Manage your profile, addresses,
+                        orders and account security.
+                    </p>
+
+                </div>
+
+            </div>
+
+
+            <div class="hero-secure">
+                <i class="fa-solid fa-shield-halved"></i>
+
+                <div>
+                    <strong>Secure Account</strong><br>
+                    <span>Your information stays protected</span>
+                </div>
+            </div>
+
+        </section>
+
+
+
+        <!-- ================= ACCOUNT QUICK HUB v0.23 ================= -->
+        <section class="account-hub" aria-label="Account shortcuts">
+            <a class="account-hub-card" href="profile.html">
+                <span class="account-hub-icon"><i class="fa-solid fa-user"></i></span>
+                <div><strong>My Profile</strong><small>Name, mobile and account details</small></div>
+                <i class="fa-solid fa-chevron-right"></i>
+            </a>
+
+            <a class="account-hub-card" href="address-book.html">
+                <span class="account-hub-icon"><i class="fa-solid fa-location-dot"></i></span>
+                <div><strong>Saved Addresses</strong><small>Home and delivery addresses</small></div>
+                <i class="fa-solid fa-chevron-right"></i>
+            </a>
+
+            <a class="account-hub-card" href="my-orders.html">
+                <span class="account-hub-icon"><i class="fa-solid fa-box"></i></span>
+                <div><strong>My Orders</strong><small>Track, buy again and get help</small></div>
+                <i class="fa-solid fa-chevron-right"></i>
+            </a>
+
+            <a class="account-hub-card" href="returns.html">
+                <span class="account-hub-icon"><i class="fa-solid fa-rotate-left"></i></span>
+                <div><strong>Returns & Refunds</strong><small>Return status and refund requests</small></div>
+                <i class="fa-solid fa-chevron-right"></i>
+            </a>
+
+            <a class="account-hub-card" href="notifications.html">
+                <span class="account-hub-icon"><i class="fa-solid fa-bell"></i></span>
+                <div><strong>Notifications</strong><small>Orders, offers and account alerts</small></div>
+                <i class="fa-solid fa-chevron-right"></i>
+            </a>
+
+            <a class="account-hub-card" href="support.html">
+                <span class="account-hub-icon"><i class="fa-solid fa-headset"></i></span>
+                <div><strong>Help & Support</strong><small>Open and manage support tickets</small></div>
+                <i class="fa-solid fa-chevron-right"></i>
+            </a>
+
+            <div class="account-hub-card disabled" aria-disabled="true">
+                <span class="account-hub-icon"><i class="fa-solid fa-wallet"></i></span>
+                <div><strong>Payments / Wallet</strong><small>Coming later — no fake wallet balance</small></div>
+                <span class="account-coming">Later</span>
+            </div>
+
+            <a class="account-hub-card" href="../index.html#about">
+                <span class="account-hub-icon"><i class="fa-solid fa-circle-info"></i></span>
+                <div><strong>About DesiMall</strong><small>Back to the DesiMall customer experience</small></div>
+                <i class="fa-solid fa-chevron-right"></i>
+            </a>
+        </section>
+
+
+        <!-- =================================================
+             PROFILE LAYOUT
+             ================================================= -->
+        <div class="profile-layout">
+
+
+            <!-- =============================================
+                 SIDEBAR
+                 ============================================= -->
+            <aside class="profile-sidebar">
+
+                <div class="sidebar-shell">
+
+                    <div class="user-brief-card">
+
+                        <div class="user-avatar-circle">
+                            <i class="fa-solid fa-user"></i>
+                        </div>
+
+                        <div class="user-brief-info">
+                            <span class="greeting">
+                                Customer Account
+                            </span>
+
+                            <h3>
+                                My DesiMall
+                            </h3>
+                        </div>
+
+                    </div>
+
+
+                    <ul class="sidebar-menu">
+
+                        <li>
+                            <a
+                                href="profile.html"
+                                class="active"
+                            >
+                                <i class="fa-solid fa-user-pen"></i>
+                                Profile Information
+                            </a>
+                        </li>
+
+                        <li>
+                            <a href="address-book.html">
+                                <i class="fa-solid fa-location-dot"></i>
+                                Address Book
+                            </a>
+                        </li>
+
+                        <li>
+                            <a href="my-orders.html">
+                                <i class="fa-solid fa-box-open"></i>
+                                My Orders
+                            </a>
+                        </li>
+
+                        <li>
+                            <a href="returns.html">
+                                <i class="fa-solid fa-rotate-left"></i>
+                                Returns & Refunds
+                            </a>
+                        </li>
+
+                        <li>
+                            <a href="notifications.html">
+                                <i class="fa-solid fa-bell"></i>
+                                Notifications
+                            </a>
+                        </li>
+
+                        <li>
+                            <a href="support.html">
+                                <i class="fa-solid fa-headset"></i>
+                                Help & Support
+                            </a>
+                        </li>
+
+                        <li class="sidebar-divider"></li>
+
+                        <li>
+                            <button
+                                type="button"
+                                class="btn-logout-sidebar"
+                                id="btnLogoutSidebar"
+                            >
+                                <i class="fa-solid fa-arrow-right-from-bracket"></i>
+                                Logout
+                            </button>
+                        </li>
+
+                    </ul>
+
+                </div>
+
+            </aside>
+
+
+            <!-- =============================================
+                 CONTENT
+                 ============================================= -->
+            <section class="profile-content">
+
+
+                <div
+                    id="profileAlert"
+                    class="profile-alert hidden"
+                ></div>
+
+
+                <!-- =========================================
+                     PERSONAL INFORMATION
+                     ========================================= -->
+                <section class="profile-card">
+
+                    <div class="profile-card-header">
+
+                        <div class="section-heading">
+
+                            <span class="section-icon">
+                                <i class="fa-solid fa-address-card"></i>
+                            </span>
+
+                            <div>
+                                <h2>
+                                    Personal Information
+                                </h2>
+
+                                <p>
+                                    Manage your basic account details
+                                </p>
+                            </div>
+
+                        </div>
+
+
+                        <button
+                            type="button"
+                            class="btn-edit-toggle"
+                            id="btnEditProfile"
+                        >
+                            <i class="fa-solid fa-pen"></i>
+                            Edit Profile
+                        </button>
+
+                    </div>
+
+
+                    <div class="profile-card-body">
+
+                        <form
+                            id="profileForm"
+                            class="profile-form"
+                        >
+
+                            <!-- Avatar -->
+                            <div class="identity-area">
+
+                                <div
+                                    class="avatar-preview"
+                                    id="avatarPreview"
+                                >
+                                    <i class="fa-solid fa-user"></i>
+                                </div>
+
+
+                                <div class="identity-copy">
+
+                                    <h3>
+                                        Profile Photo
+                                    </h3>
+
+                                    <p>
+                                        Your profile image is visible
+                                        only inside your DesiMall account.
+                                    </p>
+
+
+                                    <div
+                                        class="avatar-controls hidden"
+                                        id="avatarControls"
+                                    >
+
+                                        <label
+                                            for="avatarInput"
+                                            class="btn-avatar-upload"
+                                        >
+                                            <i class="fa-solid fa-camera"></i>
+                                            Change Photo
+                                        </label>
+
+                                        <input
+                                            type="file"
+                                            id="avatarInput"
+                                            accept="image/*"
+                                            class="hidden"
+                                        >
+
+                                    </div>
+
+                                </div>
+
+                            </div>
+
+
+                            <!-- Fields -->
+                            <div class="form-grid">
+
+
+                                <div class="input-group">
+
+                                    <label for="profileName">
+                                        <i class="fa-regular fa-user"></i>
+                                        Full Name
+                                    </label>
+
+                                    <input
+                                        type="text"
+                                        id="profileName"
+                                        disabled
+                                        required
+                                    >
+
+                                </div>
+
+
+                                <div class="input-group">
+
+                                    <label for="profileMobile">
+                                        <i class="fa-solid fa-mobile-screen"></i>
+                                        Mobile Number
+                                    </label>
+
+                                    <input
+                                        type="tel"
+                                        id="profileMobile"
+                                        maxlength="10"
+                                        disabled
+                                        required
+                                    >
+
+                                </div>
+
+
+                                <div class="input-group full-width">
+
+                                    <label for="profileEmail">
+                                        <i class="fa-regular fa-envelope"></i>
+                                        Email Address
+                                    </label>
+
+                                    <input
+                                        type="email"
+                                        id="profileEmail"
+                                        disabled
+                                        required
+                                    >
+
+                                </div>
+
+                            </div>
+
+
+                            <div
+                                class="form-actions hidden"
+                                id="profileFormActions"
+                            >
+
+                                <button
+                                    type="submit"
+                                    class="btn-save-profile"
+                                >
+                                    <i class="fa-solid fa-check"></i>
+                                    Save Changes
+                                </button>
+
+
+                                <button
+                                    type="button"
+                                    class="btn-cancel-profile"
+                                    id="btnCancelEdit"
+                                >
+                                    Cancel
+                                </button>
+
+                            </div>
+
+                        </form>
+
+                    </div>
+
+                </section>
+
+
+                <!-- =========================================
+                     SECURITY
+                     ========================================= -->
+                <section class="profile-card">
+
+                    <div class="profile-card-header">
+
+                        <div class="section-heading">
+
+                            <span class="section-icon">
+                                <i class="fa-solid fa-shield-halved"></i>
+                            </span>
+
+                            <div>
+
+                                <h2>
+                                    Security & Password
+                                </h2>
+
+                                <p>
+                                    Keep your DesiMall account secure
+                                </p>
+
+                            </div>
+
+                        </div>
+
+                    </div>
+
+
+                    <div class="profile-card-body">
+
+                        <div class="security-note">
+
+                            <i class="fa-solid fa-circle-info"></i>
+
+                            <div>
+                                Use a strong password that you do not
+                                use on other websites.
+                            </div>
+
+                        </div>
+
+
+                        <form
+                            id="passwordForm"
+                            class="profile-form"
+                        >
+
+                            <div class="form-grid">
+
+
+                                <div class="input-group">
+
+                                    <label for="currPassword">
+                                        Current Password
+                                    </label>
+
+                                    <input
+                                        type="password"
+                                        id="currPassword"
+                                        placeholder="Enter current password"
+                                        autocomplete="current-password"
+                                    >
+
+                                </div>
+
+
+                                <div class="input-group">
+
+                                    <label for="newPassword">
+                                        New Password
+                                    </label>
+
+                                    <input
+                                        type="password"
+                                        id="newPassword"
+                                        placeholder="Enter new password"
+                                        autocomplete="new-password"
+                                    >
+
+                                </div>
+
+
+                                <div class="input-group full-width">
+
+                                    <label for="confirmNewPassword">
+                                        Confirm New Password
+                                    </label>
+
+                                    <input
+                                        type="password"
+                                        id="confirmNewPassword"
+                                        placeholder="Re-enter new password"
+                                        autocomplete="new-password"
+                                    >
+
+                                </div>
+
+                            </div>
+
+
+                            <div class="security-actions">
+
+                                <button
+                                    type="submit"
+                                    class="btn-update-password"
+                                >
+                                    <i class="fa-solid fa-lock"></i>
+                                    Update Password
+                                </button>
+
+                            </div>
+
+                        </form>
+
+                    </div>
+
+                </section>
+
+
+            </section>
+
+        </div>
+
+    </main>
+
+
+    <footer class="profile-footer">
+        © 2026 DesiMall · Powered by Riddhi Rithvi Traders (RRT)
+    </footer>
+
+
+    <!-- =====================================================
+         EXISTING SCRIPTS — FUNCTIONALITY PRESERVED
+         ===================================================== -->
+
+    <script src="../js/auth.js"></script>
+    <script src="../js/cart.js"></script>
+    <script src="../js/profile.js"></script>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            DesiMallProfileApp.initProfilePage();
+        });
+    </script>
+
+    <script src="../js/pwa.js"></script>
+    <script src="../js/ui-preferences.js"></script>
+    <script src="../js/analytics.js"></script>
+
+
+<nav class="account-mobile-nav" aria-label="Customer navigation">
+  <a href="../index.html"><i class="fa-solid fa-house"></i><span>Home</span></a>
+  <a href="../index.html#productSection"><i class="fa-solid fa-magnifying-glass"></i><span>Search</span></a>
+  <a href="my-orders.html"><i class="fa-solid fa-box"></i><span>Orders</span></a>
+  <a href="cart.html"><i class="fa-solid fa-cart-shopping"></i><span>Cart</span></a>
+  <a href="profile.html" class="active"><i class="fa-solid fa-user"></i><span>Account</span></a>
+</nav>
+
+  <script src="../js/customer-footer.js?v=0.29.4"></script>
+</body>
+</html>

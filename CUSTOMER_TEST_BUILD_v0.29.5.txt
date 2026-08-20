@@ -1,0 +1,26 @@
+DESIMALL CUSTOMER TEST BUILD v0.29.5
+
+Source baseline: DesiMall_CustomerPreTestCleanup_v0.29.4_FULL(1).zip
+Purpose: Customer public HTTPS test deployment.
+Backend: existing https://desimall-backend.onrender.com
+Database: existing Supabase project.
+
+UPLOAD RULE:
+Extract this ZIP first, then upload the CONTENTS of this folder to the root of GitHub repository desimall-customer.
+Do NOT upload this ZIP itself as the website.
+
+Included:
+- Customer index/home and customer pages
+- Customer CSS/JS dependencies
+- Assets, manifest, service worker, offline page
+- Seller login bridge only because Customer footer currently contains 'Become a seller'
+
+Excluded:
+- Admin panel
+- Rider panel
+- Seller operational panel pages
+- Backend/server.js
+- SQL migrations
+- Historical change-note files
+
+Version note: v0.29.5 is a deployment/test-package version. Existing backend /health source remains 0.29.3 unless a backend change is separately required.

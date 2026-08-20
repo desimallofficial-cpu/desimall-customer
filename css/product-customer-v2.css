@@ -1,0 +1,17 @@
+/* DesiMall customer PDP v0.17.1 */
+.customer-pdp-info{display:flex;flex-direction:column;gap:15px}
+.pdp-badges{display:flex;gap:7px;flex-wrap:wrap;min-height:0}
+.customer-pdp-info .product-main-title{font-size:30px;line-height:1.18;margin:7px 0 8px}
+.customer-pdp-info .product-brand-tag{background:#24364d;color:#c4d4e8;border-radius:7px;padding:5px 8px;font-size:11px;font-weight:800}
+.customer-pdp-info .product-rating-meta{display:flex;align-items:center;gap:10px}
+.customer-pdp-info .review-count{color:#9fb0c5;font-size:12px}
+.pdp-delivery-card{display:flex;align-items:center;justify-content:space-between;gap:16px;padding:13px 15px;border:1px solid #31445c;border-radius:12px;background:#132033}
+.pdp-delivery-card>div{display:flex;align-items:center;gap:11px;min-width:0}.pdp-delivery-card i{color:#ff6b00}.pdp-delivery-card span{display:flex;flex-direction:column;min-width:0}.pdp-delivery-card small{color:#8fa2b8;font-size:10px}.pdp-delivery-card strong{white-space:nowrap;overflow:hidden;text-overflow:ellipsis;font-size:13px}.pdp-delivery-card a{color:#ff7b20;text-decoration:none;font-weight:800;font-size:12px}
+.customer-seller-row{display:flex!important;justify-content:space-between!important;gap:15px!important;align-items:center!important}.customer-seller-row .seller-info{display:flex;flex-direction:column}.customer-seller-row .seller-info small{color:#91a4b9;font-size:10px}.customer-seller-row .seller-info strong{font-size:14px}
+.customer-options{background:#111c2a;border:1px solid #2c3f56;border-radius:13px;padding:13px}.customer-options .hidden{display:none!important}
+.text-color-btn{border:1px solid #405570;background:#1d2b3d;color:#dbe6f3;border-radius:9px;padding:8px 11px;cursor:pointer}.text-color-btn.active{border-color:#ff6b00;background:#3d2a1c;color:#fff}
+.pdp-special-actions{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:9px}.pdp-special{border:1px solid #3b4d66;background:#16263a;color:#fff;border-radius:12px;padding:11px 13px;display:flex;align-items:center;text-align:left;gap:10px;cursor:pointer}.pdp-special.hidden{display:none}.pdp-special>i{color:#ff8b38;font-size:18px}.pdp-special span{display:flex;flex-direction:column}.pdp-special small{font-size:10px;color:#9db0c5;margin-top:2px}
+.customer-pdp-actions{display:grid!important;grid-template-columns:1fr 1fr 48px!important;gap:9px!important}.customer-pdp-actions .btn-action{min-height:49px!important;border-radius:11px!important}.customer-pdp-actions .btn-add-cart{background:#ff6b00!important;border-color:#ff6b00!important}.customer-pdp-actions .btn-buy-now{background:#253951!important;border:1px solid #415875!important;color:#fff!important}.customer-pdp-actions button:disabled{opacity:.45;cursor:not-allowed}
+.pdp-help-row{border-top:1px solid #2c3d53;padding-top:12px}.pdp-help-row a{color:#a9bbcf;text-decoration:none;font-size:12px}.pdp-help-row i{color:#ff6b00;margin-right:5px}
+.related-product-card a{display:flex!important;flex-direction:column!important;height:100%!important;text-decoration:none!important}.related-product-card small{color:#94a7bc;margin-top:5px}
+@media(max-width:760px){.customer-pdp-info .product-main-title{font-size:24px}.pdp-special-actions{grid-template-columns:1fr}.customer-pdp-actions{grid-template-columns:1fr 1fr 44px!important}}

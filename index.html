@@ -1,0 +1,199 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Shop fashion, footwear, electronics and daily essentials on DesiMall — Bharat Ka Apna Shopping Mall.">
+  <meta name="theme-color" content="#ff6b00">
+  <title>DesiMall | Bharat Ka Apna Shopping Mall</title>
+  <link rel="preconnect" href="https://cdnjs.cloudflare.com">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+  <link rel="stylesheet" href="css/style.css">
+    <link rel="manifest" href="manifest.webmanifest">
+  <meta name="referrer" content="strict-origin-when-cross-origin">
+  <link rel="stylesheet" href="css/global-theme.css">
+  <link rel="stylesheet" href="css/customer-shell.css?v=0.20.0">
+  <link rel="stylesheet" href="css/customer-marketplace-v2.css?v=0.20.0">
+  <link rel="stylesheet" href="css/customer-footer.css?v=0.29.4">
+</head>
+<body>
+  <header class="customer-header">
+    <div class="container customer-header-main">
+      <a class="customer-brand" href="index.html" aria-label="DesiMall home">
+        <span class="customer-brand-icon"><i class="fa-solid fa-store"></i></span>
+        <span class="customer-brand-name"><b>Desi</b>Mall</span>
+      </a>
+
+      <a class="delivery-location desktop-location" href="pages/address-book.html" title="Change delivery location">
+        <i class="fa-solid fa-location-dot"></i>
+        <span><small>Delivering to</small><strong id="deliveryLocationText">Set location</strong></span>
+        <i class="fa-solid fa-chevron-down location-chevron"></i>
+      </a>
+
+      <form class="customer-search" id="searchForm" role="search">
+        <i class="fa-solid fa-magnifying-glass search-leading-icon"></i>
+        <input id="searchInput" type="search" placeholder="Search products, food or services" autocomplete="off" aria-label="Search DesiMall">
+        <button type="submit" aria-label="Search"><i class="fa-solid fa-arrow-right"></i></button>
+        <div class="search-results-dropdown hidden" id="searchResults"></div>
+      </form>
+
+      <nav class="customer-header-actions" aria-label="Customer navigation">
+        <a class="customer-action" id="userAuthLink" href="pages/login.html">
+          <i class="fa-regular fa-user"></i><span>Account</span>
+        </a>
+        <a class="customer-action" href="pages/my-orders.html">
+          <i class="fa-solid fa-box"></i><span>Orders</span>
+        </a>
+        <a class="customer-action" href="pages/cart.html">
+          <i class="fa-solid fa-cart-shopping"></i><span>Cart</span><b class="badge" id="cartBadge">0</b>
+        </a>
+      </nav>
+    </div>
+
+    <div class="container mobile-location-row">
+      <a href="pages/address-book.html">
+        <i class="fa-solid fa-location-dot"></i>
+        <span>Delivering to: <strong id="mobileDeliveryLocationText">Set location</strong></span>
+        <i class="fa-solid fa-chevron-right"></i>
+      </a>
+    </div>
+  </header>
+
+  <main class="customer-home">
+    <section class="container service-strip-wrap" aria-label="DesiMall services">
+      <div class="service-strip">
+        <button class="service-tab active" type="button" data-service="marketplace">
+          <span class="service-icon"><i class="fa-solid fa-bag-shopping"></i></span>
+          <span><strong>DesiMall</strong><small>Shop everything</small></span>
+        </button>
+        <a class="service-tab" href="pages/tez.html" data-service="tez">
+          <span class="service-icon"><i class="fa-solid fa-bolt"></i></span>
+          <span><strong>Tez</strong><small>Daily needs fast</small></span>
+          <em>Live</em>
+        </a>
+        <button class="service-tab" type="button" data-service="food">
+          <span class="service-icon"><i class="fa-solid fa-utensils"></i></span>
+          <span><strong>Food</strong><small>Restaurants</small></span>
+          <em>Soon</em>
+        </button>
+        <button class="service-tab" type="button" data-service="services">
+          <span class="service-icon"><i class="fa-solid fa-screwdriver-wrench"></i></span>
+          <span><strong>Services</strong><small>Home help</small></span>
+          <em>Soon</em>
+        </button>
+        <button class="service-tab" type="button" data-service="tryon">
+          <span class="service-icon"><i class="fa-solid fa-shirt"></i></span>
+          <span><strong>Try-On</strong><small>Try at home</small></span>
+          <em>Soon</em>
+        </button>
+      </div>
+    </section>
+
+    <section class="container hero-section" aria-label="Featured offers">
+      <div class="banner-slider-container">
+        <div class="slider-wrapper" id="sliderWrapper"></div>
+        <button class="slider-control prev" id="prevSlide" aria-label="Previous banner"><i class="fa-solid fa-chevron-left"></i></button>
+        <button class="slider-control next" id="nextSlide" aria-label="Next banner"><i class="fa-solid fa-chevron-right"></i></button>
+        <div class="slider-dots" id="sliderDots"></div>
+      </div>
+    </section>
+
+    <section class="container section-container" id="categoriesSection">
+      <div class="section-header">
+        <div><span class="eyebrow">EXPLORE</span><h2>Shop by category</h2></div>
+        <button class="view-all-link" type="button" onclick="DesiMallApp.clearFilters()">View all</button>
+      </div>
+      <div class="category-grid" id="categoryContainer" aria-live="polite"></div>
+    </section>
+
+    <!-- Future vertical extension points.
+         Kept hidden until their real backend/workflows are implemented. -->
+    <section class="container future-vertical hidden" id="tezSection" data-module-ready="false">
+      <div class="future-heading"><span><i class="fa-solid fa-bolt"></i> Need it quickly?</span><h2>DesiMall Tez</h2></div>
+      <div id="tezProducts"></div>
+    </section>
+
+    <section class="container future-vertical hidden" id="foodSection" data-module-ready="false">
+      <div class="future-heading"><span><i class="fa-solid fa-utensils"></i> Hungry?</span><h2>Nearby restaurants</h2></div>
+      <div id="restaurantResults"></div>
+    </section>
+
+    <section class="container future-vertical hidden" id="servicesSection" data-module-ready="false">
+      <div class="future-heading"><span><i class="fa-solid fa-screwdriver-wrench"></i> Need help at home?</span><h2>Popular services</h2></div>
+      <div id="serviceResults"></div>
+    </section>
+
+    <section class="container future-vertical hidden" id="tryOnSection" data-module-ready="false">
+      <div class="future-heading"><span><i class="fa-solid fa-shirt"></i> Try before you keep</span><h2>Try-On eligible products</h2></div>
+      <div id="tryOnProducts"></div>
+    </section>
+
+    <section class="container section-container deal-section hidden" id="flashSaleSection">
+      <div class="section-header product-heading-row"><div><span class="eyebrow"><i class="fa-solid fa-bolt"></i> LIMITED TIME</span><h2>Flash Sale</h2></div><div class="flash-countdown" id="storeFlashCountdown"></div></div>
+      <div class="products-grid" id="flashSaleProducts"></div>
+    </section>
+    <section class="container section-container deal-section hidden" id="featuredSection">
+      <div class="section-header"><div><span class="eyebrow"><i class="fa-solid fa-star"></i> ADMIN PICKS</span><h2>Featured Products</h2></div></div>
+      <div class="products-grid" id="featuredProducts"></div>
+    </section>
+    <section class="container section-container products-section" id="productsSection">
+      <div class="section-header product-heading-row">
+        <div><span class="eyebrow">NEAR YOU</span><h2 id="productSectionTitle">Popular near you</h2></div>
+        <div class="product-tools">
+          <span id="productCount">0 products</span>
+          <select id="sortProducts" aria-label="Sort products">
+            <option value="featured">Featured</option>
+            <option value="price-low">Price: Low to High</option>
+            <option value="price-high">Price: High to Low</option>
+            <option value="rating">Top Rated</option>
+          </select>
+        </div>
+      </div>
+      <div class="products-grid" id="productsContainer" aria-live="polite"></div>
+      <div class="empty-state hidden" id="emptyState">
+        <i class="fa-solid fa-box-open"></i><h3>No products found</h3><p>Try another search or category.</p><button onclick="DesiMallApp.clearFilters()">Show all products</button>
+      </div>
+    </section>
+  </main>
+
+  <footer class="site-footer">
+    <div class="container footer-grid">
+      <div class="footer-about"><a class="footer-brand" href="index.html"><i class="fa-solid fa-store"></i> DesiMall</a><p>India-focused shopping with simple discovery, trusted service and value-driven products.</p><div class="social-links"><a href="#" aria-label="Facebook"><i class="fa-brands fa-facebook-f"></i></a><a href="#" aria-label="Instagram"><i class="fa-brands fa-instagram"></i></a><a href="#" aria-label="YouTube"><i class="fa-brands fa-youtube"></i></a><a href="#" aria-label="WhatsApp"><i class="fa-brands fa-whatsapp"></i></a></div></div>
+      <div><h3>Quick links</h3><a href="index.html">Home</a><a href="#categoriesSection">Categories</a><a href="pages/my-orders.html">My orders</a><a href="pages/track-order.html">Track order</a><a href="pages/profile.html">Profile</a><a href="pages/notifications.html">Notifications</a></div>
+      <div><h3>Customer care</h3><a href="pages/support.html">Help &amp; Support</a><a href="pages/return-policy.html">Return policy</a><a href="pages/privacy-policy.html">Privacy policy</a><a href="pages/terms.html">Terms & conditions</a><a href="seller/login.html">Become a seller</a></div>
+      <div><h3>Contact</h3><p><i class="fa-solid fa-location-dot"></i> Paliganj, Patna, Bihar</p><p><i class="fa-solid fa-envelope"></i> desimall.official@gmail.com</p><p><i class="fa-solid fa-phone"></i> +91 70509 41669</p></div>
+    </div>
+    <div class="footer-bottom"><div class="container"><span>© 2026 DesiMall. All rights reserved.</span><strong>Founder &amp; Developed by Suraj Kumar</strong></div></div>
+  </footer>
+
+  <nav class="mobile-bottom-nav" aria-label="Mobile customer navigation">
+    <a href="index.html" class="active"><i class="fa-solid fa-house"></i><span>Home</span></a>
+    <button type="button" id="mobileSearchButton"><i class="fa-solid fa-magnifying-glass"></i><span>Search</span></button>
+    <a href="pages/my-orders.html"><i class="fa-solid fa-box"></i><span>Orders</span></a>
+    <a href="pages/cart.html"><i class="fa-solid fa-cart-shopping"></i><span>Cart</span><b id="mobileCartBadge">0</b></a>
+    <a href="pages/profile.html"><i class="fa-solid fa-user"></i><span>Account</span></a>
+  </nav>
+
+  <div class="module-sheet-backdrop hidden" id="moduleSheetBackdrop" aria-hidden="true">
+    <section class="module-sheet" role="dialog" aria-modal="true" aria-labelledby="moduleSheetTitle">
+      <button type="button" class="module-sheet-close" id="moduleSheetClose" aria-label="Close"><i class="fa-solid fa-xmark"></i></button>
+      <div class="module-sheet-icon" id="moduleSheetIcon"><i class="fa-solid fa-bolt"></i></div>
+      <h2 id="moduleSheetTitle">Coming soon</h2>
+      <p id="moduleSheetText">This DesiMall service is being prepared.</p>
+      <button type="button" class="module-sheet-primary" id="moduleSheetOkay">Continue shopping</button>
+    </section>
+  </div>
+
+  <div class="toast" id="toast" role="status" aria-live="polite"><i class="fa-solid fa-circle-check"></i><span id="toastMessage">Done</span></div>
+  <script src="js/auth.js"></script>
+    <script src="js/api.js"></script>
+  <script src="js/app.js?v=0.21.2"></script>
+  <script src="js/customer-shell.js?v=0.20.0"></script>
+    <script src="js/voice-search.js"></script>
+    <script src="js/pwa.js"></script>
+  <script src="js/ui-preferences.js"></script>
+  <script src="js/analytics.js"></script>
+  <script src="js/product-image-resolver.js?v=0.21.3"></script>
+  <script src="js/customer-footer.js?v=0.29.4"></script>
+</body>
+</html>

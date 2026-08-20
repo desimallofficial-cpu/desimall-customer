@@ -1,0 +1,177 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="theme-color" content="#ff6b00">
+    <title>Shopping Cart - Desi Mall</title>
+
+    <link rel="stylesheet" href="../css/style.css">
+    <link rel="stylesheet" href="../css/cart.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="manifest" href="../manifest.webmanifest">
+  <meta name="referrer" content="strict-origin-when-cross-origin">
+  <link rel="stylesheet" href="../css/global-theme.css">
+<style>
+.cart-architecture-note{display:flex;gap:12px;align-items:flex-start;padding:14px 16px;margin-bottom:14px;border:1px solid #31445c;border-radius:12px;background:#142135;color:#e8eef7}
+.cart-architecture-note i{color:#ff6b00;margin-top:3px}.cart-architecture-note div{display:flex;flex-direction:column;gap:3px}.cart-architecture-note span{font-size:12px;color:#9fb0c4;line-height:1.45}
+.product-add-btn:disabled{opacity:.55;cursor:not-allowed}
+</style>
+
+<style id="cartV022">
+.cart-seller-group{border:1px solid #2e4057;border-radius:16px;overflow:hidden;margin-bottom:14px;background:#142033}
+.cart-seller-head{display:flex;justify-content:space-between;align-items:center;padding:11px 14px;background:#18273a;border-bottom:1px solid #2e4057}
+.cart-seller-head>div{display:flex;align-items:center;gap:7px}.cart-seller-head i{color:#ff6b00}.cart-seller-head span,.cart-seller-head small{font-size:10px;color:#91a4bb}.cart-seller-head strong{font-size:12px}.cart-seller-items .cart-item-card{border:0;border-bottom:1px solid #2a3b51;border-radius:0;margin:0}.cart-seller-items .cart-item-card:last-child{border-bottom:0}.cart-low-stock{display:block;color:#ff9c59;margin-top:5px;font-weight:800}
+#btnCheckout{display:flex!important;align-items:center;justify-content:center;gap:12px}#btnCheckout span{padding-left:10px;border-left:1px solid rgba(255,255,255,.35)}
+</style>
+
+<style id="tezCartV026">
+.cart-tez-badge{display:inline-flex;align-items:center;gap:4px;margin-left:6px;padding:3px 6px;border-radius:999px;background:rgba(255,101,0,.14);color:#ff7a1a;font-size:8px;font-weight:900}
+.cart-fulfilment-note{margin-bottom:10px;padding:9px 10px;border:1px solid #35513f;border-radius:9px;background:#142d21;color:#bce9cc;font-size:9px;line-height:1.45}
+.cart-fulfilment-note.warning{border-color:#76502a;background:#362719;color:#ffd0a8}
+</style>
+
+  <link rel="stylesheet" href="../css/customer-footer.css?v=0.29.4">
+</head>
+<body>
+
+    <!-- STICKY NAVBAR HEADER -->
+    <header class="navbar-header" role="banner">
+        <div class="header-container">
+            <!-- Brand Logo -->
+            <a href="../index.html" class="logo" aria-label="Desi Mall Homepage">
+                <span class="logo-orange">Desi</span><span class="logo-dark">Mall</span>
+            </a>
+
+            <!-- Search Bar -->
+            <div class="search-wrapper" role="search">
+                <input type="text" id="searchInput" placeholder="Search for products, categories..." autocomplete="off">
+                <button type="button" id="searchBtn">
+                    <i class="fa-solid fa-magnifying-glass"></i>
+                </button>
+            </div>
+
+            <!-- Navigation Actions FIXED -->
+            <nav class="nav-actions" aria-label="User navigation">
+                <a href="profile.html" class="nav-item" id="userAuthLink" title="My Profile">
+                    <i class="fa-regular fa-user"></i>
+                    <span>Profile</span>
+                </a>
+                <a href="my-orders.html" class="nav-item" title="View My Orders">
+                    <i class="fa-solid fa-box-archive"></i>
+                    <span>Orders</span>
+                </a>
+                <a href="support.html" class="nav-item" title="Help & Support">
+                    <i class="fa-solid fa-headset"></i>
+                    <span>Support</span>
+                </a>
+                <a href="cart.html" class="nav-item active" title="View Shopping Cart">
+                    <i class="fa-solid fa-cart-shopping"></i>
+                    <span>Cart</span>
+                    <span class="badge" id="cartBadge">0</span>
+                </a>
+            </nav>
+        </div>
+    </header>
+
+    <!-- MAIN CART CONTENT -->
+    <main class="main-layout" role="main">
+
+        <!-- Breadcrumb Navigation -->
+        <nav class="breadcrumb-container" aria-label="Breadcrumb">
+            <ul class="breadcrumb">
+                <li><a href="../index.html">Home</a></li>
+                <li class="active">Shopping Cart</li>
+            </ul>
+        </nav>
+
+        <h1 class="page-title">My Shopping Cart (<span id="cartItemCount">0</span>)</h1>
+
+        <!-- CART MAIN CONTAINER -->
+        <div class="cart-container" id="cartMainContainer">
+            <div class="cart-items-section" id="cartItemsList"></div>
+
+            <div class="cart-summary-section" id="cartSummaryBox">
+                <div class="cart-architecture-note">
+                    <i class="fa-solid fa-store"></i>
+                    <div>
+                        <strong>One cart, seller-wise fulfillment</strong>
+                        <span>Different sellers may prepare or deliver items separately, but you checkout once.</span>
+                    </div>
+                </div>
+                <div class="summary-card">
+                    <h2 class="summary-title">Price Details</h2>
+                    <hr class="divider">
+
+                    <div class="summary-row">
+                        <span>Price (<span id="summaryTotalItems">0</span> items)</span>
+                        <span id="summaryMRP">₹0</span>
+                    </div>
+
+                    <div class="summary-row text-green">
+                        <span>Discount</span>
+                        <span id="summaryDiscount">- ₹0</span>
+                    </div>
+
+                    <div class="summary-row delivery-row">
+                        <span>Delivery Charge</span>
+                        <span id="summaryDelivery">Calculated at checkout</span>
+                    </div>
+
+                    <hr class="divider">
+
+                    <div class="summary-row grand-total">
+                        <span>Total Amount</span>
+                        <span id="summaryGrandTotal">₹0</span>
+                    </div>
+
+                    <div class="savings-badge" id="savingsBadge">
+                        You will save <strong id="summaryTotalSavings">₹0</strong> on this order
+                    </div>
+
+                    <button type="button" class="btn-checkout" id="btnCheckout">
+                        <i class="fa-solid fa-bolt"></i> PROCEED TO CHECKOUT
+                    </button>
+                </div>
+
+                <div class="trust-footer">
+                    <i class="fa-solid fa-shield-halved"></i> Safe and Secure Payments. 100% Authentic Products.
+                </div>
+            </div>
+        </div>
+
+        <!-- EMPTY CART STATE -->
+        <div class="empty-cart-container hidden" id="emptyCartState">
+            <div class="empty-cart-card">
+                <div class="empty-cart-icon">
+                    <i class="fa-solid fa-cart-flatbed-suitcase"></i>
+                </div>
+                <h2>Your Cart is Empty!</h2>
+                <p>Explore our wide range of products and add your favorite items to the cart.</p>
+                <a href="../index.html" class="btn-continue-shopping">
+                    <i class="fa-solid fa-arrow-left"></i> Continue Shopping
+                </a>
+            </div>
+        </div>
+
+    </main>
+
+    <!-- FOOTER -->
+    <footer class="footer" role="contentinfo">
+        <div class="footer-bottom">
+            <p>Founder &amp; Developed by Suraj Kumar</p>
+        </div>
+    </footer>
+
+    <!-- Core Scripts -->
+    <script src="../js/auth.js"></script>
+    <script src="../js/api.js"></script>
+    <script src="../js/cart.js?v=0.26.0"></script>
+    <script src="../js/cartpage.js?v=0.26.0"></script>
+    <script src="../js/pwa.js"></script>
+  <script src="../js/ui-preferences.js"></script>
+  <script src="../js/analytics.js"></script>
+  <script src="../js/product-image-resolver.js?v=0.21.3"></script>
+  <script src="../js/customer-footer.js?v=0.29.4"></script>
+</body>
+</html>

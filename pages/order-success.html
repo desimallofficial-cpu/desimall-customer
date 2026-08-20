@@ -1,0 +1,251 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="theme-color" content="#ff6b00">
+    <title>Order Confirmed - Desi Mall</title>
+
+    <!-- SEO Meta -->
+    <meta name="description" content="Your order has been placed successfully on Desi Mall.">
+    <meta name="author" content="Desi Mall Team">
+
+    <!-- Stylesheets -->
+    <link rel="stylesheet" href="../css/style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <style>
+        :root {
+            --success-bg: #f5f7fb;
+            --success-card: #ffffff;
+            --success-text: #172033;
+            --success-muted: #667085;
+            --success-border: #e4e7ec;
+            --success-soft: #fff3eb;
+            --success-shadow: 0 16px 45px rgba(15, 23, 42, 0.12);
+        }
+
+        html[data-theme="dark"] {
+            --success-bg: #11151b;
+            --success-card: #1c222b;
+            --success-text: #f4f6f8;
+            --success-muted: #aeb7c3;
+            --success-border: #36404d;
+            --success-soft: #3a2418;
+            --success-shadow: 0 18px 50px rgba(0, 0, 0, 0.34);
+        }
+
+        body {
+            min-height: 100vh;
+            background: var(--success-bg);
+            color: var(--success-text);
+            display: flex;
+            flex-direction: column;
+        }
+
+        .navbar-header {
+            background: var(--success-card);
+            border-bottom: 1px solid var(--success-border);
+            box-shadow: 0 3px 14px rgba(15, 23, 42, 0.08);
+        }
+
+        .header-container {
+            width: min(100% - 32px, 1200px);
+            margin: 0 auto;
+            padding: 16px 0;
+        }
+
+        .logo {
+            display: inline-flex;
+            align-items: center;
+            text-decoration: none;
+            font-size: 28px;
+            font-weight: 900;
+        }
+
+        .logo-orange { color: #ff6b00; }
+        .logo-dark { color: var(--success-text); }
+
+        .main-layout {
+            flex: 1;
+            width: min(100% - 32px, 1200px);
+            margin: 0 auto;
+            padding: 46px 0 54px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+        }
+
+        .success-card {
+            width: min(100%, 620px);
+            margin: 0 auto;
+            padding: 46px 34px;
+            text-align: center;
+            background: var(--success-card);
+            color: var(--success-text);
+            border: 1px solid var(--success-border);
+            border-radius: 20px;
+            box-shadow: var(--success-shadow);
+        }
+
+        .success-icon {
+            width: 82px;
+            height: 82px;
+            margin: 0 auto 20px;
+            border-radius: 50%;
+            display: grid;
+            place-items: center;
+            background: rgba(21, 128, 61, 0.12);
+            color: #15803d;
+            font-size: 68px;
+        }
+
+        .success-card h1 {
+            margin: 0 0 8px;
+            color: var(--success-text);
+            font-size: clamp(24px, 3vw, 32px);
+            font-weight: 900;
+        }
+
+        .delivery-meta {
+            margin: 0;
+            color: var(--success-muted);
+            font-size: 14px;
+            line-height: 1.75;
+        }
+
+        .delivery-meta strong {
+            color: var(--success-text) !important;
+        }
+
+        .order-id-box {
+            display: inline-block;
+            margin: 22px 0;
+            padding: 12px 18px;
+            border: 1px dashed #ff6b00;
+            border-radius: 10px;
+            background: var(--success-soft);
+            color: #ff6b00;
+            font-size: 17px;
+            font-weight: 900;
+        }
+
+        .btn-continue {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 9px;
+            margin-top: 26px;
+            padding: 13px 26px;
+            border-radius: 11px;
+            background: #ff6b00;
+            color: #ffffff;
+            text-decoration: none;
+            font-size: 15px;
+            font-weight: 900;
+            transition: transform .2s ease, background .2s ease;
+        }
+
+        .btn-continue:hover {
+            background: #e85d00;
+            transform: translateY(-1px);
+        }
+
+        .track-order-wrap {
+            padding: 22px 0 0;
+            text-align: center;
+        }
+
+        .track-order-link {
+            color: #ff6b00;
+            text-decoration: none;
+            font-weight: 900;
+        }
+
+        .footer {
+            margin-top: auto;
+            padding: 18px 0;
+            background: #1b1f26;
+            color: #cbd5e1;
+            text-align: center;
+        }
+
+        .footer-bottom { margin: 0; padding: 0; border: 0; }
+
+        @media (max-width: 600px) {
+            .header-container,
+            .main-layout {
+                width: min(100% - 20px, 1200px);
+            }
+
+            .main-layout { padding: 28px 0 38px; }
+            .success-card { padding: 34px 18px; border-radius: 16px; }
+            .success-icon { width: 72px; height: 72px; font-size: 58px; }
+            .btn-continue { width: 100%; }
+        }
+    </style>
+    <link rel="manifest" href="../manifest.webmanifest">
+  <meta name="referrer" content="strict-origin-when-cross-origin">
+  <link rel="stylesheet" href="../css/global-theme.css">
+  <link rel="stylesheet" href="../css/customer-footer.css?v=0.29.4">
+</head>
+<body>
+
+    <!-- STICKY HEADER -->
+    <header class="navbar-header" role="banner">
+        <div class="header-container">
+            <!-- Brand Logo -->
+            <a href="../index.html" class="logo">
+                <span class="logo-orange">Desi</span><span class="logo-dark">Mall</span>
+            </a>
+        </div>
+    </header>
+
+    <!-- SUCCESS CONTENT -->
+    <main class="main-layout">
+        <div class="success-card">
+            <div class="success-icon">
+                <i class="fa-solid fa-circle-check"></i>
+            </div>
+            <h1>Order Placed Successfully!</h1>
+            <p class="delivery-meta">Thank you for shopping with Desi Mall.</p>
+
+            <div class="order-id-box">
+                Order ID: <span id="displayOrderId">DM-XXXXXX</span>
+            </div>
+
+            <p class="delivery-meta">
+                Estimated Delivery: <strong id="displayDeliveryDate">3 - 5 Business Days</strong><br>
+                Payment Method: <strong id="displayPayment">Cash on Delivery</strong>
+            </p>
+
+            <a href="../index.html" class="btn-continue">
+                <i class="fa-solid fa-house"></i> Continue Shopping
+            </a>
+        </div>
+    <div class="track-order-wrap"><a href="track-order.html" class="track-order-link"><i class="fa-solid fa-truck-fast"></i> Track an order</a></div>
+</main>
+
+    <!-- FOOTER -->
+    <footer class="footer">
+        <div class="footer-bottom">
+            <p>&copy; 2026 DesiMallDemo. All Rights Reserved.</p>
+        </div>
+    </footer>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const lastOrder = JSON.parse(localStorage.getItem('desimall_last_order'));
+            if (lastOrder) {
+                document.getElementById('displayOrderId').textContent = lastOrder.OrderID;
+                document.getElementById('displayPayment').textContent = lastOrder.PaymentMethod;
+            }
+        });
+    </script>
+    <script src="../js/auth.js"></script>
+        <script src="../js/pwa.js"></script>
+  <script src="../js/ui-preferences.js"></script>
+  <script src="../js/analytics.js"></script>
+  <script src="../js/customer-footer.js?v=0.29.4"></script>
+</body>
+</html>

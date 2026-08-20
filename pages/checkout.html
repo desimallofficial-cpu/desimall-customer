@@ -1,0 +1,474 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="theme-color" content="#ff6500">
+  <meta name="referrer" content="strict-origin-when-cross-origin">
+  <title>Secure Checkout - DesiMall</title>
+
+  <link rel="stylesheet" href="../css/style.css">
+  <link rel="stylesheet" href="../css/global-theme.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <link rel="manifest" href="../manifest.webmanifest">
+
+  <style>
+    :root {
+      --ck-orange:#ff6500;
+      --ck-orange-soft:#fff3e8;
+      --ck-bg:#f5f7fa;
+      --ck-card:#fff;
+      --ck-card2:#f8fafc;
+      --ck-text:#20242a;
+      --ck-muted:#697386;
+      --ck-border:#e5e9ef;
+      --ck-green:#15803d;
+      --ck-red:#c62828;
+      --ck-shadow:0 8px 28px rgba(24,39,75,.08);
+    }
+    html[data-theme="dark"] {
+      --ck-bg:#11151b;
+      --ck-card:#1c222b;
+      --ck-card2:#242b35;
+      --ck-text:#f3f5f7;
+      --ck-muted:#aeb7c3;
+      --ck-border:#36404d;
+      --ck-orange-soft:rgba(255,101,0,.14);
+      --ck-green:#86efac;
+      --ck-red:#fda4af;
+      --ck-shadow:0 10px 30px rgba(0,0,0,.26);
+    }
+    *{box-sizing:border-box}
+    body{margin:0;background:var(--ck-bg)!important;color:var(--ck-text)}
+    .ck-header{position:sticky;top:0;z-index:1000;background:var(--ck-card);border-bottom:1px solid var(--ck-border)}
+    .ck-head-inner{width:min(1200px,calc(100% - 32px));min-height:72px;margin:auto;display:flex;align-items:center;justify-content:space-between}
+    .ck-logo{text-decoration:none;font-size:27px;font-weight:900;color:var(--ck-text)}
+    .ck-logo b{color:var(--ck-orange)}
+    .ck-nav{display:flex;gap:8px}
+    .ck-nav a{position:relative;min-width:58px;padding:7px 9px;border-radius:11px;color:var(--ck-muted);text-decoration:none;text-align:center;font-size:11px}
+    .ck-nav a i{display:block;font-size:19px;margin-bottom:3px}
+    .ck-nav a:hover{color:var(--ck-orange);background:var(--ck-orange-soft)}
+    .ck-nav .badge{position:absolute;top:1px;right:5px;background:#e11d48;color:#fff;border-radius:99px;min-width:17px;height:17px;display:grid;place-items:center;font-size:9px}
+    .ck-main{width:min(1200px,calc(100% - 32px));margin:auto;padding:28px 0 50px}
+    .ck-bread{display:flex;gap:8px;align-items:center;color:var(--ck-muted);font-size:12px;margin-bottom:18px}
+    .ck-bread a{color:inherit;text-decoration:none}
+    .ck-title{display:flex;align-items:center;gap:10px;margin:0 0 22px;font-size:25px}
+    .ck-title i{color:var(--ck-orange)}
+    .checkout-alert{padding:13px 15px;margin-bottom:16px;border:1px solid #fecaca;border-radius:11px;background:#fff1f2;color:#b91c1c;font-size:13px;font-weight:700}
+    .checkout-alert.success{background:#ecfdf3;border-color:#bbf7d0;color:#15803d}
+    html[data-theme="dark"] .checkout-alert{background:rgba(190,24,93,.14);border-color:rgba(251,113,133,.28);color:var(--ck-red)}
+    .hidden{display:none!important}
+    .ck-grid{display:grid;grid-template-columns:minmax(0,1.45fr) minmax(320px,.75fr);gap:22px;align-items:start}
+    .ck-stack{display:flex;flex-direction:column;gap:18px}
+    .ck-card{background:var(--ck-card);border:1px solid var(--ck-border);border-radius:18px;box-shadow:var(--ck-shadow);overflow:hidden}
+    .ck-card-head{padding:19px 21px;border-bottom:1px solid var(--ck-border);display:flex;align-items:center;justify-content:space-between;gap:12px}
+    .ck-head-title{display:flex;align-items:center;gap:11px}
+    .ck-step{width:34px;height:34px;border-radius:10px;background:var(--ck-orange-soft);color:var(--ck-orange);display:grid;place-items:center;font-weight:900}
+    .ck-head-title h2{margin:0;font-size:17px}
+    .ck-head-title p{margin:3px 0 0;color:var(--ck-muted);font-size:11px}
+    .ck-manage{color:var(--ck-orange);text-decoration:none;font-size:11px;font-weight:800}
+    .ck-card-body{padding:20px}
+    #checkoutAddressList{display:grid;gap:12px}
+    .co-address{position:relative;display:flex;gap:13px;padding:15px;border:1px solid var(--ck-border);border-radius:13px;background:var(--ck-card2);cursor:pointer;transition:.18s}
+    .co-address.selected{border:1.5px solid var(--ck-orange);background:var(--ck-orange-soft)}
+    .co-address input{position:absolute;opacity:0;pointer-events:none}
+    .co-address-radio{width:18px;height:18px;flex:0 0 18px;margin-top:2px;border:2px solid #a8b0bb;border-radius:50%;position:relative}
+    .co-address.selected .co-address-radio{border-color:var(--ck-orange)}
+    .co-address.selected .co-address-radio:after{content:"";position:absolute;inset:3px;border-radius:50%;background:var(--ck-orange)}
+    .co-address-copy{min-width:0}
+    .co-address-title{display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:5px}
+    .co-address-title strong{font-size:14px;color:var(--ck-text)}
+    .co-address-title span{padding:3px 6px;border-radius:99px;background:var(--ck-orange);color:#fff;font-size:8px;font-weight:900}
+    .co-address-copy p{margin:0;color:var(--ck-muted);font-size:12px;line-height:1.55}
+    .co-address-copy small{display:block;margin-top:7px;color:var(--ck-muted)}
+    .co-address-copy small i{color:var(--ck-orange)}
+    .co-loading,.co-empty{min-height:120px;padding:20px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px;text-align:center;color:var(--ck-muted);border:1px dashed var(--ck-border);border-radius:13px;background:var(--ck-card2)}
+    .co-empty i{font-size:24px;color:var(--ck-orange)}
+    .co-empty strong{color:var(--ck-text)}
+    .co-empty a,.co-empty button{border:0;border-radius:9px;padding:9px 12px;background:var(--ck-orange);color:#fff;text-decoration:none;font:inherit;font-size:11px;font-weight:800;cursor:pointer}
+    .payment-box{padding:15px;border:1.5px solid var(--ck-orange);border-radius:13px;background:var(--ck-orange-soft);display:flex;align-items:flex-start;gap:12px}
+    .payment-box i{color:var(--ck-orange);font-size:21px}
+    .payment-box strong{display:block;margin-bottom:4px}
+    .payment-box span{color:var(--ck-muted);font-size:12px}
+    .summary-card{position:sticky;top:94px}
+    .co-summary-item{display:grid;grid-template-columns:48px minmax(0,1fr) auto;gap:10px;align-items:center;padding:10px 0;border-bottom:1px solid var(--ck-border)}
+    .co-summary-item img{width:48px;height:48px;border-radius:9px;object-fit:cover;background:var(--ck-card2)}
+    .co-summary-copy{min-width:0}
+    .co-summary-copy strong{display:block;font-size:12px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+    .co-summary-copy span{display:block;margin-top:3px;color:var(--ck-muted);font-size:10px}
+    .co-summary-item>b{font-size:12px}
+    .coupon-box{margin-top:16px}
+    .coupon-input{display:flex;gap:7px}
+    .coupon-input input{min-width:0;flex:1;padding:10px 12px;border:1px solid var(--ck-border);border-radius:10px;background:var(--ck-card2);color:var(--ck-text);outline:none}
+    .coupon-input button{border:0;border-radius:10px;padding:0 13px;background:var(--ck-text);color:var(--ck-card);font-weight:800;cursor:pointer}
+    .coupon-message{min-height:18px;margin-top:6px;font-size:10px;color:var(--ck-muted)}
+    .coupon-message.success{color:var(--ck-green)}
+    .coupon-message.error{color:var(--ck-red)}
+    .available-coupons{display:flex;gap:6px;flex-wrap:wrap;margin-top:7px}
+    .coupon-chip{border:1px solid var(--ck-border);border-radius:9px;padding:6px 8px;background:var(--ck-card2);color:var(--ck-text);cursor:pointer;text-align:left}
+    .coupon-chip strong{display:block;color:var(--ck-orange);font-size:10px}
+    .coupon-chip span{font-size:8px;color:var(--ck-muted)}
+    .sum-list{margin-top:16px;padding-top:14px;border-top:1px solid var(--ck-border)}
+    .sum-row{display:flex;justify-content:space-between;gap:12px;margin:9px 0;color:var(--ck-muted);font-size:12px}
+    .sum-row strong{color:var(--ck-text)}
+    .sum-row.green{color:var(--ck-green)}
+    .sum-total{padding-top:12px;margin-top:12px;border-top:1px solid var(--ck-border);font-size:17px;font-weight:900;color:var(--ck-text)}
+    .place-btn{width:100%;min-height:48px;margin-top:16px;border:0;border-radius:12px;background:linear-gradient(135deg,#ff761b,#ff5b00);color:#fff;font:inherit;font-size:13px;font-weight:900;cursor:pointer;box-shadow:0 8px 20px rgba(255,101,0,.2)}
+    .place-btn:disabled{opacity:.65;cursor:wait}
+    .trust{text-align:center;margin-top:10px;color:var(--ck-muted);font-size:10px}
+    .trust i{color:var(--ck-green)}
+    .ck-footer{text-align:center;padding:24px;color:var(--ck-muted);font-size:11px}
+    @media(max-width:850px){.ck-grid{grid-template-columns:1fr}.summary-card{position:static}}
+    @media(max-width:600px){.ck-head-inner,.ck-main{width:min(100% - 20px,1200px)}.ck-nav a span:not(.badge){display:none}.ck-nav a{min-width:42px}.ck-main{padding-top:18px}.ck-bread{display:none}.ck-title{font-size:21px}.ck-card-head,.ck-card-body{padding:16px}}
+  </style>
+
+<style id="checkoutV022">
+.co-seller-group{border:1px solid #304258;border-radius:12px;overflow:hidden;margin-bottom:10px;background:#142033}.co-seller-label{display:flex;align-items:center;gap:7px;padding:8px 11px;background:#18273a;border-bottom:1px solid #304258;color:#b9c7d8;font-size:10px;font-weight:800}.co-seller-label i{color:#ff6b00}.co-seller-group .co-summary-item{border-bottom:1px solid #28394d}.co-seller-group .co-summary-item:last-child{border-bottom:0}
+.place-btn{font-size:13px!important}.payment-box{border:1px solid #32465f;border-radius:12px;padding:13px}.payment-box>div{display:flex;flex-direction:column;gap:3px}.payment-box span{font-size:10px;color:#91a4b8}
+</style>
+
+<style id="checkoutContrastV023">
+/* Force every checkout surface to use the checkout theme variables.
+   This prevents global-theme/style.css from creating white headers with white text. */
+.ck-card,
+.summary-card{
+  background:var(--ck-card)!important;
+  color:var(--ck-text)!important;
+}
+.ck-card-head{
+  background:var(--ck-card2)!important;
+  color:var(--ck-text)!important;
+  border-bottom-color:var(--ck-border)!important;
+}
+.ck-card-head h1,
+.ck-card-head h2,
+.ck-card-head h3,
+.ck-head-title h2,
+.ck-head-title strong{
+  color:var(--ck-text)!important;
+}
+.ck-card-head p,
+.ck-head-title p{
+  color:var(--ck-muted)!important;
+}
+.ck-card-body{
+  background:var(--ck-card)!important;
+  color:var(--ck-text)!important;
+}
+.ck-step{
+  background:var(--ck-orange-soft)!important;
+  color:var(--ck-orange)!important;
+}
+.co-address{
+  background:var(--ck-card2)!important;
+  color:var(--ck-text)!important;
+}
+.co-address.selected{
+  background:var(--ck-orange-soft)!important;
+}
+.payment-box{
+  background:var(--ck-orange-soft)!important;
+  color:var(--ck-text)!important;
+}
+.payment-box strong{color:var(--ck-text)!important}
+.summary-card .co-seller-group{
+  background:var(--ck-card2)!important;
+  border-color:var(--ck-border)!important;
+}
+.summary-card .co-seller-label{
+  background:color-mix(in srgb,var(--ck-card2) 82%,var(--ck-orange) 18%)!important;
+  color:var(--ck-text)!important;
+  border-color:var(--ck-border)!important;
+}
+.summary-card .co-summary-item{
+  color:var(--ck-text)!important;
+  border-color:var(--ck-border)!important;
+}
+.coupon-input input,
+.coupon-chip{
+  background:var(--ck-card2)!important;
+  color:var(--ck-text)!important;
+}
+.sum-row strong,.sum-total{color:var(--ck-text)!important}
+@supports not (background:color-mix(in srgb,#000,#fff)){
+  .summary-card .co-seller-label{background:var(--ck-card2)!important}
+}
+</style>
+
+
+<style id="checkoutPolishV0231">
+html[data-theme="dark"] .ck-card-head{
+  background:#1d2734!important;
+}
+html[data-theme="dark"] .ck-card-body{
+  background:#151d27!important;
+}
+html[data-theme="dark"] .summary-card{
+  background:#151d27!important;
+}
+html[data-theme="dark"] .co-address{
+  background:#202a37!important;
+}
+html[data-theme="dark"] .co-address.selected{
+  background:#3a241c!important;
+}
+html[data-theme="dark"] .payment-box{
+  background:#3a241c!important;
+  border-color:#7c3f19!important;
+}
+html[data-theme="dark"] .summary-card .co-seller-group{
+  background:#1d2734!important;
+}
+html[data-theme="dark"] .summary-card .co-seller-label{
+  background:#243142!important;
+}
+html[data-theme="dark"] .coupon-input input,
+html[data-theme="dark"] .coupon-chip{
+  background:#202a37!important;
+}
+@media(max-width:850px){
+  .summary-card{order:-1;position:static!important}
+  .ck-grid{grid-template-columns:1fr}
+}
+</style>
+
+
+<style id="tezCheckoutV026">
+.tez-checkout-banner{display:flex;align-items:center;gap:10px;margin:10px 0 14px;padding:11px 13px;border:1px solid #3a6247;border-radius:11px;background:#153222;color:#d4f7df}
+.tez-checkout-banner>i{width:32px;height:32px;border-radius:9px;background:#ff6500;color:#fff;display:grid;place-items:center}
+.tez-checkout-banner strong{display:block;font-size:11px}
+.tez-checkout-banner span{display:block;margin-top:2px;color:#a8d8b8;font-size:9px}
+.checkout-alert:not(.hidden)+.tez-checkout-banner{margin-top:8px}
+</style>
+
+
+<style id="tezCheckoutCopyV0262">
+#tezCheckoutBanner{margin-bottom:14px}
+.ck-card .delivery-option strong,
+.ck-card .payment-box strong{font-weight:900}
+.ck-card .delivery-option i.fa-bolt,
+.ck-card .payment-box i.fa-bolt{color:#ff6500}
+</style>
+
+
+<style id="checkoutSummarySpacingV0263">
+/* Keep right-side prices away from the card edge */
+.summary-card .co-summary-item{
+  padding-right:16px!important;
+}
+.summary-card .co-summary-item > b{
+  min-width:72px;
+  padding-right:4px;
+  text-align:right;
+  white-space:nowrap;
+}
+.summary-card .sum-row,
+.summary-card .sum-total{
+  padding-right:10px;
+}
+.summary-card .sum-row > :last-child,
+.summary-card .sum-total > :last-child{
+  min-width:76px;
+  text-align:right;
+  white-space:nowrap;
+}
+.summary-card{
+  padding-right:2px;
+}
+@media(max-width:900px){
+  .summary-card .co-summary-item{padding-right:12px!important}
+  .summary-card .co-summary-item > b{min-width:66px}
+}
+</style>
+
+  <link rel="stylesheet" href="../css/customer-footer.css?v=0.29.4">
+</head>
+<body>
+
+<header class="ck-header">
+  <div class="ck-head-inner">
+    <a href="../index.html" class="ck-logo"><b>Desi</b>Mall</a>
+
+    <nav class="ck-nav">
+      <a href="profile.html" id="userAuthLink">
+        <i class="fa-solid fa-circle-user"></i>
+        <span>Account</span>
+      </a>
+      <a href="my-orders.html">
+        <i class="fa-solid fa-box"></i>
+        <span>Orders</span>
+      </a>
+      <a href="cart.html">
+        <i class="fa-solid fa-cart-shopping"></i>
+        <span>Cart</span>
+        <span class="badge" id="cartBadge">0</span>
+      </a>
+    </nav>
+  </div>
+</header>
+
+<main class="ck-main">
+  <div class="ck-bread">
+    <a href="../index.html">Home</a>
+    <i class="fa-solid fa-chevron-right"></i>
+    <a href="cart.html">Cart</a>
+    <i class="fa-solid fa-chevron-right"></i>
+    <strong>Checkout</strong>
+  </div>
+
+  <h1 class="ck-title">
+    <i class="fa-solid fa-shield-halved"></i>
+    Secure Checkout
+  </h1>
+
+  <div id="checkoutAlert" class="checkout-alert hidden"></div>
+
+  <div class="ck-grid">
+    <section class="ck-stack">
+
+      <article class="ck-card">
+        <header class="ck-card-head">
+          <div class="ck-head-title">
+            <span class="ck-step">1</span>
+            <div>
+              <h2>Select Delivery Address</h2>
+              <p>Choose one of your saved addresses.</p>
+            </div>
+          </div>
+
+          <a class="ck-manage" href="address-book.html">
+            <i class="fa-solid fa-pen"></i> Manage
+          </a>
+        </header>
+
+        <div class="ck-card-body">
+          <div id="checkoutAddressList"></div>
+        </div>
+      </article>
+
+      <article class="ck-card">
+        <header class="ck-card-head">
+          <div class="ck-head-title">
+            <span class="ck-step">2</span>
+            <div>
+              <h2>Delivery Method</h2>
+              <p>Standard marketplace delivery for this order.</p>
+            </div>
+          </div>
+        </header>
+        <div class="ck-card-body">
+          <div class="payment-box">
+            <i class="fa-solid fa-truck"></i>
+            <div>
+              <strong>Standard Delivery</strong>
+              <span>Delivery charge is calculated once for the whole order.</span>
+            </div>
+          </div>
+        </div>
+      </article>
+
+      <article class="ck-card">
+        <header class="ck-card-head">
+          <div class="ck-head-title">
+            <span class="ck-step">3</span>
+            <div>
+              <h2>Payment Method</h2>
+              <p>Online payment will be enabled in a later phase.</p>
+            </div>
+          </div>
+        </header>
+
+        <div class="ck-card-body">
+          <div class="payment-box">
+            <i class="fa-solid fa-hand-holding-dollar"></i>
+            <div>
+              <strong>Cash on Delivery (COD)</strong>
+              <span>Pay when your order reaches you. No COD fee at launch.</span>
+            </div>
+          </div>
+        </div>
+      </article>
+
+    </section>
+
+    <aside class="ck-card summary-card">
+      <header class="ck-card-head">
+        <div class="ck-head-title">
+          <span class="ck-step"><i class="fa-solid fa-receipt"></i></span>
+          <div>
+            <h2>Order Summary</h2>
+            <p>Prices, stock and delivery are verified before the order is created.</p>
+          </div>
+        </div>
+      </header>
+
+      <div class="ck-card-body">
+        <div id="summaryItemsList"></div>
+
+        <div class="coupon-box">
+          <div class="coupon-input">
+            <input id="couponCode" type="text" placeholder="Coupon code">
+            <button type="button" id="btnApplyCoupon">Apply</button>
+          </div>
+          <div id="couponMessage" class="coupon-message"></div>
+          <div id="availableCoupons" class="available-coupons"></div>
+        </div>
+
+        <div class="sum-list">
+          <div class="sum-row">
+            <span>Total Items</span>
+            <strong id="summaryTotalQty">0</strong>
+          </div>
+          <div class="sum-row">
+            <span>Total MRP</span>
+            <strong id="summaryMRP">₹0</strong>
+          </div>
+          <div class="sum-row green">
+            <span>Product Discount</span>
+            <strong id="summaryDiscount">- ₹0</strong>
+          </div>
+          <div class="sum-row">
+            <span>Delivery <small style="opacity:.65">(once per order)</small></span>
+            <strong id="summaryDelivery">FREE</strong>
+          </div>
+          <div class="sum-row green hidden" id="couponDiscountRow">
+            <span>Coupon Discount</span>
+            <strong id="summaryCouponDiscount">- ₹0</strong>
+          </div>
+          <div class="sum-row sum-total">
+            <span>Estimated Payable</span>
+            <strong id="summaryGrandTotal">₹0</strong>
+          </div>
+        </div>
+
+        <button class="place-btn" type="button" id="btnPlaceOrder">
+          <i class="fa-solid fa-lock"></i>
+          PLACE ORDER
+        </button>
+
+        <div class="trust">
+          <i class="fa-solid fa-shield-halved"></i>
+          Server verifies live price, stock and address ownership before creating the order.
+        </div>
+      </div>
+    </aside>
+  </div>
+</main>
+
+<footer class="ck-footer">
+  © 2026 DesiMall · Powered by Riddhi Rithvi Traders (RRT)
+</footer>
+
+<script src="../js/auth.js"></script>
+<script src="../js/api.js"></script>
+<script src="../js/cart.js?v=0.26.0"></script>
+<script src="../js/coupons.js"></script>
+<script src="../js/product-image-resolver.js?v=0.23.0"></script>
+<script src="../js/checkout.js?v=0.26.3"></script>
+<script src="../js/pwa.js"></script>
+<script src="../js/ui-preferences.js"></script>
+<script src="../js/analytics.js"></script>
+
+  <script src="../js/customer-footer.js?v=0.29.4"></script>
+</body>
+</html>

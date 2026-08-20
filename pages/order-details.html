@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="theme-color" content="#ff6b00">
+    <title>Order Details - Desi Mall</title>
+
+    <link rel="stylesheet" href="../css/style.css">
+    <link rel="stylesheet" href="../css/orders.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="manifest" href="../manifest.webmanifest">
+  <meta name="referrer" content="strict-origin-when-cross-origin">
+  <link rel="stylesheet" href="../css/global-theme.css">
+  <link rel="stylesheet" href="../css/customer-footer.css?v=0.29.4">
+</head>
+<body>
+
+    <!-- STICKY NAVBAR HEADER -->
+    <header class="navbar-header" role="banner">
+        <div class="header-container">
+            <!-- Brand Logo -->
+            <a href="../index.html" class="logo" aria-label="Desi Mall Homepage">
+                <span class="logo-orange">Desi</span><span class="logo-dark">Mall</span>
+            </a>
+
+            <!-- Navigation Actions FIXED -->
+            <nav class="nav-actions" aria-label="User navigation">
+                <a href="profile.html" class="nav-item" id="userAuthLink" title="My Profile">
+                    <i class="fa-regular fa-user"></i>
+                    <span>Profile</span>
+                </a>
+                <a href="my-orders.html" class="nav-item active" title="View My Orders">
+                    <i class="fa-solid fa-box-archive"></i>
+                    <span>Orders</span>
+                </a>
+                <a href="cart.html" class="nav-item" title="View Shopping Cart">
+                    <i class="fa-solid fa-cart-shopping"></i>
+                    <span>Cart</span>
+                    <span class="badge" id="cartBadge">0</span>
+                </a>
+            </nav>
+        </div>
+    </header>
+
+    <!-- MAIN ORDER DETAILS CONTENT -->
+    <main class="main-layout" role="main">
+
+        <!-- Breadcrumb Navigation -->
+        <nav class="breadcrumb-container" aria-label="Breadcrumb">
+            <ul class="breadcrumb">
+                <li><a href="../index.html">Home</a></li>
+                <li><a href="my-orders.html">My Orders</a></li>
+                <li class="active" id="breadcrumbOrderId">Order Details</li>
+            </ul>
+        </nav>
+
+        <div class="details-header-row">
+            <div>
+                <h1 class="page-title" style="margin-bottom:2px;">Order ID: <span id="displayDetailsOrderId">DM-XXXXXX</span></h1>
+                <p class="order-meta-text">Placed on <span id="displayDetailsOrderDate">Date</span></p>
+            </div>
+            <div id="displayDetailsStatusBadge"></div>
+        </div>
+
+        <!-- TIMELINE TRACKER SECTION -->
+        <section class="details-card">
+            <h2 class="card-title"><i class="fa-solid fa-route text-orange"></i> Order Tracking Timeline</h2>
+            <div class="timeline-container" id="timelineContainer">
+                <div class="timeline-step" id="stepPending">
+                    <div class="step-icon"><i class="fa-solid fa-clipboard-list"></i></div>
+                    <div class="step-label">Pending</div>
+                </div>
+                <div class="timeline-line" id="line1"></div>
+                <div class="timeline-step" id="stepConfirmed">
+                    <div class="step-icon"><i class="fa-solid fa-circle-check"></i></div>
+                    <div class="step-label">Confirmed</div>
+                </div>
+                <div class="timeline-line" id="line2"></div>
+                <div class="timeline-step" id="stepPacked">
+                    <div class="step-icon"><i class="fa-solid fa-box"></i></div>
+                    <div class="step-label">Packed</div>
+                </div>
+                <div class="timeline-line" id="line3"></div>
+                <div class="timeline-step" id="stepShipped">
+                    <div class="step-icon"><i class="fa-solid fa-truck"></i></div>
+                    <div class="step-label">Shipped</div>
+                </div>
+                <div class="timeline-line" id="line4"></div>
+                <div class="timeline-step" id="stepDelivered">
+                    <div class="step-icon"><i class="fa-solid fa-house-chimney"></i></div>
+                    <div class="step-label">Delivered</div>
+                </div>
+            </div>
+        </section>
+
+        <!-- DETAILS GRID -->
+        <div class="details-grid">
+            <div class="details-left">
+                <section class="details-card">
+                    <h2 class="card-title"><i class="fa-solid fa-bag-shopping text-orange"></i> Items in this Order</h2>
+                    <div class="details-products-list" id="detailsProductsList"></div>
+                </section>
+            </div>
+
+            <div class="details-right">
+                <section class="details-card">
+                    <h2 class="card-title"><i class="fa-solid fa-location-dot text-orange"></i> Delivery Address</h2>
+                    <div class="address-box" id="detailsAddressBox"></div>
+                </section>
+
+                <section class="details-card">
+                    <h2 class="card-title"><i class="fa-solid fa-receipt text-orange"></i> Payment Details</h2>
+                    <div class="summary-breakdown">
+                        <div class="summary-row">
+                            <span>Payment Method</span>
+                            <strong id="detailsPaymentMethod">COD</strong>
+                        </div>
+                        <div class="summary-row">
+                            <span>Delivery Fee</span>
+                            <span class="text-green">FREE</span>
+                        </div>
+                        <hr class="divider">
+                        <div class="summary-row grand-total">
+                            <span>Total Amount</span>
+                            <span id="detailsGrandTotal">₹0</span>
+                        </div>
+                    </div>
+                </section>
+
+                <div class="details-actions" id="detailsActionsBox"></div>
+            </div>
+        </div>
+
+    <div class="container" style="text-align:center;padding:12px 0 30px"><a href="track-order.html" style="color:#ff6b00;font-weight:800"><i class="fa-solid fa-truck-fast"></i> Track an order</a></div>
+</main>
+
+    <!-- FOOTER -->
+    <footer class="footer" role="contentinfo">
+        <div class="footer-bottom">
+            <p>&copy; 2026 DesiMallDemo. All Rights Reserved.</p>
+        </div>
+    </footer>
+
+    <!-- Core Scripts -->
+    <script src="../js/auth.js"></script>
+    <script src="../js/cart.js"></script>
+    <script src="../js/orders.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            DesiMallOrdersApp.initOrderDetails();
+        });
+    </script>
+    <script src="../js/pwa.js"></script>
+  <script src="../js/ui-preferences.js"></script>
+  <script src="../js/analytics.js"></script>
+  <script src="../js/customer-footer.js?v=0.29.4"></script>
+</body>
+</html>

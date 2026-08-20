@@ -1,0 +1,177 @@
+<!doctype html><html lang="en" data-theme="dark"><head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Help & Support - DesiMall</title>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+<link rel="stylesheet" href="../css/global-theme.css"><link rel="stylesheet" href="../css/support.css?v=0.15.7">
+<style>
+body{margin:0;background:#0e151f;color:#fff;font-family:Arial,sans-serif}.cs-wrap{width:min(1180px,calc(100% - 32px));margin:0 auto;padding:28px 0 60px}.cs-top{display:flex;justify-content:space-between;gap:16px;align-items:center;margin-bottom:20px}.cs-top a{color:#ff6b00;text-decoration:none}.cs-actions{display:flex;gap:10px}.cs-btn{border:0;border-radius:10px;padding:11px 15px;font-weight:800;cursor:pointer;background:#243952;color:#fff}.cs-btn.primary{background:#ff6b00}.cs-grid{display:grid;grid-template-columns:360px 1fr;gap:16px}.cs-card{background:#172538;border:1px solid #31445e;border-radius:14px;padding:16px}.cs-form{display:grid;gap:10px}.cs-form input,.cs-form select,.cs-form textarea{width:100%;box-sizing:border-box;background:#101a28;border:1px solid #3a4e68;border-radius:9px;color:#fff;padding:11px}.ticket-item{cursor:pointer}@media(max-width:800px){.cs-grid{grid-template-columns:1fr}}
+</style>
+<style id="customerSupportFixedNav">
+.customer-support-header{position:sticky;top:0;z-index:1000;background:#1c232d;border-bottom:1px solid #334155}
+.customer-support-header .csh-inner{max-width:1320px;margin:auto;min-height:78px;padding:0 20px;display:flex;align-items:center;justify-content:space-between;gap:24px}
+.customer-support-header .csh-brand{font-size:27px;font-weight:900;color:#fff;text-decoration:none;letter-spacing:-1px}
+.customer-support-header .csh-brand b{color:#ff6800}
+.customer-support-header .csh-nav{display:flex;align-items:stretch;gap:8px}
+.customer-support-header .csh-nav a{min-width:72px;padding:11px 13px;border-radius:13px;text-decoration:none;color:#bcc6d3;display:flex;flex-direction:column;align-items:center;gap:5px;font-size:12px;font-weight:700}
+.customer-support-header .csh-nav a i{font-size:21px}
+.customer-support-header .csh-nav a:hover,.customer-support-header .csh-nav a.active{background:#51301f;color:#ff7a1a}
+@media(max-width:700px){
+ .customer-support-header .csh-inner{min-height:66px;padding:0 12px}
+ .customer-support-header .csh-brand{font-size:22px}
+ .customer-support-header .csh-nav{gap:2px}
+ .customer-support-header .csh-nav a{min-width:54px;padding:9px 6px;font-size:10px}
+ .customer-support-header .csh-nav a i{font-size:18px}
+}
+</style>
+
+
+<style id="customerSupportModalFix">
+/* Customer Support UI v0.15.4
+   New Ticket form stays hidden until the top button is clicked. */
+.modal{
+  position:fixed;
+  inset:0;
+  z-index:2200;
+  display:none;
+  align-items:center;
+  justify-content:center;
+  padding:24px;
+  background:rgba(3,8,15,.76);
+  backdrop-filter:blur(5px);
+}
+.modal.show{display:flex}
+.modal-box{
+  width:min(680px,100%);
+  max-height:calc(100vh - 48px);
+  overflow:auto;
+  background:#172538;
+  border:1px solid #3a4f6b;
+  border-radius:18px;
+  box-shadow:0 24px 80px rgba(0,0,0,.48);
+  padding:22px;
+}
+.modal-head{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:16px;
+  margin-bottom:18px;
+  padding-bottom:14px;
+  border-bottom:1px solid #31445e;
+}
+.modal-head h2{
+  margin:0;
+  font-size:24px;
+  line-height:1.2;
+}
+.close-btn{
+  width:38px;
+  height:38px;
+  border:1px solid #405570;
+  border-radius:10px;
+  background:#243952;
+  color:#fff;
+  font-size:22px;
+  line-height:1;
+  cursor:pointer;
+}
+.close-btn:hover{background:#314964}
+.support-modal .cs-form{
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:12px;
+}
+.support-modal .cs-form textarea,
+.support-modal .cs-form button{
+  grid-column:1/-1;
+}
+.support-modal .cs-form input,
+.support-modal .cs-form select,
+.support-modal .cs-form textarea{
+  min-height:46px;
+  background:#101a28;
+  border:1px solid #3a4e68;
+  border-radius:10px;
+  color:#fff;
+  padding:12px 13px;
+  font:inherit;
+}
+.support-modal .cs-form textarea{
+  min-height:130px;
+  resize:vertical;
+}
+.support-modal .cs-form button{
+  min-height:48px;
+  margin-top:2px;
+}
+.cs-top{
+  padding:20px 22px;
+  background:#172538;
+  border:1px solid #31445e;
+  border-radius:16px;
+}
+.cs-top h1{margin:0 0 7px;font-size:30px}
+.cs-top p{margin:0;color:#aebcd0}
+.cs-actions{flex-shrink:0}
+@media(max-width:700px){
+  .cs-top{align-items:flex-start;flex-direction:column}
+  .cs-actions{width:100%}
+  .cs-actions .cs-btn{flex:1}
+  .support-modal .cs-form{grid-template-columns:1fr}
+  .support-modal .cs-form textarea,
+  .support-modal .cs-form button{grid-column:auto}
+  .modal{padding:12px}
+  .modal-box{max-height:calc(100vh - 24px);padding:17px}
+}
+</style>
+
+
+<style id="supportUiPolish0155">
+/* Visual-only support polish */
+.cs-status,.status-badge,.ticket-status,.badge.status,[class*="status"][class*="badge"]{
+ display:inline-flex!important;align-items:center!important;justify-content:center!important;
+ width:auto!important;min-width:0!important;height:auto!important;min-height:26px!important;
+ padding:5px 11px!important;border-radius:999px!important;line-height:1!important;
+ white-space:nowrap!important;align-self:flex-start!important;flex:0 0 auto!important;
+}
+.cs-detail-head,.ticket-detail-head,.detail-head{align-items:flex-start!important}
+.cs-reply,.reply-row,.reply-box,.ticket-reply{
+ display:flex!important;align-items:stretch!important;gap:10px!important;
+}
+.cs-reply textarea,.reply-row textarea,.reply-box textarea,.ticket-reply textarea{
+ flex:1 1 auto!important;width:auto!important;min-width:0!important;min-height:84px!important;
+ margin:0!important;resize:vertical!important;border-radius:10px!important;
+}
+.cs-reply button,.reply-row button,.reply-box button,.ticket-reply button,
+button[type="submit"].send-btn,.send-btn{
+ position:static!important;right:auto!important;bottom:auto!important;flex:0 0 auto!important;
+ align-self:stretch!important;min-width:86px!important;height:auto!important;margin:0!important;
+ border-radius:10px!important;
+}
+@media(max-width:700px){
+ .cs-reply,.reply-row,.reply-box,.ticket-reply{flex-direction:column!important}
+ .cs-reply button,.reply-row button,.reply-box button,.ticket-reply button,
+ button[type="submit"].send-btn,.send-btn{width:100%!important;min-height:46px!important}
+}
+</style>
+
+  <link rel="stylesheet" href="../css/customer-footer.css?v=0.29.4">
+</head><body>
+
+<header class="customer-support-header">
+  <div class="csh-inner">
+    <a class="csh-brand" href="../index.html"><b>Desi</b>Mall</a>
+    <nav class="csh-nav" aria-label="Customer navigation">
+      <a href="profile.html" title="My Account"><i class="fa-solid fa-circle-user"></i><span>Account</span></a>
+      <a href="my-orders.html" title="My Orders"><i class="fa-solid fa-box"></i><span>Orders</span></a>
+      <a href="support.html" class="active" title="Help & Support"><i class="fa-solid fa-headset"></i><span>Support</span></a>
+      <a href="cart.html" title="Shopping Cart"><i class="fa-solid fa-cart-shopping"></i><span>Cart</span></a>
+    </nav>
+  </div>
+</header>
+<main class="cs-wrap">
+<div class="cs-top"><div><h1>Help & Support</h1><p>Order, payment, return, delivery ya account problem ke liye ticket banayein.</p></div><div class="cs-actions"><button class="cs-btn" id="refreshCustomerSupport">Refresh</button><button class="cs-btn primary" id="newCustomerTicket">New Ticket</button></div></div>
+<section class="cs-grid"><article class="cs-card"><h2>My Tickets</h2><div id="customerTicketList" class="ticket-list"></div></article><article class="cs-card"><div id="customerTicketDetail" class="support-empty"><i class="fa-solid fa-comments"></i><strong>Select a ticket</strong></div></article></section>
+</main>
+<div class="modal" id="customerTicketModal"><div class="modal-box support-modal"><div class="modal-head"><h2>New Support Ticket</h2><button class="close-btn" id="closeCustomerTicket">×</button></div><form id="customerTicketForm" class="cs-form"><select id="customerCategory" required><option value="">Select category</option><option>Order</option><option>Payment / Refund</option><option>Return</option><option>Delivery</option><option>Product</option><option>Account</option><option>Other</option></select><select id="customerPriority"><option>Low</option><option selected>Medium</option><option>High</option><option>Urgent</option></select><input id="customerOrderCode" placeholder="Order ID (optional)"><input id="customerReturnCode" placeholder="Return ID (optional)"><input id="customerSubject" maxlength="160" placeholder="Subject" required><textarea id="customerDescription" rows="6" maxlength="5000" placeholder="Describe the problem" required></textarea><button class="cs-btn primary">Submit Ticket</button></form></div></div>
+<script src="../js/api.js"></script><script src="../js/auth.js"></script><script src="../js/customer-support.js"></script>  <script src="../js/customer-footer.js?v=0.29.4"></script>
+</body></html>
