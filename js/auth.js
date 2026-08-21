@@ -144,6 +144,11 @@ const DesiMallAuth = (() => {
     link.innerHTML = user
       ? `<i class="fa-solid fa-circle-user" aria-hidden="true"></i><span>${escapeHtml((user.Name || 'User').split(' ')[0])}</span>`
       : `<i class="fa-regular fa-user" aria-hidden="true"></i><span>Login</span>`;
+
+    const mobileLink = document.getElementById('mobileAccountLink');
+    const mobileLabel = document.getElementById('mobileAccountLabel');
+    if (mobileLink) mobileLink.href = user ? 'pages/profile.html' : 'pages/login.html';
+    if (mobileLabel) mobileLabel.textContent = user ? (user.Name || 'User').split(' ')[0] : 'Login';
   }
 
   function escapeHtml(value) {

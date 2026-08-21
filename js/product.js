@@ -43,7 +43,7 @@ const ProductDetailsApp={
   updateUser(){
     let u;try{u=JSON.parse(localStorage.getItem('desimall_user'));}catch{}
     const a=document.getElementById('userAuthLink');
-    if(u&&a){a.href='profile.html';a.innerHTML='<i class="fa-solid fa-circle-user"></i><span>Account</span>';}
+    if(a){if(u){const n=u.Name||u.FullName||u.name||'Profile';a.href='profile.html';a.title='My Profile';a.innerHTML=`<i class="fa-solid fa-circle-user"></i><span>${this.esc(String(n).split(' ')[0])}</span>`;}else{a.href='login.html';a.innerHTML='<i class="fa-regular fa-user"></i><span>Login</span>';}}
   },
 
   updateLocation(){

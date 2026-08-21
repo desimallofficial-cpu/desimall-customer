@@ -1,0 +1,16 @@
+DESIMALL CUSTOMER TEST BUILD v0.29.6
+
+Base: Customer Test Build v0.29.5 derived from FULL v0.29.4.
+Release type: Frontend-only customer UI consistency / auth-display cleanup.
+
+Changes:
+- Fixed Login/Signup low-contrast white-screen text by applying a consistent dark auth theme.
+- Password login now clearly labels the field as Email Address; Mobile OTP remains a separate tab.
+- Logged-in customer first name now replaces Account on Home and Product headers.
+- Mobile Home account label also changes to customer first name after login.
+- Order Success now has customer navigation and a View My Orders action.
+- Standardized DesiMall naming on Order Success and removed DesiMallDemo footer text.
+- Service worker cache version bumped so testers receive updated UI files.
+
+Backend/SQL: No changes required.
+Render backend + Supabase remain unchanged.
