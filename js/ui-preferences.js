@@ -26,13 +26,25 @@ const DesiMallUI = (() => {
 
   function addThemeButton() {
     if (document.querySelector('[data-theme-toggle]')) return;
-    const nav = document.querySelector('.nav-actions');
+
+    // New customer shell (Home) and legacy customer pages use different header classes.
+    // Support both so the same persisted theme is available everywhere.
+    const customerNav = document.querySelector('.customer-header-actions');
+    const legacyNav = document.querySelector('.nav-actions');
+    const nav = customerNav || legacyNav;
     if (!nav) return;
+
     const button = document.createElement('button');
     button.type = 'button';
-    button.className = 'nav-item theme-toggle';
     button.dataset.themeToggle = '';
     button.addEventListener('click', toggleTheme);
+
+    if (customerNav) {
+      button.className = 'customer-action customer-theme-toggle';
+    } else {
+      button.className = 'nav-item theme-toggle';
+    }
+
     nav.prepend(button);
     applyTheme(root.dataset.theme || preferredTheme());
   }

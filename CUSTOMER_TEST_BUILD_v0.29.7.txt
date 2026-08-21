@@ -1,0 +1,11 @@
+DesiMall Customer Test Build v0.29.7
+
+Theme consistency cleanup:
+- Light/Dark toggle now works on both new Customer Home header and legacy customer headers.
+- Theme preference persists across pages through localStorage.
+- Added real light-mode styling for Customer Home shell.
+- Added light-mode compatibility for Cart legacy UI.
+- Theme/CSS asset cache-busting bumped to v0.29.7.
+- Service worker cache bumped to v0.29.7.
+
+Backend/Supabase: no change.
