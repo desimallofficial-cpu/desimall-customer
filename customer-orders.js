@@ -187,14 +187,18 @@ const CustomerOrders = {
     const showTrack = !['Delivered','Cancelled'].includes(status);
     const delivered = status === 'Delivered';
 
-    const rawOrderStatus = String(order.Status || order.status || '').toLowerCase();
-    const itemStatuses = items.map(item => String(item.Status || item.status || rawOrderStatus).toLowerCase());
-    const cancellationBlocked = itemStatuses.some(x =>
-      ['picked_up','out_for_delivery','reached_customer','delivered'].includes(x)
-    ) || ['picked_up','out_for_delivery','reached_customer','delivered','cancelled','rejected'].includes(rawOrderStatus);
+    // Use the customer-facing normalized status for button visibility.
+    // The backend remains the final authority and will reject cancellation
+    // if pickup/delivery has already started.
+    const cancellableCustomerStatuses = new Set([
+      'Placed',
+      'Accepted',
+      'Preparing',
+      'Ready for Pickup',
+      'Pickup Assigned'
+    ]);
 
-    const canCancel = !cancellationBlocked &&
-      ['new','accepted','preparing','ready','ready_for_pickup','pickup_assigned'].includes(rawOrderStatus);
+    const canCancel = cancellableCustomerStatuses.has(status);
 
     return `
       <article class="mo-order">
