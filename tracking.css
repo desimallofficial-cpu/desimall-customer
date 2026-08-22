@@ -42,3 +42,76 @@
 #tezLocationUpdated{
   margin-left:auto;
 }
+
+/* ===== DesiMall animated bike tracking v0.31.0 ===== */
+.tez-live-map{
+  position:relative;
+  width:100%;
+  min-height:330px;
+  overflow:hidden;
+  border-radius:14px;
+  background:#e9eef5;
+}
+.tez-live-map .leaflet-control-attribution{
+  font-size:8px;
+}
+.dm-bike-marker-wrap,
+.dm-customer-marker-wrap{
+  background:transparent!important;
+  border:0!important;
+}
+.dm-bike-marker{
+  width:52px;
+  height:52px;
+  position:relative;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  transition:transform .25s ease;
+}
+.dm-bike-circle{
+  position:relative;
+  z-index:3;
+  width:42px;
+  height:42px;
+  border-radius:50%;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  background:#ff6b00;
+  color:#fff;
+  border:3px solid #fff;
+  box-shadow:0 6px 16px rgba(0,0,0,.28);
+  font-size:18px;
+}
+.dm-bike-pulse{
+  position:absolute;
+  inset:4px;
+  border-radius:50%;
+  background:rgba(255,107,0,.28);
+  animation:dmBikePulse 1.8s ease-out infinite;
+}
+@keyframes dmBikePulse{
+  0%{transform:scale(.72);opacity:.9}
+  100%{transform:scale(1.55);opacity:0}
+}
+.dm-customer-marker{
+  width:38px;
+  height:38px;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  border-radius:50% 50% 50% 8px;
+  transform:rotate(-45deg);
+  background:#14213d;
+  color:#fff;
+  border:3px solid #fff;
+  box-shadow:0 6px 16px rgba(0,0,0,.24);
+}
+.dm-customer-marker i{
+  transform:rotate(45deg);
+  font-size:14px;
+}
+#tezLocationUpdated{
+  margin-left:auto;
+}
