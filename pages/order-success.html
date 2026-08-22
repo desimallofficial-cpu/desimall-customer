@@ -261,6 +261,13 @@
             if (lastOrder) {
                 document.getElementById('displayOrderId').textContent = lastOrder.OrderID;
                 document.getElementById('displayPayment').textContent = lastOrder.PaymentMethod;
+                const isTez = Boolean(lastOrder.IsTez || String(lastOrder.FulfillmentMode || '').toLowerCase() === 'tez');
+                if (isTez) {
+                    const max = Math.min(25, Number(lastOrder.DeliveryTargetMaxMinutes || 25));
+                    document.getElementById('displayDeliveryDate').textContent = `Within ${max} minutes`;
+                }
+                const track = document.querySelector('.track-order-link');
+                if (track) track.href = `track-order.html?order=${encodeURIComponent(lastOrder.OrderID)}`;
             }
         });
     </script>

@@ -763,13 +763,37 @@ const DesiMallAPI = {
     );
   },
 
-  // Customer cancellation is intentionally not enabled in this migration stage.
-  cancelOrder() {
-    return Promise.resolve({
-      success: false,
-      code: 'NOT_AVAILABLE',
-      message: 'Customer cancellation is not enabled yet.'
+  async getOrderLiveTracking(orderId) {
+    const token = this._customerAccessToken();
+    if (!token) {
+      const error = new Error('Please login again to track this order.');
+      error.code = 'AUTH_REQUIRED';
+      error.status = 401;
+      throw error;
+    }
+    return this._rest(`/api/v1/orders/${encodeURIComponent(String(orderId || ''))}/live-tracking`, {
+      method: 'GET',
+      token
     });
+  },
+
+  async cancelOrder(orderId, reason = '') {
+    const token = this._customerAccessToken();
+    if (!token) {
+      const error = new Error('Please login again before cancelling this order.');
+      error.code = 'AUTH_REQUIRED';
+      error.status = 401;
+      throw error;
+    }
+
+    return this._rest(
+      `/api/v1/orders/${encodeURIComponent(String(orderId || ''))}/cancel`,
+      {
+        method: 'POST',
+        data: { Reason: reason },
+        token
+      }
+    );
   },
 
   // =========================================================

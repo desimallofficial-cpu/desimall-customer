@@ -1,6 +1,7 @@
 document.addEventListener('DOMContentLoaded', () => TrackingApp.init());
 
 const TrackingApp = {
+  liveTimer: null,
   stages: [
     { key:'placed', label:'Order placed', icon:'fa-receipt' },
     { key:'accepted', label:'Seller accepted', icon:'fa-store' },
@@ -102,6 +103,8 @@ const TrackingApp = {
     const orderedDate = new Date(createdAt);
     const total = Number(order.TotalAmount ?? order.total_amount ?? 0);
     const address = order.DeliveryAddress || order.delivery_address || null;
+    const internalOrderId = order.OrderID || order.id || order.InternalOrderID || '';
+    if (this.liveTimer) { clearInterval(this.liveTimer); this.liveTimer = null; }
 
     const riderName = order.RiderName || order.rider_name || order.AssignedRiderName || '';
     const riderMobile = order.RiderMobile || order.rider_mobile || order.AssignedRiderMobile || '';
@@ -150,6 +153,24 @@ const TrackingApp = {
           </section>
         ` : ''}
 
+        ${isTez ? `
+          <section class="tez-live-panel" id="tezLivePanel">
+            <div class="tez-live-top">
+              <div>
+                <small>TEZ LIVE TRACKING</small>
+                <h3 id="tezLiveEta">Estimated arrival: within 25 min</h3>
+                <p id="tezLiveStatus">Waiting for rider live location…</p>
+              </div>
+              <span class="tez-live-dot" id="tezLiveDot"></span>
+            </div>
+            <iframe id="tezLiveMap" class="tez-live-map" title="Rider live location map" loading="lazy"></iframe>
+            <div class="tez-live-actions">
+              <a id="tezOpenMap" href="#" target="_blank" rel="noopener" hidden><i class="fa-solid fa-map-location-dot"></i> Open map</a>
+              <span id="tezLocationUpdated"></span>
+            </div>
+          </section>
+        ` : ''}
+
         <ol class="tracking-timeline">
           ${this.stages.map((stage,index)=>{
             const complete=index<=Math.max(0,currentIndex);
@@ -174,7 +195,54 @@ const TrackingApp = {
     </article>`;
 
     result.classList.remove('hidden');
+    if (isTez && internalOrderId && !cancelled && currentKey !== 'delivered') {
+      this.startLiveTracking(internalOrderId);
+    }
     DesiMallAnalytics?.track?.('track_order', {orderId: orderCode, status: rawStatus});
+  },
+
+  startLiveTracking(orderId) {
+    const load = () => this.loadLiveTracking(orderId);
+    load();
+    this.liveTimer = setInterval(load, 8000);
+  },
+
+  async loadLiveTracking(orderId) {
+    try {
+      const data = await DesiMallAPI.getOrderLiveTracking(orderId);
+      const eta = Math.max(0, Math.min(25, Number(data?.etaMinutes ?? 25)));
+      const etaEl = document.getElementById('tezLiveEta');
+      const statusEl = document.getElementById('tezLiveStatus');
+      const map = document.getElementById('tezLiveMap');
+      const openMap = document.getElementById('tezOpenMap');
+      const updated = document.getElementById('tezLocationUpdated');
+      const dot = document.getElementById('tezLiveDot');
+
+      if (etaEl) etaEl.textContent = eta > 0 ? `Estimated arrival: about ${eta} min` : 'Promised time reached — rider should arrive now';
+
+      const loc = data?.location;
+      if (!loc || !Number.isFinite(Number(loc.latitude)) || !Number.isFinite(Number(loc.longitude))) {
+        if (statusEl) statusEl.textContent = 'Rider location will appear after assignment and GPS permission.';
+        if (map) map.removeAttribute('src');
+        if (openMap) openMap.hidden = true;
+        if (dot) dot.classList.remove('live');
+        return;
+      }
+
+      const lat = Number(loc.latitude), lon = Number(loc.longitude), delta = 0.006;
+      const bbox = [lon-delta, lat-delta, lon+delta, lat+delta].join(',');
+      const osm = `https://www.openstreetmap.org/export/embed.html?bbox=${encodeURIComponent(bbox)}&layer=mapnik&marker=${encodeURIComponent(lat+','+lon)}`;
+      const mapUrl = `https://www.openstreetmap.org/?mlat=${encodeURIComponent(lat)}&mlon=${encodeURIComponent(lon)}#map=17/${encodeURIComponent(lat)}/${encodeURIComponent(lon)}`;
+
+      if (map) map.src = osm;
+      if (openMap) { openMap.href = mapUrl; openMap.hidden = false; }
+      if (statusEl) statusEl.textContent = data.live ? 'Rider location is live' : 'Showing the rider’s latest available location';
+      if (updated) updated.textContent = loc.ageSeconds == null ? '' : `Updated ${loc.ageSeconds <= 5 ? 'just now' : `${loc.ageSeconds}s ago`}`;
+      if (dot) dot.classList.toggle('live', Boolean(data.live));
+    } catch (error) {
+      const statusEl = document.getElementById('tezLiveStatus');
+      if (statusEl) statusEl.textContent = error?.message || 'Live tracking temporarily unavailable.';
+    }
   },
 
   renderAddress(address) {

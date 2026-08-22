@@ -79,6 +79,11 @@
     .mo-modal-card textarea{min-height:90px;resize:vertical}.mo-modal-actions{display:flex;gap:9px;justify-content:flex-end;margin-top:16px}
     .mo-modal-actions button{border:0;border-radius:9px;padding:10px 13px;font:inherit;font-size:10px;font-weight:900;cursor:pointer}
     .mo-cancel-modal{background:var(--mo-card2);color:var(--mo-text);border:1px solid var(--mo-border)!important}.mo-submit-return{background:var(--mo-orange);color:#fff}
+    .mo-cancel-order{background:transparent;color:var(--mo-red);border:1px solid rgba(190,18,60,.26)!important}
+    .mo-cancel-order:hover{background:rgba(190,18,60,.08)}
+    .mo-danger-confirm{background:var(--mo-red);color:#fff}
+    .mo-modal-warning{padding:10px 12px;border-radius:10px;background:rgba(190,18,60,.08);color:var(--mo-red);font-size:10px;line-height:1.5;margin:8px 0 14px}
+
     .mo-loading,.mo-empty{min-height:210px;padding:30px;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;color:var(--mo-muted);border:1px dashed var(--mo-border);border-radius:16px;background:var(--mo-card)}
     .mo-loading i,.mo-empty>i{font-size:28px;color:var(--mo-orange);margin-bottom:8px}.mo-empty h3{margin:3px 0;color:var(--mo-text)}.mo-empty p{font-size:11px}.mo-empty a,.mo-empty button{border:0;border-radius:9px;padding:10px 13px;background:var(--mo-orange);color:#fff;text-decoration:none;font:inherit;font-size:10px;font-weight:900;cursor:pointer}
     .mo-footer{text-align:center;padding:25px;color:var(--mo-muted);font-size:11px}
@@ -202,6 +207,39 @@
   </section>
 </main>
 
+<div class="mo-modal" id="cancelOrderModal">
+  <div class="mo-modal-card">
+    <h2>Cancel Order</h2>
+    <p id="cancelOrderCode">Order</p>
+
+    <div class="mo-modal-warning">
+      <i class="fa-solid fa-triangle-exclamation"></i>
+      Cancellation is available only before rider pickup/delivery starts.
+    </div>
+
+    <label for="cancelOrderReason">Reason</label>
+    <select id="cancelOrderReason">
+      <option value="">Select a reason</option>
+      <option>Changed my mind</option>
+      <option>Ordered by mistake</option>
+      <option>Need to change delivery address</option>
+      <option>Need to change items / quantity</option>
+      <option>Delivery taking too long</option>
+      <option>Found a better price</option>
+      <option>Other</option>
+    </select>
+
+    <label for="cancelOrderDetails">Details (optional)</label>
+    <textarea id="cancelOrderDetails" placeholder="Add a short note if needed"></textarea>
+
+    <div class="mo-modal-actions">
+      <button type="button" class="mo-cancel-modal" id="closeCancelOrderModal">Keep Order</button>
+      <button type="button" class="mo-danger-confirm" id="confirmCancelOrder">Cancel Order</button>
+    </div>
+  </div>
+</div>
+
+
 <div class="mo-modal" id="returnModal">
   <div class="mo-modal-card">
     <h2>Request a Return</h2>
@@ -244,10 +282,14 @@
 <script src="../js/auth.js"></script>
 <script src="../js/api.js"></script>
   <script src="../js/product-image-resolver.js?v=0.21.3"></script>
-<script src="../js/customer-orders.js?v=0.26.0"></script>
+<script src="../js/customer-orders.js?v=0.30.4"></script>
 <script src="../js/pwa.js"></script>
 <script src="../js/ui-preferences.js?v=0.29.7"></script>
 
   <script src="../js/customer-footer.js?v=0.29.4"></script>
+<script>
+  window.DESIMALL_CUSTOMER_BUILD = 'v0.30.4';
+  console.info('DesiMall Customer build v0.30.4 - Cancel button visible');
+</script>
 </body>
 </html>
