@@ -34,3 +34,11 @@
 .tez-delivery-otp span{display:block;font-size:9px;font-weight:900;letter-spacing:.12em;color:#ff6b00}.tez-delivery-otp strong{display:block;margin:5px 0;font-size:28px;letter-spacing:.18em}.tez-delivery-otp small{color:var(--muted)}
 .tez-delivered-card{display:flex;align-items:center;gap:13px;margin:18px 0;padding:16px;border:1px solid rgba(18,183,106,.28);border-radius:14px;background:rgba(18,183,106,.08)}
 .tez-delivered-card>i{font-size:28px;color:#12b76a}.tez-delivered-card strong{display:block}.tez-delivered-card p{margin:3px 0 0;color:var(--muted)}
+
+/* Tez live ETA v0.30.9 */
+.tez-live-actions{
+  justify-content:flex-end!important;
+}
+#tezLocationUpdated{
+  margin-left:auto;
+}

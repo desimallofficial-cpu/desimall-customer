@@ -2,6 +2,7 @@ document.addEventListener('DOMContentLoaded', () => TrackingApp.init());
 
 const TrackingApp = {
   liveTimer: null,
+  lastDisplayedEta: null,
   stages: [
     { key:'placed', label:'Order placed', icon:'fa-receipt' },
     { key:'accepted', label:'Seller accepted', icon:'fa-store' },
@@ -171,11 +172,7 @@ const TrackingApp = {
             </div>
 
             <iframe id="tezLiveMap" class="tez-live-map hidden" title="Rider live location map" loading="lazy"></iframe>
-
             <div class="tez-live-actions">
-              <a id="tezOpenMap" href="#" target="_blank" rel="noopener" hidden>
-                <i class="fa-solid fa-map-location-dot"></i> Open map
-              </a>
               <span id="tezLocationUpdated"></span>
             </div>
           </section>
@@ -228,10 +225,10 @@ const TrackingApp = {
   async loadLiveTracking(orderId) {
     try {
       const data = await DesiMallAPI.getOrderLiveTracking(orderId);
+
       const etaEl = document.getElementById('tezLiveEta');
       const statusEl = document.getElementById('tezLiveStatus');
       const map = document.getElementById('tezLiveMap');
-      const openMap = document.getElementById('tezOpenMap');
       const updated = document.getElementById('tezLocationUpdated');
       const dot = document.getElementById('tezLiveDot');
       const otpBox = document.getElementById('tezDeliveryOtpBox');
@@ -242,25 +239,51 @@ const TrackingApp = {
           clearInterval(this.liveTimer);
           this.liveTimer = null;
         }
+        this.lastDisplayedEta = null;
         return;
       }
 
       if (!data?.liveTrackingAvailable) {
-        if (etaEl) etaEl.textContent = 'Live tracking starts after rider pickup';
-        if (statusEl) statusEl.textContent = 'Seller is preparing your order / rider is heading to pickup.';
+        this.lastDisplayedEta = null;
+
+        if (etaEl) {
+          etaEl.textContent = 'Live tracking starts after rider pickup';
+        }
+
+        if (statusEl) {
+          statusEl.textContent =
+            'Seller is preparing your order / rider is heading to pickup.';
+        }
+
         if (map) map.classList.add('hidden');
-        if (openMap) openMap.hidden = true;
         if (otpBox) otpBox.classList.add('hidden');
         if (dot) dot.classList.remove('live');
+        if (updated) updated.textContent = '';
+
         return;
       }
 
-      const eta = Math.max(0, Math.min(25, Number(data?.etaMinutes ?? 25)));
+      let eta = Math.max(
+        1,
+        Math.min(25, Number(data?.etaMinutes ?? 25))
+      );
+
+      // Customer should see ETA reducing as rider gets closer.
+      // Small GPS jumps must not make the displayed ETA go backwards/up.
+      if (
+        Number.isFinite(this.lastDisplayedEta) &&
+        eta > this.lastDisplayedEta
+      ) {
+        eta = this.lastDisplayedEta;
+      }
+
+      this.lastDisplayedEta = eta;
 
       if (etaEl) {
-        etaEl.textContent = eta > 0
-          ? `Estimated arrival: about ${eta} min`
-          : 'Rider should arrive now';
+        etaEl.textContent =
+          eta <= 1
+            ? 'Rider is almost there'
+            : `Estimated arrival: about ${eta} min`;
       }
 
       if (otpBox && otpEl && data?.deliveryOtp) {
@@ -270,47 +293,81 @@ const TrackingApp = {
 
       const loc = data?.location;
 
-      if (!loc || !Number.isFinite(Number(loc.latitude)) || !Number.isFinite(Number(loc.longitude))) {
-        if (statusEl) statusEl.textContent = 'Rider picked up your order. Waiting for live GPS signal…';
+      if (
+        !loc ||
+        !Number.isFinite(Number(loc.latitude)) ||
+        !Number.isFinite(Number(loc.longitude))
+      ) {
+        if (statusEl) {
+          statusEl.textContent =
+            'Rider picked up your order. Waiting for live GPS signal…';
+        }
+
         if (map) map.classList.add('hidden');
-        if (openMap) openMap.hidden = true;
         if (dot) dot.classList.remove('live');
+
         return;
       }
 
       const lat = Number(loc.latitude);
       const lon = Number(loc.longitude);
       const delta = 0.006;
-      const bbox = [lon-delta, lat-delta, lon+delta, lat+delta].join(',');
-      const osm = `https://www.openstreetmap.org/export/embed.html?bbox=${encodeURIComponent(bbox)}&layer=mapnik&marker=${encodeURIComponent(lat+','+lon)}`;
-      const mapUrl = `https://www.openstreetmap.org/?mlat=${encodeURIComponent(lat)}&mlon=${encodeURIComponent(lon)}#map=17/${encodeURIComponent(lat)}/${encodeURIComponent(lon)}`;
+      const bbox = [
+        lon - delta,
+        lat - delta,
+        lon + delta,
+        lat + delta
+      ].join(',');
+
+      const osm =
+        `https://www.openstreetmap.org/export/embed.html?bbox=${encodeURIComponent(bbox)}` +
+        `&layer=mapnik&marker=${encodeURIComponent(lat + ',' + lon)}`;
 
       if (map) {
         map.src = osm;
         map.classList.remove('hidden');
       }
 
-      if (openMap) {
-        openMap.href = mapUrl;
-        openMap.hidden = false;
-      }
-
       if (statusEl) {
-        statusEl.textContent = data.live
-          ? 'Rider location is live'
-          : 'Showing rider’s latest available location';
+        const distance = Number(data?.distanceKm);
+
+        if (Number.isFinite(distance)) {
+          statusEl.textContent =
+            distance < 0.15
+              ? 'Rider is very close to your delivery location'
+              : distance < 1
+                ? `Rider is about ${Math.round(distance * 1000)} m away`
+                : `Rider is about ${distance.toFixed(1)} km away`;
+        } else {
+          statusEl.textContent =
+            data.live
+              ? 'Rider location is live'
+              : 'Showing rider’s latest available location';
+        }
       }
 
       if (updated) {
-        updated.textContent = loc.ageSeconds == null
-          ? ''
-          : `Updated ${loc.ageSeconds <= 5 ? 'just now' : `${loc.ageSeconds}s ago`}`;
+        updated.textContent =
+          loc.ageSeconds == null
+            ? ''
+            : `Updated ${
+                loc.ageSeconds <= 5
+                  ? 'just now'
+                  : `${loc.ageSeconds}s ago`
+              }`;
       }
 
-      if (dot) dot.classList.toggle('live', Boolean(data.live));
+      if (dot) {
+        dot.classList.toggle('live', Boolean(data.live));
+      }
     } catch (error) {
       const statusEl = document.getElementById('tezLiveStatus');
-      if (statusEl) statusEl.textContent = error?.message || 'Live tracking temporarily unavailable.';
+
+      if (statusEl) {
+        statusEl.textContent =
+          error?.message ||
+          'Live tracking temporarily unavailable.';
+      }
     }
   },
 
