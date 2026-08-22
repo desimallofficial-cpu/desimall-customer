@@ -1,7 +1,14 @@
+// DesiMall Tracking v0.31.2
 document.addEventListener('DOMContentLoaded', () => TrackingApp.init());
 
 const TrackingApp = {
   liveTimer: null,
+  lastDisplayedEta: null,
+  tezMap: null,
+  riderMarker: null,
+  customerMarker: null,
+  riderMarkerLatLng: null,
+  markerAnimFrame: null,
   stages: [
     { key:'placed', label:'Order placed', icon:'fa-receipt' },
     { key:'accepted', label:'Seller accepted', icon:'fa-store' },
@@ -153,20 +160,34 @@ const TrackingApp = {
           </section>
         ` : ''}
 
-        ${isTez ? `
+        ${isTez && !cancelled && currentKey !== 'delivered' ? `
           <section class="tez-live-panel" id="tezLivePanel">
             <div class="tez-live-top">
               <div>
-                <small>TEZ LIVE TRACKING</small>
-                <h3 id="tezLiveEta">Estimated arrival: within 25 min</h3>
-                <p id="tezLiveStatus">Waiting for rider live location…</p>
+                <small>TEZ DELIVERY</small>
+                <h3 id="tezLiveEta">Checking delivery status…</h3>
+                <p id="tezLiveStatus">Live tracking starts after rider pickup.</p>
               </div>
               <span class="tez-live-dot" id="tezLiveDot"></span>
             </div>
-            <iframe id="tezLiveMap" class="tez-live-map" title="Rider live location map" loading="lazy"></iframe>
+
+            <div class="tez-delivery-otp hidden" id="tezDeliveryOtpBox">
+              <span>DELIVERY OTP</span>
+              <strong id="tezDeliveryOtp">------</strong>
+              <small>Order receive karne ke baad hi rider ko OTP batayein.</small>
+            </div>
+
+            <div id="tezLiveMap" class="tez-live-map hidden" aria-label="Rider live location map"></div>
             <div class="tez-live-actions">
-              <a id="tezOpenMap" href="#" target="_blank" rel="noopener" hidden><i class="fa-solid fa-map-location-dot"></i> Open map</a>
               <span id="tezLocationUpdated"></span>
+            </div>
+          </section>
+        ` : currentKey === 'delivered' && isTez ? `
+          <section class="tez-delivered-card">
+            <i class="fa-solid fa-circle-check"></i>
+            <div>
+              <strong>Tez order delivered</strong>
+              <p>Delivery OTP verified. Rider live location has been stopped.</p>
             </div>
           </section>
         ` : ''}
@@ -207,41 +228,312 @@ const TrackingApp = {
     this.liveTimer = setInterval(load, 8000);
   },
 
+  ensureTezMap() {
+    const el = document.getElementById('tezLiveMap');
+    if (!el || typeof L === 'undefined') return null;
+
+    if (!this.tezMap) {
+      this.tezMap = L.map(el, {
+        zoomControl: true,
+        attributionControl: true
+      });
+
+      L.tileLayer(
+        'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',
+        {
+          maxZoom: 19,
+          attribution: '&copy; OpenStreetMap contributors'
+        }
+      ).addTo(this.tezMap);
+
+      setTimeout(() => {
+        try { this.tezMap.invalidateSize(); } catch (_) {}
+      }, 80);
+    }
+
+    return this.tezMap;
+  },
+
+  bikeIcon(heading = 0) {
+    const safeHeading = Number.isFinite(Number(heading)) ? Number(heading) : 0;
+
+    return L.divIcon({
+      className: 'dm-bike-marker-wrap',
+      html: `
+        <div class="dm-bike-marker" style="transform:rotate(${safeHeading}deg)">
+          <div class="dm-bike-pulse"></div>
+          <div class="dm-bike-circle">
+            <i class="fa-solid fa-motorcycle"></i>
+          </div>
+        </div>
+      `,
+      iconSize: [52, 52],
+      iconAnchor: [26, 26]
+    });
+  },
+
+  customerIcon() {
+    return L.divIcon({
+      className: 'dm-customer-marker-wrap',
+      html: `
+        <div class="dm-customer-marker">
+          <i class="fa-solid fa-house"></i>
+        </div>
+      `,
+      iconSize: [38, 38],
+      iconAnchor: [19, 34]
+    });
+  },
+
+  animateRiderMarker(nextLat, nextLon, heading = 0) {
+    const map = this.ensureTezMap();
+    if (!map) return;
+
+    const target = L.latLng(Number(nextLat), Number(nextLon));
+
+    if (!this.riderMarker) {
+      this.riderMarker = L.marker(target, {
+        icon: this.bikeIcon(heading),
+        zIndexOffset: 1000
+      }).addTo(map);
+
+      this.riderMarkerLatLng = target;
+      map.setView(target, 16);
+      return;
+    }
+
+    if (this.markerAnimFrame) {
+      cancelAnimationFrame(this.markerAnimFrame);
+      this.markerAnimFrame = null;
+    }
+
+    const start = this.riderMarker.getLatLng();
+    const startTime = performance.now();
+    const duration = 3500;
+
+    this.riderMarker.setIcon(this.bikeIcon(heading));
+
+    const step = (now) => {
+      const progress = Math.min(1, (now - startTime) / duration);
+      const eased = progress < 0.5
+        ? 2 * progress * progress
+        : 1 - Math.pow(-2 * progress + 2, 2) / 2;
+
+      const lat = start.lat + (target.lat - start.lat) * eased;
+      const lng = start.lng + (target.lng - start.lng) * eased;
+
+      this.riderMarker.setLatLng([lat, lng]);
+      this.riderMarkerLatLng = L.latLng(lat, lng);
+
+      if (progress < 1) {
+        this.markerAnimFrame = requestAnimationFrame(step);
+      } else {
+        this.markerAnimFrame = null;
+        this.riderMarkerLatLng = target;
+      }
+    };
+
+    this.markerAnimFrame = requestAnimationFrame(step);
+  },
+
+  updateCustomerMarker(destination) {
+    const map = this.ensureTezMap();
+    if (!map || !destination) return;
+
+    const lat = Number(destination.latitude);
+    const lon = Number(destination.longitude);
+
+    if (!Number.isFinite(lat) || !Number.isFinite(lon)) return;
+
+    if (!this.customerMarker) {
+      this.customerMarker = L.marker([lat, lon], {
+        icon: this.customerIcon(),
+        zIndexOffset: 500
+      }).addTo(map);
+    } else {
+      this.customerMarker.setLatLng([lat, lon]);
+    }
+  },
+
+  fitTezMap(riderLat, riderLon, destination) {
+    const map = this.ensureTezMap();
+    if (!map) return;
+
+    const points = [];
+
+    if (Number.isFinite(Number(riderLat)) && Number.isFinite(Number(riderLon))) {
+      points.push([Number(riderLat), Number(riderLon)]);
+    }
+
+    if (
+      destination &&
+      Number.isFinite(Number(destination.latitude)) &&
+      Number.isFinite(Number(destination.longitude))
+    ) {
+      points.push([
+        Number(destination.latitude),
+        Number(destination.longitude)
+      ]);
+    }
+
+    if (points.length >= 2) {
+      map.fitBounds(points, {
+        padding: [50, 50],
+        maxZoom: 16
+      });
+    } else if (points.length === 1) {
+      map.setView(points[0], 16);
+    }
+
+    setTimeout(() => {
+      try { map.invalidateSize(); } catch (_) {}
+    }, 50);
+  },
+
   async loadLiveTracking(orderId) {
     try {
       const data = await DesiMallAPI.getOrderLiveTracking(orderId);
-      const eta = Math.max(0, Math.min(25, Number(data?.etaMinutes ?? 25)));
+
       const etaEl = document.getElementById('tezLiveEta');
       const statusEl = document.getElementById('tezLiveStatus');
-      const map = document.getElementById('tezLiveMap');
-      const openMap = document.getElementById('tezOpenMap');
+      const mapEl = document.getElementById('tezLiveMap');
       const updated = document.getElementById('tezLocationUpdated');
       const dot = document.getElementById('tezLiveDot');
+      const otpBox = document.getElementById('tezDeliveryOtpBox');
+      const otpEl = document.getElementById('tezDeliveryOtp');
 
-      if (etaEl) etaEl.textContent = eta > 0 ? `Estimated arrival: about ${eta} min` : 'Promised time reached — rider should arrive now';
+      if (data?.delivered) {
+        if (this.liveTimer) {
+          clearInterval(this.liveTimer);
+          this.liveTimer = null;
+        }
 
-      const loc = data?.location;
-      if (!loc || !Number.isFinite(Number(loc.latitude)) || !Number.isFinite(Number(loc.longitude))) {
-        if (statusEl) statusEl.textContent = 'Rider location will appear after assignment and GPS permission.';
-        if (map) map.removeAttribute('src');
-        if (openMap) openMap.hidden = true;
-        if (dot) dot.classList.remove('live');
+        if (this.markerAnimFrame) {
+          cancelAnimationFrame(this.markerAnimFrame);
+          this.markerAnimFrame = null;
+        }
+
+        this.lastDisplayedEta = null;
         return;
       }
 
-      const lat = Number(loc.latitude), lon = Number(loc.longitude), delta = 0.006;
-      const bbox = [lon-delta, lat-delta, lon+delta, lat+delta].join(',');
-      const osm = `https://www.openstreetmap.org/export/embed.html?bbox=${encodeURIComponent(bbox)}&layer=mapnik&marker=${encodeURIComponent(lat+','+lon)}`;
-      const mapUrl = `https://www.openstreetmap.org/?mlat=${encodeURIComponent(lat)}&mlon=${encodeURIComponent(lon)}#map=17/${encodeURIComponent(lat)}/${encodeURIComponent(lon)}`;
+      if (!data?.liveTrackingAvailable) {
+        this.lastDisplayedEta = null;
 
-      if (map) map.src = osm;
-      if (openMap) { openMap.href = mapUrl; openMap.hidden = false; }
-      if (statusEl) statusEl.textContent = data.live ? 'Rider location is live' : 'Showing the rider’s latest available location';
-      if (updated) updated.textContent = loc.ageSeconds == null ? '' : `Updated ${loc.ageSeconds <= 5 ? 'just now' : `${loc.ageSeconds}s ago`}`;
-      if (dot) dot.classList.toggle('live', Boolean(data.live));
+        if (etaEl) {
+          etaEl.textContent = 'Live tracking starts after rider pickup';
+        }
+
+        if (statusEl) {
+          statusEl.textContent =
+            'Seller is preparing your order / rider is heading to pickup.';
+        }
+
+        if (mapEl) mapEl.classList.add('hidden');
+        if (otpBox) otpBox.classList.add('hidden');
+        if (dot) dot.classList.remove('live');
+        if (updated) updated.textContent = '';
+
+        return;
+      }
+
+      let eta = Math.max(
+        1,
+        Math.min(25, Number(data?.etaMinutes ?? 25))
+      );
+
+      if (
+        Number.isFinite(this.lastDisplayedEta) &&
+        eta > this.lastDisplayedEta
+      ) {
+        eta = this.lastDisplayedEta;
+      }
+
+      this.lastDisplayedEta = eta;
+
+      if (etaEl) {
+        etaEl.textContent =
+          eta <= 1
+            ? 'Rider is almost there'
+            : `Estimated arrival: about ${eta} min`;
+      }
+
+      if (otpBox && otpEl && data?.deliveryOtp) {
+        otpEl.textContent = String(data.deliveryOtp);
+        otpBox.classList.remove('hidden');
+      }
+
+      const loc = data?.location;
+
+      if (
+        !loc ||
+        !Number.isFinite(Number(loc.latitude)) ||
+        !Number.isFinite(Number(loc.longitude))
+      ) {
+        if (statusEl) {
+          statusEl.textContent =
+            'Rider picked up your order. Waiting for live GPS signal…';
+        }
+
+        if (mapEl) mapEl.classList.add('hidden');
+        if (dot) dot.classList.remove('live');
+
+        return;
+      }
+
+      const lat = Number(loc.latitude);
+      const lon = Number(loc.longitude);
+      const heading = Number(loc.headingDeg || 0);
+
+      if (mapEl) {
+        mapEl.classList.remove('hidden');
+      }
+
+      this.ensureTezMap();
+      this.updateCustomerMarker(data?.destination || null);
+      this.animateRiderMarker(lat, lon, heading);
+      this.fitTezMap(lat, lon, data?.destination || null);
+
+      if (statusEl) {
+        const distance = Number(data?.distanceKm);
+
+        if (Number.isFinite(distance)) {
+          statusEl.textContent =
+            distance < 0.15
+              ? 'Rider is very close to your delivery location'
+              : distance < 1
+                ? `Rider is about ${Math.round(distance * 1000)} m away`
+                : `Rider is about ${distance.toFixed(1)} km away`;
+        } else {
+          statusEl.textContent =
+            data.live
+              ? 'Rider location is live'
+              : 'Showing rider’s latest available location';
+        }
+      }
+
+      if (updated) {
+        updated.textContent =
+          loc.ageSeconds == null
+            ? ''
+            : `Updated ${
+                loc.ageSeconds <= 5
+                  ? 'just now'
+                  : `${loc.ageSeconds}s ago`
+              }`;
+      }
+
+      if (dot) {
+        dot.classList.toggle('live', Boolean(data.live));
+      }
     } catch (error) {
       const statusEl = document.getElementById('tezLiveStatus');
-      if (statusEl) statusEl.textContent = error?.message || 'Live tracking temporarily unavailable.';
+
+      if (statusEl) {
+        statusEl.textContent =
+          error?.message ||
+          'Live tracking temporarily unavailable.';
+      }
     }
   },
 
