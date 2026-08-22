@@ -452,3 +452,33 @@ html[data-theme="light"] .tez-empty h3{color:#172033}
   .tez-header nav{display:none}
   .tez-mobile-search-row:not(.hidden){display:block!important}
 }
+
+
+/* v0.30.0 Tez cart interaction + light-mode contrast fixes */
+.tez-product-actions button:not(:disabled){
+  cursor:pointer;
+}
+.tez-product-actions button:not(:disabled):hover{
+  filter:brightness(1.04);
+  transform:translateY(-1px);
+}
+.tez-product-actions button:not(:disabled):active{
+  transform:translateY(0);
+}
+.tez-product-actions button:disabled{
+  cursor:not-allowed;
+}
+
+html[data-theme="light"] .tez-hero h1,
+html[data-theme="light"] .tez-hero .tez-kicker{
+  color:#ffffff !important;
+}
+html[data-theme="light"] .tez-hero p{
+  color:#dbe7f4 !important;
+}
+html[data-theme="light"] .tez-location-card label{
+  color:#ffffff !important;
+}
+html[data-theme="light"] .tez-location-card small{
+  color:#bdd0e5 !important;
+}

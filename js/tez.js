@@ -229,7 +229,11 @@ const TezApp={
       }
       CartManager.updateQty(key,existing.Qty+1);
     }else{
-      CartManager.add(normalized);
+      CartManager.addToCart(normalized, 1, {
+        IsTez:true,
+        FulfilmentMode:'tez',
+        TezPincode:this.pincode
+      });
     }
 
     CartManager.updateCartBadge();

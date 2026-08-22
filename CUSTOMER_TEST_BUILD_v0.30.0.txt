@@ -1,0 +1,12 @@
+DESIMALL CUSTOMER TEST BUILD v0.30.0
+Base: Customer v0.29.9
+
+FINAL TEST BLOCKER FIX
+- Fixed Tez "Add +" button: it now calls the existing CartManager.addToCart() API.
+- Tez item is stored with IsTez=true, FulfilmentMode=tez and current Tez pincode.
+- Add button now shows pointer cursor and hover/press feedback.
+- Fixed Tez light-mode hero/pincode label contrast noted during testing.
+- Service worker cache bumped so old Tez JS/CSS does not remain stuck.
+- Backend and Supabase unchanged.
+
+Deployment: frontend-only replacement for desimall-customer.
