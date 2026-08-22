@@ -160,7 +160,7 @@ const ProductDetailsApp={
       btn.classList.add('active');document.getElementById(btn.dataset.tab)?.classList.add('active');
     }));
 
-    document.getElementById('btnTezOption')?.addEventListener('click',()=>this.toast('Tez checkout workflow will be enabled when the Tez backend is ready.'));
+    document.getElementById('btnTezOption')?.addEventListener('click',()=>location.href='tez.html');
     document.getElementById('btnTryOnOption')?.addEventListener('click',()=>this.toast('Try-On rules and checkout will be enabled after final business approval.'));
   },
 

@@ -1,0 +1,16 @@
+DESIMALL CUSTOMER TEST BUILD v0.29.8 — TEZ
+Base: DesiMall Customer Test Build v0.29.7
+
+CUSTOMER MARKETPLACE CLEANUP + TEZ PRESERVED
+- Tez remains the customer-facing quick-commerce name.
+- Existing /api/tez endpoints and internal Tez fulfillment logic are preserved unchanged.
+- Home Tez entry opens pages/tez.html directly.
+- Product, Cart, Checkout, My Orders and Tracking keep Tez customer-facing wording.
+- Product page placeholder footer links were replaced with real customer routes/contact/policies.
+- Home footer exposes Tez and Wishlist.
+- Food, Services and Try-On remain clearly marked Soon; no fake working workflow was added.
+- Service worker/cache version remains v0.29.8.
+
+Backend: unchanged, existing https://desimall-backend.onrender.com
+Database: unchanged, existing Supabase
+Deployment: frontend-only replacement for desimall-customer.

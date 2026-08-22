@@ -5,7 +5,7 @@
     tez: {
       icon: 'fa-bolt',
       title: 'DesiMall Tez',
-      text: 'Fast nearby delivery is part of the DesiMall roadmap. We will enable it only after Tez-eligible inventory, service radius and rapid-delivery workflow are ready.'
+      text: 'Tez uses DesiMall\'s existing quick-commerce workflow and is available only where eligible nearby inventory and delivery coverage are active.'
     },
     food: {
       icon: 'fa-utensils',
@@ -63,6 +63,10 @@
   function openModule(key) {
     if (key === 'marketplace') {
       document.getElementById('categoriesSection')?.scrollIntoView({behavior:'smooth'});
+      return;
+    }
+    if (key === 'tez') {
+      location.href = 'pages/tez.html';
       return;
     }
     const data = SERVICES[key];
