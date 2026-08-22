@@ -1,3 +1,4 @@
+/* DesiMall Tracking v0.31.2 */
 
 .tracking-page{min-height:70vh;padding-top:38px;padding-bottom:70px}
 .tracking-hero{text-align:center;max-width:760px;margin:auto}.tracking-hero h1{font-size:clamp(30px,5vw,46px);margin:5px 0 10px}.tracking-hero>p{color:var(--muted);margin-bottom:22px}
@@ -114,4 +115,32 @@
 }
 #tezLocationUpdated{
   margin-left:auto;
+}
+
+/* v0.31.3 track button fix */
+#trackingForm button{
+  cursor:pointer!important;
+}
+#trackingForm button:active{
+  transform:translateY(1px);
+}
+
+/* v0.31.4 rider-to-customer route tracking */
+.tez-live-map{
+  min-height:360px;
+}
+.tez-live-map::after{
+  content:"";
+  position:absolute;
+  pointer-events:none;
+  inset:0;
+  border-radius:14px;
+  box-shadow:inset 0 0 0 1px rgba(15,23,42,.08);
+  z-index:400;
+}
+.leaflet-overlay-pane path{
+  stroke:#ff6b00;
+}
+.dm-bike-circle{
+  background:#ff6b00;
 }

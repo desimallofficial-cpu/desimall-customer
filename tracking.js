@@ -1,3 +1,4 @@
+// DesiMall Tracking v0.31.3
 document.addEventListener('DOMContentLoaded', () => TrackingApp.init());
 
 const TrackingApp = {
@@ -8,6 +9,11 @@ const TrackingApp = {
   customerMarker: null,
   riderMarkerLatLng: null,
   markerAnimFrame: null,
+  routeLine: null,
+  routeCoords: [],
+  routeFetchedAt: 0,
+  lastRouteOrigin: null,
+  lastRouteDestination: null,
   stages: [
     { key:'placed', label:'Order placed', icon:'fa-receipt' },
     { key:'accepted', label:'Seller accepted', icon:'fa-store' },
@@ -72,29 +78,64 @@ const TrackingApp = {
   },
 
   async track() {
-    const id = document.getElementById('trackingOrderId')?.value.trim();
+    const input = document.getElementById('trackingOrderId');
+    const id = String(input?.value || '').trim();
     const result = document.getElementById('trackingResult');
+
     if (!id || !result) return;
 
-    result.innerHTML = '<div class="tracking-empty"><i class="fa-solid fa-spinner fa-spin"></i><h2>Loading latest status...</h2><p>Please wait a moment.</p></div>';
+    // Keep the shareable URL in sync without reloading the page.
+    try {
+      const url = new URL(location.href);
+      url.searchParams.set('order', id);
+      history.replaceState({}, '', url);
+    } catch (_) {}
+
+    result.innerHTML = `
+      <div class="tracking-empty">
+        <i class="fa-solid fa-spinner fa-spin"></i>
+        <h2>Loading latest status...</h2>
+        <p>Please wait a moment.</p>
+      </div>`;
     result.classList.remove('hidden');
 
     try {
       const orders = await DesiMallAPI.getMyOrders();
-      const order = this.findOrder(orders, id);
+      const list = Array.isArray(orders)
+        ? orders
+        : Array.isArray(orders?.orders)
+          ? orders.orders
+          : [];
+
+      const order = this.findOrder(list, id);
+
       if (!order) {
-        result.innerHTML = '<div class="tracking-empty"><i class="fa-solid fa-box-open"></i><h2>Order not found</h2><p>Check the order ID and try again.</p></div>';
+        result.innerHTML = `
+          <div class="tracking-empty">
+            <i class="fa-solid fa-box-open"></i>
+            <h2>Order not found</h2>
+            <p>Check the order ID or open it from My Orders.</p>
+          </div>`;
         return;
       }
+
       this.render(order);
     } catch (error) {
-      const authEnded = error?.status === 401 || error?.code === 'SESSION_ENDED';
-      result.innerHTML = `<div class="tracking-empty">
-        <i class="fa-solid ${authEnded ? 'fa-user-lock' : 'fa-triangle-exclamation'}"></i>
-        <h2>${authEnded ? 'Please login to track this order' : 'Could not load latest status'}</h2>
-        <p>${this.esc(error?.message || 'Please try again.')}</p>
-        ${authEnded ? '<a href="login.html">Login</a>' : '<button type="button" onclick="TrackingApp.track()">Try Again</button>'}
-      </div>`;
+      const authEnded =
+        error?.status === 401 ||
+        error?.code === 'SESSION_ENDED' ||
+        error?.code === 'INVALID_SESSION';
+
+      result.innerHTML = `
+        <div class="tracking-empty">
+          <i class="fa-solid ${authEnded ? 'fa-user-lock' : 'fa-triangle-exclamation'}"></i>
+          <h2>${authEnded ? 'Login required' : 'Could not load order'}</h2>
+          <p>${this.esc(
+            authEnded
+              ? 'Please login again, then open Track Order from My Orders.'
+              : (error?.message || 'Please try again in a moment.')
+          )}</p>
+        </div>`;
     }
   },
 
@@ -389,6 +430,123 @@ const TrackingApp = {
     }, 50);
   },
 
+  nearestRoutePoint(lat, lon) {
+    if (!Array.isArray(this.routeCoords) || !this.routeCoords.length) {
+      return { lat:Number(lat), lon:Number(lon) };
+    }
+
+    let best = null;
+    let bestScore = Infinity;
+
+    for (const point of this.routeCoords) {
+      const dLat = Number(point[0]) - Number(lat);
+      const dLon = Number(point[1]) - Number(lon);
+      const score = dLat*dLat + dLon*dLon;
+
+      if (score < bestScore) {
+        bestScore = score;
+        best = point;
+      }
+    }
+
+    return best
+      ? { lat:Number(best[0]), lon:Number(best[1]) }
+      : { lat:Number(lat), lon:Number(lon) };
+  },
+
+  routeNeedsRefresh(riderLat, riderLon, destination) {
+    if (!destination) return false;
+
+    const now = Date.now();
+    if (!this.routeFetchedAt || now - this.routeFetchedAt > 30000) {
+      return true;
+    }
+
+    if (!this.lastRouteOrigin || !this.lastRouteDestination) {
+      return true;
+    }
+
+    const moved =
+      Math.abs(Number(riderLat) - Number(this.lastRouteOrigin.lat)) +
+      Math.abs(Number(riderLon) - Number(this.lastRouteOrigin.lon));
+
+    const destMoved =
+      Math.abs(Number(destination.latitude) - Number(this.lastRouteDestination.lat)) +
+      Math.abs(Number(destination.longitude) - Number(this.lastRouteDestination.lon));
+
+    return moved > 0.001 || destMoved > 0.0002;
+  },
+
+  async updateRoadRoute(riderLat, riderLon, destination) {
+    const map = this.ensureTezMap();
+    if (!map || !destination) return null;
+
+    const dLat = Number(destination.latitude);
+    const dLon = Number(destination.longitude);
+
+    if (![riderLat, riderLon, dLat, dLon].every(v => Number.isFinite(Number(v)))) {
+      return null;
+    }
+
+    if (!this.routeNeedsRefresh(riderLat, riderLon, destination)) {
+      return null;
+    }
+
+    this.routeFetchedAt = Date.now();
+    this.lastRouteOrigin = { lat:Number(riderLat), lon:Number(riderLon) };
+    this.lastRouteDestination = { lat:dLat, lon:dLon };
+
+    try {
+      const url =
+        `https://router.project-osrm.org/route/v1/driving/` +
+        `${Number(riderLon)},${Number(riderLat)};${dLon},${dLat}` +
+        `?overview=full&geometries=geojson&steps=false`;
+
+      const response = await fetch(url, {
+        method:'GET',
+        cache:'no-store'
+      });
+
+      if (!response.ok) throw new Error('Route service unavailable');
+
+      const data = await response.json();
+      const route = data?.routes?.[0];
+
+      if (!route?.geometry?.coordinates?.length) {
+        throw new Error('Road route not found');
+      }
+
+      this.routeCoords = route.geometry.coordinates.map(([lon, lat]) => [lat, lon]);
+
+      if (this.routeLine) {
+        try { map.removeLayer(this.routeLine); } catch (_) {}
+      }
+
+      this.routeLine = L.polyline(
+        this.routeCoords,
+        {
+          weight:6,
+          opacity:.85,
+          lineCap:'round',
+          lineJoin:'round'
+        }
+      ).addTo(map);
+
+      map.fitBounds(
+        this.routeLine.getBounds(),
+        { padding:[45,45], maxZoom:16 }
+      );
+
+      return {
+        durationMinutes: Math.max(1, Math.ceil(Number(route.duration || 0) / 60)),
+        distanceKm: Number(route.distance || 0) / 1000
+      };
+    } catch (error) {
+      console.warn('Road route:', error);
+      return null;
+    }
+  },
+
   async loadLiveTracking(orderId) {
     try {
       const data = await DesiMallAPI.getOrderLiveTracking(orderId);
@@ -406,41 +564,94 @@ const TrackingApp = {
           clearInterval(this.liveTimer);
           this.liveTimer = null;
         }
-
         if (this.markerAnimFrame) {
           cancelAnimationFrame(this.markerAnimFrame);
           this.markerAnimFrame = null;
         }
-
         this.lastDisplayedEta = null;
         return;
       }
 
       if (!data?.liveTrackingAvailable) {
         this.lastDisplayedEta = null;
-
-        if (etaEl) {
-          etaEl.textContent = 'Live tracking starts after rider pickup';
-        }
-
-        if (statusEl) {
-          statusEl.textContent =
-            'Seller is preparing your order / rider is heading to pickup.';
-        }
-
+        if (etaEl) etaEl.textContent = 'Live tracking starts after rider pickup';
+        if (statusEl) statusEl.textContent = 'Seller is preparing your order / rider is heading to pickup.';
         if (mapEl) mapEl.classList.add('hidden');
         if (otpBox) otpBox.classList.add('hidden');
         if (dot) dot.classList.remove('live');
         if (updated) updated.textContent = '';
-
         return;
       }
 
-      let eta = Math.max(
-        1,
-        Math.min(25, Number(data?.etaMinutes ?? 25))
+      if (otpBox && otpEl && data?.deliveryOtp) {
+        otpEl.textContent = String(data.deliveryOtp);
+        otpBox.classList.remove('hidden');
+      }
+
+      const loc = data?.location;
+      const stale = Boolean(data?.locationStale);
+      const valid = data?.locationValid !== false;
+
+      if (!valid) {
+        if (etaEl) etaEl.textContent = 'Waiting for correct rider GPS';
+        if (statusEl) statusEl.textContent = 'Rider GPS looks incorrect. Waiting for a fresh valid location.';
+        if (mapEl) mapEl.classList.add('hidden');
+        if (dot) dot.classList.remove('live');
+        if (updated) updated.textContent = '';
+        return;
+      }
+
+      if (
+        !loc ||
+        !Number.isFinite(Number(loc.latitude)) ||
+        !Number.isFinite(Number(loc.longitude))
+      ) {
+        if (etaEl) etaEl.textContent = 'Waiting for rider location';
+        if (statusEl) statusEl.textContent = 'Rider picked up your order. Waiting for GPS signal…';
+        if (mapEl) mapEl.classList.add('hidden');
+        if (dot) dot.classList.remove('live');
+        return;
+      }
+
+      if (stale || Number(loc.ageSeconds || 0) > 90) {
+        if (etaEl) etaEl.textContent = 'Location update delayed';
+        if (statusEl) statusEl.textContent = 'Waiting for a fresh rider location…';
+        if (dot) dot.classList.remove('live');
+        if (updated) updated.textContent = `Last update ${Number(loc.ageSeconds || 0)}s ago`;
+        return;
+      }
+
+      const lat = Number(loc.latitude);
+      const lon = Number(loc.longitude);
+      const destination = data?.destination || null;
+
+      if (mapEl) mapEl.classList.remove('hidden');
+      this.ensureTezMap();
+      this.updateCustomerMarker(destination);
+
+      const routeInfo = await this.updateRoadRoute(lat, lon, destination);
+
+      // Keep the bike visually on the road route.
+      const snapped = this.nearestRoutePoint(lat, lon);
+      this.animateRiderMarker(
+        snapped.lat,
+        snapped.lon,
+        Number(loc.headingDeg || 0)
       );
 
+      if (!this.routeLine) {
+        this.fitTezMap(lat, lon, destination);
+      }
+
+      let eta = Number(data?.etaMinutes ?? 25);
+
+      if (routeInfo?.durationMinutes) {
+        eta = Math.min(25, routeInfo.durationMinutes);
+      }
+
+      eta = Math.max(1, Math.min(25, Number(eta)));
+
+      // ETA should not jump upward during one live session.
       if (
         Number.isFinite(this.lastDisplayedEta) &&
         eta > this.lastDisplayedEta
@@ -457,44 +668,11 @@ const TrackingApp = {
             : `Estimated arrival: about ${eta} min`;
       }
 
-      if (otpBox && otpEl && data?.deliveryOtp) {
-        otpEl.textContent = String(data.deliveryOtp);
-        otpBox.classList.remove('hidden');
-      }
-
-      const loc = data?.location;
-
-      if (
-        !loc ||
-        !Number.isFinite(Number(loc.latitude)) ||
-        !Number.isFinite(Number(loc.longitude))
-      ) {
-        if (statusEl) {
-          statusEl.textContent =
-            'Rider picked up your order. Waiting for live GPS signal…';
-        }
-
-        if (mapEl) mapEl.classList.add('hidden');
-        if (dot) dot.classList.remove('live');
-
-        return;
-      }
-
-      const lat = Number(loc.latitude);
-      const lon = Number(loc.longitude);
-      const heading = Number(loc.headingDeg || 0);
-
-      if (mapEl) {
-        mapEl.classList.remove('hidden');
-      }
-
-      this.ensureTezMap();
-      this.updateCustomerMarker(data?.destination || null);
-      this.animateRiderMarker(lat, lon, heading);
-      this.fitTezMap(lat, lon, data?.destination || null);
-
       if (statusEl) {
-        const distance = Number(data?.distanceKm);
+        const distance =
+          routeInfo?.distanceKm != null
+            ? Number(routeInfo.distanceKm)
+            : Number(data?.distanceKm);
 
         if (Number.isFinite(distance)) {
           statusEl.textContent =
@@ -504,10 +682,7 @@ const TrackingApp = {
                 ? `Rider is about ${Math.round(distance * 1000)} m away`
                 : `Rider is about ${distance.toFixed(1)} km away`;
         } else {
-          statusEl.textContent =
-            data.live
-              ? 'Rider location is live'
-              : 'Showing rider’s latest available location';
+          statusEl.textContent = 'Rider location is live';
         }
       }
 
@@ -522,16 +697,12 @@ const TrackingApp = {
               }`;
       }
 
-      if (dot) {
-        dot.classList.toggle('live', Boolean(data.live));
-      }
+      if (dot) dot.classList.toggle('live', Boolean(data.live));
     } catch (error) {
       const statusEl = document.getElementById('tezLiveStatus');
-
       if (statusEl) {
         statusEl.textContent =
-          error?.message ||
-          'Live tracking temporarily unavailable.';
+          error?.message || 'Live tracking temporarily unavailable.';
       }
     }
   },
