@@ -3,6 +3,8 @@ document.addEventListener('DOMContentLoaded',()=>TezApp.init());
 const TezApp={
   pincode:'',
   products:[],
+  filteredProducts:[],
+  searchQuery:'',
   result:null,
 
   esc(v){return String(v??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));},
@@ -18,6 +20,30 @@ const TezApp={
 
     document.getElementById('btnCheckTez')?.addEventListener('click',()=>this.load());
     input?.addEventListener('keydown',e=>{if(e.key==='Enter')this.load();});
+
+    const bindSearch=(formId,inputId)=>{
+      const form=document.getElementById(formId);
+      const search=document.getElementById(inputId);
+      form?.addEventListener('submit',e=>{e.preventDefault();this.applySearch(search?.value||'');});
+      search?.addEventListener('input',()=>this.applySearch(search.value||''));
+    };
+    bindSearch('tezSearchForm','tezSearchInput');
+    bindSearch('tezMobileSearchForm','tezMobileSearchInput');
+
+    document.getElementById('tezMobileSearchButton')?.addEventListener('click',()=>{
+      const row=document.getElementById('tezMobileSearchRow');
+      row?.classList.toggle('hidden');
+      if(!row?.classList.contains('hidden'))setTimeout(()=>document.getElementById('tezMobileSearchInput')?.focus(),50);
+    });
+
+    const initialQ=new URLSearchParams(location.search).get('q')||'';
+    if(initialQ){
+      const desktop=document.getElementById('tezSearchInput');
+      const mobile=document.getElementById('tezMobileSearchInput');
+      if(desktop)desktop.value=initialQ;
+      if(mobile)mobile.value=initialQ;
+      this.searchQuery=initialQ.trim().toLowerCase();
+    }
 
     if(saved)this.load();
   },
@@ -53,6 +79,7 @@ const TezApp={
       const result=await DesiMallAPI.getTezProducts(pincode);
       this.result=result;
       this.products=Array.isArray(result.products)?result.products:[];
+      this.filteredProducts=this.filterProducts(this.searchQuery);
       this.render();
     }catch(error){
       this.products=[];
@@ -83,11 +110,32 @@ const TezApp={
     }
   },
 
+  filterProducts(query=''){
+    const q=String(query||'').trim().toLowerCase();
+    if(!q)return [...this.products];
+    return this.products.filter(p=>[
+      p.ProductName,p.SellerName,p.ShopName,p.SKU
+    ].some(v=>String(v||'').toLowerCase().includes(q)));
+  },
+
+  applySearch(query=''){
+    this.searchQuery=String(query||'').trim().toLowerCase();
+    this.filteredProducts=this.filterProducts(this.searchQuery);
+
+    const d=document.getElementById('tezSearchInput');
+    const m=document.getElementById('tezMobileSearchInput');
+    if(d && d.value!==query)d.value=query;
+    if(m && m.value!==query)m.value=query;
+
+    if(this.result)this.render();
+  },
+
   render(){
     const result=this.result||{};
     const zone=result.zone;
+    const visible=this.filteredProducts.length || this.searchQuery ? this.filteredProducts : this.products;
     const count=document.getElementById('tezProductCount');
-    if(count)count.textContent=`${this.products.length} product${this.products.length===1?'':'s'}`;
+    if(count)count.textContent=`${visible.length} product${visible.length===1?'':'s'}`;
 
     const status=document.getElementById('tezStatus');
     const empty=document.getElementById('tezEmpty');
@@ -119,8 +167,15 @@ const TezApp={
       return;
     }
 
+    if(this.searchQuery && !visible.length){
+      empty?.classList.remove('hidden');
+      if(empty)empty.innerHTML=`<i class="fa-solid fa-magnifying-glass"></i><h3>No Tez products found</h3><p>Try another product name or clear the search.</p>`;
+      grid.innerHTML='';
+      return;
+    }
+
     empty?.classList.add('hidden');
-    grid.innerHTML=this.products.map(p=>this.card(p)).join('');
+    grid.innerHTML=visible.map(p=>this.card(p)).join('');
   },
 
   card(p){

@@ -383,3 +383,72 @@ body{
   .tez-mobile-nav a i{font-size:16px}
   .tez-mobile-nav a.active{color:var(--tz-orange)}
 }
+
+
+/* ===== v0.29.9 full Tez customer header/search ===== */
+.tez-head-full{width:min(1460px,calc(100% - 32px))}
+.tez-search{
+  flex:1;
+  max-width:640px;
+  min-width:260px;
+  height:42px;
+  display:flex;
+  align-items:center;
+  gap:8px;
+  padding-left:13px;
+  border:1px solid #3a4b61;
+  border-radius:11px;
+  background:#111b27;
+}
+.tez-search>i{color:#8fa3ba;font-size:13px}
+.tez-search input{
+  flex:1;
+  min-width:0;
+  border:0;
+  outline:0;
+  background:transparent;
+  color:#fff;
+  font-size:13px;
+}
+.tez-search input::placeholder{color:#8092a7}
+.tez-search button{
+  width:44px;
+  align-self:stretch;
+  border:0;
+  border-radius:0 10px 10px 0;
+  background:var(--tz-orange);
+  color:#fff;
+  cursor:pointer;
+}
+.tez-mobile-search-row{
+  width:min(100% - 24px,720px);
+  margin:0 auto 10px;
+}
+.tez-mobile-search-row .tez-search{max-width:none;width:100%}
+.tez-mobile-nav button{
+  border:0;background:transparent;color:inherit;font:inherit;
+}
+html[data-theme="light"] .tez-header{background:#fff;border-color:#dfe4ea}
+html[data-theme="light"] .tez-brand{color:#172033}
+html[data-theme="light"] .tez-search{background:#f4f6f8;border-color:#d7dde5}
+html[data-theme="light"] .tez-search input{color:#172033}
+html[data-theme="light"] .tez-header nav a{color:#667085}
+html[data-theme="light"] .tez-header nav a:hover{color:var(--tz-orange)}
+html[data-theme="light"] body{background:#f7f8fa;color:#172033}
+html[data-theme="light"] .tez-product{background:#fff;border-color:#d9e0e8}
+html[data-theme="light"] .tez-product-body h3,
+html[data-theme="light"] .tez-product-actions a{color:#172033}
+html[data-theme="light"] .tez-product-actions a{border-color:#d9e0e8}
+html[data-theme="light"] .tez-empty h3{color:#172033}
+
+@media(max-width:1150px){
+  .tez-head-inner{gap:10px}
+  .tez-header nav a{min-width:48px}
+  .tez-header nav a span{display:none}
+}
+@media(max-width:760px){
+  .tez-head-inner{min-height:58px;width:min(100% - 24px,720px)}
+  .tez-head-inner>.tez-search{display:none}
+  .tez-header nav{display:none}
+  .tez-mobile-search-row:not(.hidden){display:block!important}
+}

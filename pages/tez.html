@@ -6,21 +6,37 @@
   <meta name="theme-color" content="#ff6500">
   <meta name="referrer" content="strict-origin-when-cross-origin">
   <title>DesiMall Tez - Fast Daily Needs</title>
-  <link rel="stylesheet" href="../css/global-theme.css?v=0.29.7">
-  <link rel="stylesheet" href="../css/tez.css?v=0.29.8">
+  <link rel="stylesheet" href="../css/global-theme.css?v=0.29.9">
+  <link rel="stylesheet" href="../css/tez.css?v=0.29.9">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
   <link rel="stylesheet" href="../css/customer-footer.css?v=0.29.4">
 </head>
 <body>
 <header class="tez-header">
-  <div class="tez-head-inner">
+  <div class="tez-head-inner tez-head-full">
     <a href="../index.html" class="tez-brand"><span>Desi</span>Mall <b>Tez</b></a>
-    <nav>
+
+    <form class="tez-search" id="tezSearchForm" role="search">
+      <i class="fa-solid fa-magnifying-glass"></i>
+      <input id="tezSearchInput" type="search" placeholder="Search Tez products..." autocomplete="off" aria-label="Search Tez products">
+      <button type="submit" aria-label="Search"><i class="fa-solid fa-arrow-right"></i></button>
+    </form>
+
+    <nav aria-label="Tez customer navigation">
       <a href="../index.html"><i class="fa-solid fa-house"></i><span>Home</span></a>
+      <a href="wishlist.html" title="Wishlist"><i class="fa-regular fa-heart"></i><span>Wishlist</span></a>
+      <a href="notifications.html" title="Notifications"><i class="fa-regular fa-bell"></i><span>Alerts</span><em class="notification-badge hidden" id="tezNotificationBadge">0</em></a>
       <a href="my-orders.html"><i class="fa-solid fa-box"></i><span>Orders</span></a>
       <a href="cart.html"><i class="fa-solid fa-cart-shopping"></i><span>Cart</span><em id="cartBadge">0</em></a>
-      <a href="profile.html"><i class="fa-solid fa-user"></i><span>Account</span></a>
+      <a href="login.html" id="userAuthLink"><i class="fa-regular fa-user"></i><span>Account</span></a>
     </nav>
+  </div>
+  <div class="tez-mobile-search-row hidden" id="tezMobileSearchRow">
+    <form class="tez-search" id="tezMobileSearchForm" role="search">
+      <i class="fa-solid fa-magnifying-glass"></i>
+      <input id="tezMobileSearchInput" type="search" placeholder="Search Tez products..." autocomplete="off">
+      <button type="submit" aria-label="Search"><i class="fa-solid fa-arrow-right"></i></button>
+    </form>
   </div>
 </header>
 
@@ -66,7 +82,7 @@
 
 <nav class="tez-mobile-nav">
   <a href="../index.html"><i class="fa-solid fa-house"></i><span>Home</span></a>
-  <a href="tez.html" class="active"><i class="fa-solid fa-bolt"></i><span>Tez</span></a>
+  <button type="button" id="tezMobileSearchButton"><i class="fa-solid fa-magnifying-glass"></i><span>Search</span></button>
   <a href="my-orders.html"><i class="fa-solid fa-box"></i><span>Orders</span></a>
   <a href="cart.html"><i class="fa-solid fa-cart-shopping"></i><span>Cart</span></a>
   <a href="profile.html"><i class="fa-solid fa-user"></i><span>Account</span></a>
@@ -76,7 +92,9 @@
 <script src="../js/auth.js"></script>
 <script src="../js/cart.js"></script>
 <script src="../js/product-image-resolver.js?v=0.24.0"></script>
-<script src="../js/tez.js?v=0.29.8"></script>
+<script src="../js/tez.js?v=0.29.9"></script>
   <script src="../js/customer-footer.js?v=0.29.4"></script>
+  <script src="../js/ui-preferences.js?v=0.29.9"></script>
+  <script src="../js/notification-badge.js?v=0.29.9"></script>
 </body>
 </html>

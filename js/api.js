@@ -899,6 +899,42 @@ const DesiMallAPI = {
       : [];
   },
 
+
+  async getNotifications({ limit = 30, unreadOnly = false } = {}, token = '') {
+    token = token || (typeof DesiMallAuth !== 'undefined' ? DesiMallAuth.getAccessToken?.() || '' : '');
+    if (!token) {
+      const error = new Error('Please login to view notifications.');
+      error.status = 401;
+      error.code = 'LOGIN_REQUIRED';
+      throw error;
+    }
+    const q = `?limit=${encodeURIComponent(limit)}&unreadOnly=${unreadOnly ? 'true' : 'false'}`;
+    return this._rest(`/api/notifications${q}`, { method: 'GET', token });
+  },
+
+  async getNotificationUnreadCount(token = '') {
+    token = token || (typeof DesiMallAuth !== 'undefined' ? DesiMallAuth.getAccessToken?.() || '' : '');
+    if (!token) return { success: true, unreadCount: 0 };
+    return this._rest('/api/notifications/unread-count', { method: 'GET', token });
+  },
+
+  async markNotificationRead(notificationId, token = '') {
+    token = token || (typeof DesiMallAuth !== 'undefined' ? DesiMallAuth.getAccessToken?.() || '' : '');
+    return this._rest(`/api/notifications/${encodeURIComponent(notificationId)}/read`, {
+      method: 'PATCH',
+      token
+    });
+  },
+
+  async markAllNotificationsRead(token = '') {
+    token = token || (typeof DesiMallAuth !== 'undefined' ? DesiMallAuth.getAccessToken?.() || '' : '');
+    return this._rest('/api/notifications/read-all', {
+      method: 'POST',
+      data: {},
+      token
+    });
+  },
+
   getUploadStatus(token = '') {
     if (!token) {
       try {

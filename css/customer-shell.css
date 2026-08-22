@@ -77,3 +77,14 @@ html[data-theme="light"] .mobile-bottom-nav button{color:#667085}
 html[data-theme="light"] .mobile-bottom-nav .active{color:var(--cs-orange)}
 .customer-theme-toggle{border:0;background:transparent;cursor:pointer;font:inherit}
 .customer-theme-toggle i{font-size:19px}
+
+/* v0.29.9 customer utility actions */
+.compact-customer-action{min-width:54px}
+.notification-badge.hidden{display:none!important}
+@media(max-width:1280px){
+  .compact-customer-action span{display:none}
+  .compact-customer-action{min-width:42px}
+}
+@media(max-width:1050px){
+  .compact-customer-action{display:none!important}
+}

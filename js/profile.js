@@ -169,14 +169,11 @@ const DesiMallProfileApp = {
         if (passwordForm) {
             passwordForm.onsubmit = event => {
                 event.preventDefault();
-
                 this.showAlert(
-                    'Password updated successfully!',
-                    'success',
+                    'Password self-service change is not connected yet. Please use DesiMall Support for a password reset.',
+                    'warning',
                     'profileAlert'
                 );
-
-                passwordForm.reset();
             };
         }
     },

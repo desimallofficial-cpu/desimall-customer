@@ -4,6 +4,16 @@ document.addEventListener('DOMContentLoaded', () => {
   const form = $('customerSignupForm');
   const message = $('signupMessage');
 
+  document.querySelectorAll('[data-toggle-password]').forEach(btn => {
+    btn.addEventListener('click', () => {
+      const input = document.getElementById(btn.dataset.togglePassword);
+      if (!input) return;
+      const show = input.type === 'password';
+      input.type = show ? 'text' : 'password';
+      btn.textContent = show ? 'Hide' : 'Show';
+    });
+  });
+
   const showMessage = (text, type = 'info') => {
     if (!message) return alert(text);
     message.textContent = text;

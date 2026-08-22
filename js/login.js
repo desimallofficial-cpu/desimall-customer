@@ -27,6 +27,28 @@ document.addEventListener('DOMContentLoaded', () => {
   const passwordForm = $('passwordLoginForm');
   const otpForm = $('otpLoginForm');
 
+  const passwordInput = $('password');
+  const passwordToggle = $('toggleLoginPassword');
+  passwordToggle?.addEventListener('click', () => {
+    const show = passwordInput?.type === 'password';
+    if (passwordInput) passwordInput.type = show ? 'text' : 'password';
+    passwordToggle.textContent = show ? 'Hide' : 'Show';
+  });
+
+  const rememberCustomer = $('rememberCustomer');
+  try {
+    const remembered = localStorage.getItem('desimall_customer_email') || '';
+    if (remembered && $('email')) {
+      $('email').value = remembered;
+      if (rememberCustomer) rememberCustomer.checked = true;
+    }
+  } catch (_) {}
+
+  $('forgotCustomerPassword')?.addEventListener('click', () => {
+    const note = $('customerForgotNote');
+    if (note) note.hidden = !note.hidden;
+  });
+
   passwordTab?.addEventListener('click', () => {
     passwordTab.classList.add('active');
     otpTab?.classList.remove('active');
@@ -59,10 +81,22 @@ document.addEventListener('DOMContentLoaded', () => {
       const result = await DesiMallAPI.loginUser({ Email: email, Password: password });
       if (!result?.success) throw new Error(result?.message || 'Login failed');
       const user = DesiMallAuth.setAuthResult(result, email);
+      try {
+        if (rememberCustomer?.checked) localStorage.setItem('desimall_customer_email', email);
+        else localStorage.removeItem('desimall_customer_email');
+      } catch (_) {}
       showMessage(`Welcome, ${user.Name}!`, 'success');
       setTimeout(() => DesiMallAuth.redirectAfterLogin('../index.html'), 400);
     } catch (error) {
-      showMessage(error.message || 'Login failed.', 'error');
+      const raw = String(error?.message || '').toLowerCase();
+      const invalid = error?.status === 401 ||
+        raw.includes('invalid email or password') ||
+        raw.includes('invalid login credentials') ||
+        raw.includes('invalid credentials');
+      showMessage(
+        invalid ? 'Wrong / invalid password. Please enter a valid password.' : (error.message || 'Login failed.'),
+        'error'
+      );
     } finally {
       setBusy(button, false);
     }

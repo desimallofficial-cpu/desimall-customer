@@ -1,0 +1,20 @@
+DESIMALL CUSTOMER TEST BUILD v0.29.9
+Base: Customer v0.29.8 TEZ
+
+CUSTOMER FEATURE-SURFACE + SEARCH + NOTIFICATION PACK
+- Tez remains the quick-commerce name.
+- Tez now has a desktop/mobile search box with live local filtering of Tez products.
+- Tez header now exposes Home, Wishlist, Notifications, Orders, Cart and logged-in customer name.
+- Home header now exposes Wishlist and real Notifications shortcuts on suitable desktop widths.
+- Customer Notifications now use the real backend /api/notifications endpoints; fake seeded demo offers were removed.
+- Unread notification badges added to supported customer headers.
+- Customer login now has Show/Hide password, Remember email, Forgot password guidance and friendly invalid-password text.
+- Customer signup now has Show/Hide controls for password and confirm password.
+- Fake homepage social '#' links removed.
+- Hidden legacy heading corrected from Minutes back to Tez.
+- Fake "Password updated successfully" behavior in Profile removed; the page now states that self-service password change is not connected yet.
+- Existing Marketplace, Cart, Checkout, Orders, Tracking, Returns, Support, Wishlist, Profile, Addresses and Tez business logic preserved.
+- Food, Services and Try-On remain marked Soon; no fake workflows were activated.
+- Backend and Supabase unchanged.
+
+Deployment: replace desimall-customer frontend only.
