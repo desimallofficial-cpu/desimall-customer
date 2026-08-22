@@ -116,3 +116,11 @@
 #tezLocationUpdated{
   margin-left:auto;
 }
+
+/* v0.31.3 track button fix */
+#trackingForm button{
+  cursor:pointer!important;
+}
+#trackingForm button:active{
+  transform:translateY(1px);
+}

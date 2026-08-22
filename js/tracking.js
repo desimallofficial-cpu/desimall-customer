@@ -1,4 +1,4 @@
-// DesiMall Tracking v0.31.2
+// DesiMall Tracking v0.31.3
 document.addEventListener('DOMContentLoaded', () => TrackingApp.init());
 
 const TrackingApp = {
@@ -73,29 +73,64 @@ const TrackingApp = {
   },
 
   async track() {
-    const id = document.getElementById('trackingOrderId')?.value.trim();
+    const input = document.getElementById('trackingOrderId');
+    const id = String(input?.value || '').trim();
     const result = document.getElementById('trackingResult');
+
     if (!id || !result) return;
 
-    result.innerHTML = '<div class="tracking-empty"><i class="fa-solid fa-spinner fa-spin"></i><h2>Loading latest status...</h2><p>Please wait a moment.</p></div>';
+    // Keep the shareable URL in sync without reloading the page.
+    try {
+      const url = new URL(location.href);
+      url.searchParams.set('order', id);
+      history.replaceState({}, '', url);
+    } catch (_) {}
+
+    result.innerHTML = `
+      <div class="tracking-empty">
+        <i class="fa-solid fa-spinner fa-spin"></i>
+        <h2>Loading latest status...</h2>
+        <p>Please wait a moment.</p>
+      </div>`;
     result.classList.remove('hidden');
 
     try {
       const orders = await DesiMallAPI.getMyOrders();
-      const order = this.findOrder(orders, id);
+      const list = Array.isArray(orders)
+        ? orders
+        : Array.isArray(orders?.orders)
+          ? orders.orders
+          : [];
+
+      const order = this.findOrder(list, id);
+
       if (!order) {
-        result.innerHTML = '<div class="tracking-empty"><i class="fa-solid fa-box-open"></i><h2>Order not found</h2><p>Check the order ID and try again.</p></div>';
+        result.innerHTML = `
+          <div class="tracking-empty">
+            <i class="fa-solid fa-box-open"></i>
+            <h2>Order not found</h2>
+            <p>Check the order ID or open it from My Orders.</p>
+          </div>`;
         return;
       }
+
       this.render(order);
     } catch (error) {
-      const authEnded = error?.status === 401 || error?.code === 'SESSION_ENDED';
-      result.innerHTML = `<div class="tracking-empty">
-        <i class="fa-solid ${authEnded ? 'fa-user-lock' : 'fa-triangle-exclamation'}"></i>
-        <h2>${authEnded ? 'Please login to track this order' : 'Could not load latest status'}</h2>
-        <p>${this.esc(error?.message || 'Please try again.')}</p>
-        ${authEnded ? '<a href="login.html">Login</a>' : '<button type="button" onclick="TrackingApp.track()">Try Again</button>'}
-      </div>`;
+      const authEnded =
+        error?.status === 401 ||
+        error?.code === 'SESSION_ENDED' ||
+        error?.code === 'INVALID_SESSION';
+
+      result.innerHTML = `
+        <div class="tracking-empty">
+          <i class="fa-solid ${authEnded ? 'fa-user-lock' : 'fa-triangle-exclamation'}"></i>
+          <h2>${authEnded ? 'Login required' : 'Could not load order'}</h2>
+          <p>${this.esc(
+            authEnded
+              ? 'Please login again, then open Track Order from My Orders.'
+              : (error?.message || 'Please try again in a moment.')
+          )}</p>
+        </div>`;
     }
   },
 
