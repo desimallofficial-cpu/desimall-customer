@@ -1,0 +1,1084 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="theme-color" content="#ff6500">
+    <meta name="referrer" content="strict-origin-when-cross-origin">
+    <title>Address Book - DesiMall</title>
+
+    <link rel="stylesheet" href="../css/style.css">
+    <link rel="stylesheet" href="../css/global-theme.css?v=0.29.7">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="manifest" href="../manifest.webmanifest">
+
+    <style>
+        :root {
+            --ab-orange: #ff6500;
+            --ab-orange-dark: #e75b00;
+            --ab-orange-soft: #fff4ec;
+            --ab-bg: #f5f7fa;
+            --ab-surface: #ffffff;
+            --ab-surface-2: #f8fafc;
+            --ab-text: #20242a;
+            --ab-muted: #697386;
+            --ab-border: #e7eaf0;
+            --ab-danger: #dc2626;
+            --ab-radius: 18px;
+            --ab-shadow: 0 8px 30px rgba(24,39,75,.07);
+            --ab-shadow-hover: 0 12px 34px rgba(24,39,75,.11);
+        }
+
+        html[data-theme="dark"] {
+            --ab-bg: #11151b;
+            --ab-surface: #1c222b;
+            --ab-surface-2: #242b35;
+            --ab-text: #f4f6f8;
+            --ab-muted: #aeb7c3;
+            --ab-border: #36404d;
+            --ab-orange-soft: rgba(255,101,0,.14);
+            --ab-shadow: 0 8px 28px rgba(0,0,0,.25);
+            --ab-shadow-hover: 0 12px 34px rgba(0,0,0,.34);
+        }
+
+        * { box-sizing: border-box; }
+
+        body {
+            margin: 0;
+            background: var(--ab-bg) !important;
+            color: var(--ab-text);
+        }
+
+        /* Header */
+        .ab-header {
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+            background: color-mix(in srgb, var(--ab-surface) 96%, transparent);
+            backdrop-filter: blur(14px);
+            border-bottom: 1px solid var(--ab-border);
+            box-shadow: 0 3px 16px rgba(0,0,0,.045);
+        }
+
+        .ab-header-inner {
+            width: min(1440px, calc(100% - 40px));
+            min-height: 74px;
+            margin: auto;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 24px;
+        }
+
+        .ab-brand {
+            display: inline-flex;
+            align-items: center;
+            gap: 11px;
+            text-decoration: none;
+            color: var(--ab-text);
+        }
+
+        .ab-brand-icon {
+            width: 42px;
+            height: 42px;
+            border-radius: 12px;
+            display: grid;
+            place-items: center;
+            color: #fff;
+            background: linear-gradient(135deg,#ff7b21,#ff5b00);
+            box-shadow: 0 7px 18px rgba(255,101,0,.22);
+            font-size: 18px;
+        }
+
+        .ab-brand-name {
+            font-weight: 850;
+            font-size: 26px;
+            letter-spacing: -.8px;
+        }
+
+        .ab-brand-name .desi { color: var(--ab-orange); }
+        .ab-brand-name .mall { color: #7246f5; }
+
+        .ab-header-actions {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .ab-nav-link {
+            position: relative;
+            min-width: 66px;
+            padding: 8px 10px;
+            border-radius: 12px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 4px;
+            color: var(--ab-muted);
+            text-decoration: none;
+            font-size: 11px;
+            transition: .18s ease;
+        }
+
+        .ab-nav-link i { font-size: 20px; }
+
+        .ab-nav-link:hover,
+        .ab-nav-link.active {
+            color: var(--ab-orange);
+            background: var(--ab-orange-soft);
+        }
+
+        .ab-nav-link .badge {
+            position: absolute;
+            top: 3px;
+            right: 8px;
+            min-width: 17px;
+            height: 17px;
+            padding: 0 4px;
+            border-radius: 20px;
+            background: #ef2020;
+            color: #fff;
+            display: grid;
+            place-items: center;
+            font-size: 10px;
+            font-weight: 800;
+        }
+
+        /* Page shell */
+        .ab-page {
+            width: min(1440px, calc(100% - 40px));
+            margin: 0 auto;
+            padding: 26px 0 44px;
+        }
+
+        .ab-breadcrumb {
+            display: flex;
+            align-items: center;
+            gap: 9px;
+            margin-bottom: 22px;
+            font-size: 13px;
+            color: var(--ab-muted);
+        }
+
+        .ab-breadcrumb a {
+            color: var(--ab-muted);
+            text-decoration: none;
+        }
+
+        .ab-breadcrumb a:hover { color: var(--ab-orange); }
+        .ab-breadcrumb .current { color: var(--ab-text); font-weight: 700; }
+
+        .ab-hero {
+            position: relative;
+            overflow: hidden;
+            margin-bottom: 24px;
+            padding: 25px 28px;
+            border-radius: 22px;
+            background: linear-gradient(120deg,#25364c 0%,#1d2b3d 58%,#ff6500 160%);
+            color: #fff;
+            box-shadow: var(--ab-shadow);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 22px;
+        }
+
+        .ab-hero::after {
+            content: "";
+            position: absolute;
+            width: 280px;
+            height: 280px;
+            border-radius: 50%;
+            right: -100px;
+            top: -125px;
+            background: radial-gradient(circle,rgba(255,101,0,.55),rgba(255,101,0,0) 70%);
+            pointer-events: none;
+        }
+
+        .ab-hero-user {
+            position: relative;
+            z-index: 1;
+            display: flex;
+            align-items: center;
+            gap: 17px;
+        }
+
+        .ab-hero-avatar {
+            width: 64px;
+            height: 64px;
+            flex: 0 0 64px;
+            border-radius: 50%;
+            overflow: hidden;
+            display: grid;
+            place-items: center;
+            background: #fff;
+            color: var(--ab-orange);
+            font-size: 26px;
+            border: 3px solid rgba(255,255,255,.26);
+        }
+
+        .ab-hero-avatar img { width: 100%; height: 100%; object-fit: cover; }
+
+        .ab-hero-copy small {
+            display: block;
+            opacity: .74;
+            margin-bottom: 4px;
+            font-size: 12px;
+        }
+
+        .ab-hero-copy h1 {
+            margin: 0 0 5px;
+            font-size: clamp(20px,2vw,27px);
+            line-height: 1.15;
+        }
+
+        .ab-hero-copy p {
+            margin: 0;
+            color: rgba(255,255,255,.76);
+            font-size: 13px;
+        }
+
+        .ab-hero-chip {
+            position: relative;
+            z-index: 1;
+            padding: 11px 15px;
+            border-radius: 14px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            background: rgba(255,255,255,.10);
+            border: 1px solid rgba(255,255,255,.12);
+            white-space: nowrap;
+            font-size: 12px;
+        }
+
+        .ab-hero-chip i { color: #ffb27e; font-size: 17px; }
+
+        /* Grid */
+        .ab-layout {
+            display: grid;
+            grid-template-columns: 270px minmax(0,1fr);
+            gap: 22px;
+            align-items: start;
+        }
+
+        .ab-sidebar { position: sticky; top: 100px; }
+
+        .ab-sidebar-shell {
+            overflow: hidden;
+            border-radius: var(--ab-radius);
+            border: 1px solid var(--ab-border);
+            background: var(--ab-surface);
+            box-shadow: var(--ab-shadow);
+        }
+
+        .ab-user-card {
+            padding: 21px 19px 18px;
+            display: flex;
+            align-items: center;
+            gap: 13px;
+            border-bottom: 1px solid var(--ab-border);
+            background: linear-gradient(135deg,var(--ab-orange-soft),var(--ab-surface) 72%);
+        }
+
+        .ab-user-avatar {
+            width: 48px;
+            height: 48px;
+            flex: 0 0 48px;
+            border-radius: 50%;
+            overflow: hidden;
+            display: grid;
+            place-items: center;
+            color: var(--ab-orange);
+            background: var(--ab-orange-soft);
+            font-size: 20px;
+        }
+
+        .ab-user-avatar img { width: 100%; height: 100%; object-fit: cover; }
+
+        .ab-user-info small {
+            display: block;
+            color: var(--ab-muted);
+            font-size: 11px;
+            margin-bottom: 2px;
+        }
+
+        .ab-user-info h3 {
+            margin: 0;
+            font-size: 15px;
+            color: var(--ab-text);
+        }
+
+        .ab-side-menu {
+            margin: 0;
+            padding: 8px;
+            list-style: none;
+        }
+
+        .ab-side-menu li + li { margin-top: 3px; }
+
+        .ab-side-menu a,
+        .ab-logout {
+            width: 100%;
+            min-height: 48px;
+            padding: 0 14px;
+            border: 0;
+            border-radius: 11px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            background: transparent;
+            color: var(--ab-muted);
+            text-decoration: none;
+            font: inherit;
+            font-size: 13px;
+            font-weight: 650;
+            cursor: pointer;
+            transition: .18s ease;
+        }
+
+        .ab-side-menu a i,
+        .ab-logout i {
+            width: 20px;
+            text-align: center;
+        }
+
+        .ab-side-menu a:hover {
+            background: var(--ab-surface-2);
+            color: var(--ab-text);
+        }
+
+        .ab-side-menu a.active {
+            background: var(--ab-orange-soft);
+            color: var(--ab-orange);
+        }
+
+        .ab-logout {
+            color: var(--ab-danger);
+            border-top: 1px solid var(--ab-border);
+            border-radius: 0;
+            margin-top: 8px;
+        }
+
+        .ab-logout:hover { background: rgba(220,38,38,.08); }
+
+        .ab-content {
+            min-width: 0;
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        .ab-card {
+            border: 1px solid var(--ab-border);
+            border-radius: var(--ab-radius);
+            background: var(--ab-surface);
+            box-shadow: var(--ab-shadow);
+            overflow: hidden;
+        }
+
+        .ab-card-header {
+            padding: 20px 23px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 14px;
+            border-bottom: 1px solid var(--ab-border);
+        }
+
+        .ab-heading {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .ab-heading-icon {
+            width: 39px;
+            height: 39px;
+            flex: 0 0 39px;
+            border-radius: 11px;
+            display: grid;
+            place-items: center;
+            color: var(--ab-orange);
+            background: var(--ab-orange-soft);
+        }
+
+        .ab-heading h2 {
+            margin: 0;
+            font-size: 17px;
+            color: var(--ab-text);
+        }
+
+        .ab-heading p {
+            margin: 3px 0 0;
+            color: var(--ab-muted);
+            font-size: 11px;
+        }
+
+        .ab-card-body { padding: 23px; }
+
+        /* Alerts */
+        .profile-alert {
+            padding: 13px 16px;
+            border-radius: 12px;
+            border: 1px solid #bbf7d0;
+            background: #ecfdf3;
+            color: #15803d;
+            font-size: 12px;
+            font-weight: 650;
+        }
+
+        .profile-alert.error {
+            border-color: #fecdd3;
+            background: #fff1f2;
+            color: #be123c;
+        }
+
+        html[data-theme="dark"] .profile-alert {
+            background: rgba(21,128,61,.14);
+            border-color: rgba(34,197,94,.34);
+            color: #86efac;
+        }
+
+        html[data-theme="dark"] .profile-alert.error {
+            background: rgba(190,24,93,.14);
+            border-color: rgba(251,113,133,.30);
+            color: #fda4af;
+        }
+
+        .hidden { display: none !important; }
+
+        /* Form */
+        .ab-form-grid {
+            display: grid;
+            grid-template-columns: repeat(2,minmax(0,1fr));
+            gap: 17px;
+        }
+
+        .ab-field {
+            display: flex;
+            flex-direction: column;
+            gap: 7px;
+            min-width: 0;
+        }
+
+        .ab-field.full { grid-column: 1 / -1; }
+
+        .ab-field label {
+            color: var(--ab-text) !important;
+            font-size: 12px;
+            font-weight: 700;
+        }
+
+        .ab-field input,
+        .ab-field textarea {
+            width: 100%;
+            border: 1px solid var(--ab-border) !important;
+            border-radius: 11px;
+            background: var(--ab-surface-2) !important;
+            color: var(--ab-text) !important;
+            padding: 11px 14px;
+            font: inherit;
+            font-size: 13px;
+            outline: none;
+            transition: .18s ease;
+        }
+
+        .ab-field input { min-height: 47px; }
+        .ab-field textarea { min-height: 88px; resize: vertical; }
+
+        .ab-field input:focus,
+        .ab-field textarea:focus {
+            border-color: var(--ab-orange) !important;
+            box-shadow: 0 0 0 3px rgba(255,101,0,.10);
+        }
+
+        .ab-check-row {
+            margin-top: 17px;
+            display: flex;
+            align-items: center;
+            gap: 9px;
+            color: var(--ab-text);
+            font-size: 13px;
+            cursor: pointer;
+        }
+
+        .ab-check-row input {
+            width: 16px;
+            height: 16px;
+            accent-color: var(--ab-orange);
+        }
+
+        .ab-form-actions {
+            margin-top: 18px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .ab-primary-btn,
+        .ab-secondary-btn {
+            min-height: 42px;
+            padding: 0 18px;
+            border-radius: 11px;
+            font: inherit;
+            font-size: 12px;
+            font-weight: 800;
+            cursor: pointer;
+            transition: .18s ease;
+        }
+
+        .ab-primary-btn {
+            border: 0;
+            background: linear-gradient(135deg,#ff761b,#ff5b00);
+            color: #fff;
+            box-shadow: 0 7px 17px rgba(255,101,0,.18);
+        }
+
+        .ab-primary-btn:hover { transform: translateY(-1px); }
+
+        .ab-primary-btn:disabled { opacity: .66; cursor: wait; transform: none; }
+
+        .ab-secondary-btn {
+            border: 1px solid var(--ab-border);
+            background: var(--ab-surface-2);
+            color: var(--ab-text);
+        }
+
+        /* Address cards */
+        .address-grid {
+            display: grid;
+            grid-template-columns: repeat(2,minmax(0,1fr));
+            gap: 16px;
+        }
+
+        .address-item-card {
+            position: relative;
+            min-width: 0;
+            padding: 18px;
+            border: 1px solid var(--ab-border) !important;
+            border-radius: 14px;
+            background: var(--ab-surface-2) !important;
+            color: var(--ab-text) !important;
+            box-shadow: none;
+            transition: .18s ease;
+        }
+
+        .address-item-card:hover {
+            transform: translateY(-2px);
+            box-shadow: var(--ab-shadow-hover);
+            border-color: color-mix(in srgb,var(--ab-orange) 35%,var(--ab-border)) !important;
+        }
+
+        .address-item-card.default-addr {
+            background:
+                linear-gradient(135deg,
+                    color-mix(in srgb,var(--ab-orange) 8%,var(--ab-surface)),
+                    var(--ab-surface-2)
+                ) !important;
+            border: 1.5px solid var(--ab-orange) !important;
+            box-shadow: 0 7px 20px rgba(255,101,0,.10);
+        }
+
+        html[data-theme="dark"] .address-item-card.default-addr {
+            background:
+                linear-gradient(135deg,
+                    rgba(255,101,0,.13),
+                    #242b35 76%
+                ) !important;
+            border-color: #ff7a22 !important;
+        }
+
+        .address-card-top {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            gap: 12px;
+            margin-bottom: 12px;
+            padding-right: 0;
+        }
+
+        .address-card-top > div {
+            min-width: 0;
+            padding-right: 4px;
+        }
+
+        .address-recipient {
+            display: block;
+            margin: 0;
+            color: var(--ab-text) !important;
+            font-size: 15px;
+            font-weight: 800;
+            line-height: 1.3;
+            overflow-wrap: anywhere;
+        }
+
+        .address-label {
+            flex-shrink: 0;
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+            padding: 6px 9px;
+            border-radius: 999px;
+            background: var(--ab-surface) !important;
+            color: var(--ab-muted) !important;
+            border: 1px solid var(--ab-border);
+            font-size: 10px;
+            font-weight: 750;
+        }
+
+        html[data-theme="dark"] .address-label {
+            background: #1c222b !important;
+            color: #d5dbe3 !important;
+        }
+
+        .default-badge {
+            position: static !important;
+            display: inline-flex !important;
+            width: fit-content;
+            align-items: center;
+            gap: 5px;
+            margin-bottom: 8px;
+            padding: 4px 8px !important;
+            border-radius: 999px;
+            background: var(--ab-orange) !important;
+            color: #fff !important;
+            font-size: 9px !important;
+            font-weight: 850 !important;
+            line-height: 1;
+            text-transform: uppercase;
+        }
+
+        .address-details {
+            color: var(--ab-muted) !important;
+            font-size: 12px;
+            line-height: 1.55;
+        }
+
+        .address-details p {
+            margin: 4px 0 !important;
+            color: var(--ab-muted) !important;
+        }
+
+        .address-details i { color: var(--ab-orange); }
+
+        .address-actions {
+            margin-top: 14px;
+            padding-top: 13px;
+            border-top: 1px solid var(--ab-border);
+            display: flex;
+            flex-wrap: wrap;
+            gap: 7px;
+        }
+
+        .btn-addr-action {
+            min-height: 34px;
+            padding: 0 10px;
+            border: 1px solid var(--ab-border);
+            border-radius: 9px;
+            background: var(--ab-surface) !important;
+            color: var(--ab-orange) !important;
+            font: inherit;
+            font-size: 10px;
+            font-weight: 800;
+            cursor: pointer;
+            transition: .18s ease;
+        }
+
+        .btn-addr-action:hover {
+            border-color: var(--ab-orange);
+            background: var(--ab-orange-soft) !important;
+        }
+
+        .btn-addr-action.delete {
+            color: var(--ab-danger) !important;
+        }
+
+        .btn-addr-action.delete:hover {
+            border-color: #fecaca;
+            background: rgba(220,38,38,.08) !important;
+        }
+
+        .address-loading,
+        .address-empty-state {
+            grid-column: 1 / -1;
+            min-height: 150px;
+            padding: 28px 18px;
+            border: 1px dashed var(--ab-border);
+            border-radius: 14px;
+            background: var(--ab-surface-2);
+            color: var(--ab-muted);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 9px;
+            text-align: center;
+        }
+
+        .address-empty-state > i {
+            color: var(--ab-orange);
+            font-size: 27px;
+        }
+
+        .address-empty-state strong {
+            color: var(--ab-text);
+            font-size: 14px;
+        }
+
+        .address-empty-state span { font-size: 11px; }
+
+        .ab-footer {
+            padding: 25px 16px 30px;
+            text-align: center;
+            color: var(--ab-muted);
+            font-size: 11px;
+        }
+
+        @media (max-width: 1000px) {
+            .ab-layout { grid-template-columns: 230px minmax(0,1fr); }
+        }
+
+        @media (max-width: 850px) {
+            .ab-layout { grid-template-columns: 1fr; }
+            .ab-sidebar { position: static; }
+            .ab-side-menu {
+                display: grid;
+                grid-template-columns: repeat(4,1fr);
+                gap: 5px;
+            }
+            .ab-side-menu li + li { margin-top: 0; }
+            .ab-side-menu a,
+            .ab-logout {
+                justify-content: center;
+                padding: 9px;
+                border-radius: 10px;
+                border: 0;
+                font-size: 11px;
+            }
+            .ab-logout { margin-top: 0; }
+        }
+
+        @media (max-width: 700px) {
+            .ab-header-inner,
+            .ab-page { width: min(100% - 24px,1440px); }
+
+            .ab-brand-name { font-size: 21px; }
+            .ab-brand-icon { width: 36px; height: 36px; }
+
+            .ab-nav-link { min-width: 49px; padding: 6px; }
+            .ab-nav-link span:not(.badge) { display: none; }
+
+            .ab-hero { padding: 20px; border-radius: 17px; }
+            .ab-hero-chip { display: none; }
+
+            .ab-form-grid { grid-template-columns: 1fr; }
+            .address-grid { grid-template-columns: 1fr; }
+            .ab-card-header,
+            .ab-card-body { padding: 18px; }
+        }
+
+        @media (max-width: 520px) {
+            .ab-page { padding-top: 16px; }
+            .ab-breadcrumb { display: none; }
+            .ab-side-menu { grid-template-columns: repeat(2,1fr); }
+            .ab-hero-copy p { display: none; }
+            .ab-form-actions { flex-direction: column; }
+            .ab-form-actions button { width: 100%; }
+            .address-actions .btn-addr-action { flex: 1 1 auto; }
+        }
+    </style>
+  <link rel="stylesheet" href="../css/customer-footer.css?v=0.29.4">
+</head>
+
+<body>
+
+<header class="ab-header">
+    <div class="ab-header-inner">
+        <a href="../index.html" class="ab-brand" aria-label="DesiMall Home">
+            <span class="ab-brand-icon"><i class="fa-solid fa-store"></i></span>
+            <span class="ab-brand-name">
+                <span class="desi">Desi</span><span class="mall">Mall</span>
+            </span>
+        </a>
+
+        <nav class="ab-header-actions" aria-label="Customer navigation">
+            <a href="profile.html" class="ab-nav-link" id="userAuthLink">
+                <i class="fa-solid fa-circle-user"></i>
+                <span>Account</span>
+            </a>
+
+            <a href="my-orders.html" class="ab-nav-link">
+                <i class="fa-solid fa-box"></i>
+                <span>Orders</span>
+            </a>
+
+            <a href="cart.html" class="ab-nav-link">
+                <i class="fa-solid fa-cart-shopping"></i>
+                <span>Cart</span>
+                <span class="badge" id="cartBadge">0</span>
+            </a>
+        </nav>
+    </div>
+</header>
+
+<main class="ab-page">
+
+    <div class="ab-breadcrumb">
+        <a href="../index.html"><i class="fa-solid fa-house"></i> Home</a>
+        <i class="fa-solid fa-chevron-right"></i>
+        <a href="profile.html">My Account</a>
+        <i class="fa-solid fa-chevron-right"></i>
+        <span class="current">Address Book</span>
+    </div>
+
+    <section class="ab-hero">
+        <div class="ab-hero-user">
+            <div class="ab-hero-avatar" id="briefAvatar">
+                <i class="fa-solid fa-user"></i>
+            </div>
+
+            <div class="ab-hero-copy">
+                <small>Delivery addresses</small>
+                <h1 id="briefUserName">DesiMall Customer</h1>
+                <p>Manage where your DesiMall orders should be delivered.</p>
+            </div>
+        </div>
+
+        <div class="ab-hero-chip">
+            <i class="fa-solid fa-location-dot"></i>
+            <div>
+                <strong>Saved securely</strong><br>
+                <span>Only your account can access these addresses</span>
+            </div>
+        </div>
+    </section>
+
+    <div class="ab-layout">
+
+        <aside class="ab-sidebar">
+            <div class="ab-sidebar-shell">
+                <div class="ab-user-card">
+                    <div class="ab-user-avatar">
+                        <i class="fa-solid fa-user"></i>
+                    </div>
+
+                    <div class="ab-user-info">
+                        <small>Customer Account</small>
+                        <h3>My DesiMall</h3>
+                    </div>
+                </div>
+
+                <ul class="ab-side-menu">
+                    <li>
+                        <a href="profile.html">
+                            <i class="fa-solid fa-user-pen"></i>
+                            Profile Information
+                        </a>
+                    </li>
+
+                    <li>
+                        <a href="address-book.html" class="active">
+                            <i class="fa-solid fa-location-dot"></i>
+                            Address Book
+                        </a>
+                    </li>
+
+                    <li>
+                        <a href="my-orders.html">
+                            <i class="fa-solid fa-box-open"></i>
+                            My Orders
+                        </a>
+                    </li>
+
+                    <li>
+                        <button type="button" class="ab-logout" id="btnLogoutSidebar">
+                            <i class="fa-solid fa-arrow-right-from-bracket"></i>
+                            Logout
+                        </button>
+                    </li>
+                </ul>
+            </div>
+        </aside>
+
+        <section class="ab-content">
+
+            <div id="addressAlert" class="profile-alert hidden"></div>
+
+            <section class="ab-card">
+                <div class="ab-card-header">
+                    <div class="ab-heading">
+                        <span class="ab-heading-icon">
+                            <i class="fa-solid fa-location-dot"></i>
+                        </span>
+
+                        <div>
+                            <h2 id="formAddressTitle">
+                                <i class="fa-solid fa-location-dot text-orange" style="display:none"></i>
+                                Add New Address
+                            </h2>
+                            <p>Add or update a delivery address for your orders.</p>
+                        </div>
+                    </div>
+
+                    <button
+                        type="button"
+                        class="ab-secondary-btn hidden"
+                        id="btnCancelAddressEdit"
+                    >
+                        Cancel Edit
+                    </button>
+                </div>
+
+                <div class="ab-card-body">
+                    <form id="addressForm">
+                        <input type="hidden" id="addressId">
+
+                        <div class="ab-form-grid">
+                            <div class="ab-field">
+                                <label for="addrFullName">Full Name *</label>
+                                <input
+                                    type="text"
+                                    id="addrFullName"
+                                    placeholder="Recipient's full name"
+                                    autocomplete="name"
+                                    required
+                                >
+                            </div>
+
+                            <div class="ab-field">
+                                <label for="addrMobile">Mobile Number *</label>
+                                <input
+                                    type="tel"
+                                    id="addrMobile"
+                                    maxlength="10"
+                                    inputmode="numeric"
+                                    placeholder="10-digit mobile number"
+                                    autocomplete="tel"
+                                    required
+                                >
+                            </div>
+
+                            <div class="ab-field">
+                                <label for="addrPincode">Pincode *</label>
+                                <input
+                                    type="text"
+                                    id="addrPincode"
+                                    maxlength="6"
+                                    inputmode="numeric"
+                                    placeholder="6-digit pincode"
+                                    autocomplete="postal-code"
+                                    required
+                                >
+                            </div>
+
+                            <div class="ab-field">
+                                <label for="addrCity">City / District *</label>
+                                <input
+                                    type="text"
+                                    id="addrCity"
+                                    placeholder="City or district"
+                                    autocomplete="address-level2"
+                                    required
+                                >
+                            </div>
+
+                            <div class="ab-field">
+                                <label for="addrState">State *</label>
+                                <input
+                                    type="text"
+                                    id="addrState"
+                                    placeholder="State"
+                                    autocomplete="address-level1"
+                                    required
+                                >
+                            </div>
+
+                            <div class="ab-field">
+                                <label for="addrLandmark">Landmark (Optional)</label>
+                                <input
+                                    type="text"
+                                    id="addrLandmark"
+                                    placeholder="Near temple, school, etc."
+                                >
+                            </div>
+
+                            <div class="ab-field full">
+                                <label for="addrFullText">Full Address (House No, Street, Area) *</label>
+                                <textarea
+                                    id="addrFullText"
+                                    rows="3"
+                                    placeholder="Enter house no., street and area"
+                                    autocomplete="street-address"
+                                    required
+                                ></textarea>
+                            </div>
+                        </div>
+
+                        <label class="ab-check-row">
+                            <input type="checkbox" id="addrIsDefault">
+                            <span>Set as Default Delivery Address</span>
+                        </label>
+
+                        <div class="ab-form-actions">
+                            <button
+                                type="submit"
+                                class="ab-primary-btn btn-save-profile"
+                                id="btnSaveAddress"
+                            >
+                                <i class="fa-solid fa-floppy-disk"></i>
+                                Save Address
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </section>
+
+            <section class="ab-card">
+                <div class="ab-card-header">
+                    <div class="ab-heading">
+                        <span class="ab-heading-icon">
+                            <i class="fa-solid fa-address-book"></i>
+                        </span>
+
+                        <div>
+                            <h2>Saved Addresses</h2>
+                            <p>Your default address is used first during checkout.</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="ab-card-body">
+                    <div class="address-grid" id="addressGrid">
+                        <!-- Loaded by profile.js -->
+                    </div>
+                </div>
+            </section>
+
+        </section>
+    </div>
+</main>
+
+<footer class="ab-footer">
+    © 2026 DesiMall · Powered by Riddhi Rithvi Traders (RRT)
+</footer>
+
+<script src="../js/auth.js"></script>
+<script src="../js/api.js"></script>
+<script src="../js/cart.js"></script>
+<script src="../js/profile.js"></script>
+
+<script>
+    document.addEventListener('DOMContentLoaded', () => {
+        DesiMallProfileApp.initAddressBookPage();
+    });
+</script>
+
+<script src="../js/pwa.js"></script>
+<script src="../js/ui-preferences.js?v=0.29.7"></script>
+<script src="../js/analytics.js"></script>
+
+  <script src="../js/customer-footer.js?v=0.29.4"></script>
+</body>
+</html>

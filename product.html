@@ -1,0 +1,244 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="theme-color" content="#ff6b00">
+    <title>Product Details - Desi Mall</title>
+
+    <!-- SEO Meta -->
+    <meta name="description" content="Shop high quality apparel and products on Desi Mall. Fast shipping and best prices.">
+    <meta name="author" content="Desi Mall Team">
+
+    <!-- Stylesheets -->
+    <link rel="stylesheet" href="../css/style.css">
+    <link rel="stylesheet" href="../css/product.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="manifest" href="../manifest.webmanifest">
+  <meta name="referrer" content="strict-origin-when-cross-origin">
+  <link rel="stylesheet" href="../css/global-theme.css?v=0.29.7">
+  <link rel="stylesheet" href="../css/customer-shell.css?v=0.17.0">
+  <link rel="stylesheet" href="../css/customer-marketplace-v2.css?v=0.17.1">
+  <link rel="stylesheet" href="../css/product-customer-v2.css?v=0.17.1">
+<style id="productV022">
+.pdp-order-note{display:flex;align-items:center;gap:8px;padding:10px 12px;border-radius:10px;background:#142339;border:1px solid #2f435c;color:#aebed0;font-size:11px}.pdp-order-note i{color:#ff6b00}
+</style>
+  <link rel="stylesheet" href="../css/customer-footer.css?v=0.29.4">
+</head>
+<body>
+
+    <!-- CUSTOMER APP HEADER -->
+    <header class="customer-header product-customer-header"><div class="container customer-header-main"><a class="customer-brand" href="../index.html"><span class="customer-brand-icon"><i class="fa-solid fa-store"></i></span><span class="customer-brand-name"><b>Desi</b>Mall</span></a><a class="delivery-location desktop-location" href="address-book.html"><i class="fa-solid fa-location-dot"></i><span><small>Delivering to</small><strong>Home</strong></span></a><form class="customer-search" action="../index.html"><i class="fa-solid fa-magnifying-glass search-leading-icon"></i><input name="q" type="search" placeholder="Search products, food or services"><button type="submit"><i class="fa-solid fa-arrow-right"></i></button></form><nav class="customer-header-actions"><a class="customer-action" href="wishlist.html"><i class="fa-regular fa-heart"></i><span>Wishlist</span></a><a class="customer-action" href="notifications.html"><i class="fa-regular fa-bell"></i><span>Alerts</span><b class="badge notification-badge hidden">0</b></a><a class="customer-action" id="userAuthLink" href="login.html"><i class="fa-regular fa-user"></i><span>Account</span></a><a class="customer-action" href="my-orders.html"><i class="fa-solid fa-box"></i><span>Orders</span></a><a class="customer-action" href="cart.html"><i class="fa-solid fa-cart-shopping"></i><span>Cart</span><b class="badge" id="cartBadge">0</b></a></nav></div></header>
+
+    <!-- MAIN PRODUCT DETAILS SECTION -->
+    <main class="main-layout" role="main">
+
+        <!-- Breadcrumb Navigation -->
+        <nav class="breadcrumb-container" aria-label="Breadcrumb">
+            <ul class="breadcrumb">
+                <li><a href="../index.html">Home</a></li>
+                <li><a href="../index.html#categoriesSection" id="breadcrumbCategory">Category</a></li>
+                <li id="breadcrumbTitle" class="active">Product Name</li>
+            </ul>
+        </nav>
+
+        <!-- Product Details Grid -->
+        <section class="product-details-container" id="productContainer">
+            
+            <!-- LEFT COLUMN: Image Gallery & Zoom -->
+            <div class="product-gallery-section">
+                <div class="gallery-wrapper">
+                    <div class="thumbnail-list" id="thumbnailList">
+                        <!-- Thumbnails injected dynamically -->
+                    </div>
+                    <div class="main-image-container" id="mainImageContainer">
+                        <span class="badge-discount" id="badgeDiscount"></span>
+                        <img id="mainProductImage" src="../assets/products/noimage.jpg" alt="Product Image">
+                        <div class="zoom-lens" id="zoomLens"></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- RIGHT COLUMN: Customer-first purchase details -->
+            <div class="product-info-section customer-pdp-info">
+                <div class="pdp-badges" id="pdpFulfilmentBadges"></div>
+
+                <div class="product-header-info">
+                    <span class="product-brand-tag" id="productBrand">Product</span>
+                    <h1 class="product-main-title" id="productName">Loading Product...</h1>
+                    <div class="product-rating-meta">
+                        <div class="rating-badge" id="ratingBadge">
+                            <span id="ratingVal">0</span> <i class="fa-solid fa-star"></i>
+                        </div>
+                        <span class="review-count" id="reviewCount"></span>
+                    </div>
+                </div>
+
+                <div class="product-price-box">
+                    <div class="price-row">
+                        <span class="current-price" id="finalPrice">₹0</span>
+                        <span class="original-price" id="originalPrice"></span>
+                        <span class="discount-percent" id="discountTag"></span>
+                    </div>
+                    <p class="tax-inclusive-text">Inclusive of applicable taxes</p>
+                </div>
+
+                <div class="pdp-delivery-card">
+                    <div><i class="fa-solid fa-location-dot"></i><span><small>Delivery to</small><strong id="pdpDeliveryLocation">Set delivery location</strong></span></div>
+                    <a href="address-book.html">Change</a>
+                </div>
+
+                <div class="seller-stock-row customer-seller-row">
+                    <div class="seller-info"><small>Sold by</small><strong id="sellerName">DesiMall Seller</strong></div>
+                    <div class="stock-status in-stock" id="stockStatus"><i class="fa-solid fa-circle"></i> Checking stock</div>
+                </div>
+
+                <!-- Only actual product options are shown. -->
+                <div class="product-options-container customer-options">
+                    <div class="option-group hidden" id="sizeGroup">
+                        <label class="option-label">Size</label>
+                        <div class="size-selector" id="sizeSelector"></div>
+                    </div>
+                    <div class="option-group hidden" id="colorGroup">
+                        <label class="option-label">Color</label>
+                        <div class="color-selector" id="colorSelector"></div>
+                    </div>
+                    <div class="option-group">
+                        <label class="option-label">Quantity</label>
+                        <div class="quantity-control">
+                            <button type="button" id="qtyMinusBtn" aria-label="Decrease quantity">−</button>
+                            <input type="number" id="productQtyInput" value="1" min="1" max="10" readonly>
+                            <button type="button" id="qtyPlusBtn" aria-label="Increase quantity">+</button>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="pdp-special-actions">
+                    <button type="button" class="pdp-special hidden" id="btnTezOption"><i class="fa-solid fa-bolt"></i><span><strong>Get with Tez</strong><small>Fast delivery option</small></span></button>
+                    <button type="button" class="pdp-special hidden" id="btnTryOnOption"><i class="fa-solid fa-house"></i><span><strong>Try at Home</strong><small>Eligible Try-On product</small></span></button>
+                </div>
+
+                <div class="product-action-buttons customer-pdp-actions">
+                    <button type="button" class="btn-action btn-add-cart" id="btnAddToCart">
+                        <i class="fa-solid fa-cart-shopping"></i> Add to Cart
+                    </button>
+                    <button type="button" class="btn-action btn-buy-now" id="btnBuyNow">Buy Now</button>
+                    <button type="button" class="btn-action btn-wishlist-toggle" id="btnWishlistToggle" title="Add to Wishlist">
+                        <i class="fa-regular fa-heart"></i>
+                    </button>
+                </div>
+
+                <div class="pdp-order-note"><i class="fa-solid fa-truck"></i><span>Delivery charge is added once for the complete order at checkout.</span></div><div class="pdp-help-row">
+                    <a href="support.html"><i class="fa-solid fa-headset"></i> Need help with this product?</a>
+                </div>
+            </div>
+        </section>
+
+        <!-- PRODUCT TABS: Description, Specifications, Reviews -->
+        <section class="product-tabs-section">
+            <div class="tab-headers">
+                <button type="button" class="tab-link active" data-tab="tab-description">Description</button>
+                <button type="button" class="tab-link" data-tab="tab-specs">Details</button>
+                <button type="button" class="tab-link" data-tab="tab-reviews">Ratings</button>
+            </div>
+
+            <div class="tab-content-wrapper">
+                <!-- Description Tab -->
+                <div class="tab-pane active" id="tab-description">
+                    <h3>Product Overview</h3>
+                    <p id="tabDescriptionContent">Loading product description...</p>
+                </div>
+
+                <!-- Specifications Tab -->
+                <div class="tab-pane" id="tab-specs">
+                    <h3>Technical Specifications</h3>
+                    <table class="specs-table" id="specsTable">
+                        <tr><th>Brand</th><td id="specBrand">RRT Apparel</td></tr>
+                        <tr><th>Category</th><td id="specCategory">Apparel</td></tr>
+                        <tr><th>Fabric / Material</th><td>Premium Grade Cotton Blend</td></tr>
+                        <tr><th>Fit Type</th><td>Regular Comfort Fit</td></tr>
+                        <tr><th>Country of Origin</th><td>Bharat (India)</td></tr>
+                    </table>
+                </div>
+
+                <!-- Reviews Tab -->
+                <div class="tab-pane" id="tab-reviews">
+                    <h3>Ratings &amp; Reviews</h3>
+                    <p>Customer ratings and reviews appear here when available.</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- RELATED PRODUCTS SECTION -->
+        <section class="section-container" id="relatedProductsSection">
+            <div class="section-header">
+                <h2>Similar Products</h2>
+            </div>
+            <div class="product-grid" id="relatedProductsContainer">
+                <!-- Related Products injected dynamically -->
+            </div>
+        </section>
+
+    </main>
+
+    <!-- FOOTER -->
+    <footer class="footer" role="contentinfo">
+        <div class="footer-container">
+            <div class="footer-col">
+                <div class="footer-logo">
+                    <span class="logo-orange">Desi</span><span class="logo-white">Mall</span>
+                </div>
+                <p>Bharat's favorite destination for quality apparel, fashion, and daily essentials directly from top regional suppliers.</p>
+            </div>
+
+            <div class="footer-col">
+                <h3>Quick Links</h3>
+                <ul>
+                    <li><a href="../index.html">Home</a></li>
+                    <li><a href="tez.html">Tez</a></li>
+                    <li><a href="wishlist.html">Wishlist</a></li>
+                    <li><a href="my-orders.html">My Orders</a></li>
+                </ul>
+            </div>
+
+            <div class="footer-col">
+                <h3>Help &amp; Support</h3>
+                <ul>
+                    <li><a href="support.html">Help &amp; Support</a></li>
+                    <li><a href="track-order.html">Track Order</a></li>
+                    <li><a href="return-policy.html">Return Policy</a></li>
+                    <li><a href="returns.html">My Returns</a></li>
+                </ul>
+            </div>
+
+            <div class="footer-col">
+                <h3>Contact &amp; Legal</h3>
+                <ul>
+                    <li><a href="mailto:desimall.official@gmail.com">desimall.official@gmail.com</a></li>
+                    <li><a href="tel:+917050941669">+91 70509 41669</a></li>
+                    <li><a href="privacy-policy.html">Privacy Policy</a></li>
+                    <li><a href="terms.html">Terms &amp; Conditions</a></li>
+                </ul>
+            </div>
+        </div>
+
+        <div class="footer-bottom">
+            <p>Founder &amp; Developed by Suraj Kumar</p>
+        </div>
+    </footer>
+
+    <!-- Core Scripts -->
+    <script src="../js/auth.js"></script>
+    <script src="../js/api.js"></script>
+    <script src="../js/cart.js"></script>
+    <script src="../js/wishlist.js"></script>
+    <script src="../js/reviews.js"></script>
+    <script src="../js/product-image-resolver.js?v=0.22.0"></script>
+<script src="../js/product.js?v=0.29.8"></script>
+    <script src="../js/pwa.js"></script>
+  <script src="../js/ui-preferences.js?v=0.29.7"></script>
+  <script src="../js/analytics.js"></script>
+  <script src="../js/customer-footer.js?v=0.29.4"></script>
+  <script src="../js/notification-badge.js?v=0.29.9"></script>
+</body>
+</html>

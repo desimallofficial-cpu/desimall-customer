@@ -1,0 +1,5 @@
+const DesiMallCoupons={
+ rules:{SAVE10:{type:'percent',value:10,min:499,max:100,label:'10% off up to ₹100'},DESI50:{type:'flat',value:50,min:999,label:'₹50 off'},FREESHIP:{type:'shipping',value:0,min:299,label:'Free delivery'}},
+ apply(code,totals){code=String(code||'').trim().toUpperCase();const r=this.rules[code];if(!r)return{ok:false,message:'Invalid coupon code.'};if(totals.subtotal<r.min)return{ok:false,message:`Add items worth ₹${r.min-totals.subtotal} more to use ${code}.`};let discount=0,delivery=totals.delivery;if(r.type==='percent')discount=Math.min(r.max||Infinity,Math.round(totals.subtotal*r.value/100));if(r.type==='flat')discount=r.value;if(r.type==='shipping')delivery=0;return{ok:true,code,label:r.label,couponDiscount:discount,delivery,total:Math.max(0,totals.subtotal-discount+delivery)};},
+ list(){return Object.entries(this.rules).map(([code,r])=>({code,label:r.label,min:r.min}));}
+};

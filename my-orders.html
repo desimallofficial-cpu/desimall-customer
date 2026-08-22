@@ -1,0 +1,253 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="theme-color" content="#ff6500">
+  <meta name="referrer" content="strict-origin-when-cross-origin">
+  <title>My Orders - DesiMall</title>
+
+  <link rel="stylesheet" href="../css/style.css">
+  <link rel="stylesheet" href="../css/global-theme.css?v=0.29.7">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <link rel="manifest" href="../manifest.webmanifest">
+
+  <style>
+    :root{
+      --mo-orange:#ff6500;--mo-orange-soft:#fff3e8;--mo-bg:#f5f7fa;--mo-card:#fff;
+      --mo-card2:#f8fafc;--mo-text:#20242a;--mo-muted:#697386;--mo-border:#e5e9ef;
+      --mo-green:#15803d;--mo-red:#be123c;--mo-blue:#2563eb;--mo-shadow:0 8px 28px rgba(24,39,75,.08)
+    }
+    html[data-theme="dark"]{
+      --mo-bg:#11151b;--mo-card:#1c222b;--mo-card2:#242b35;--mo-text:#f3f5f7;
+      --mo-muted:#aeb7c3;--mo-border:#36404d;--mo-orange-soft:rgba(255,101,0,.14);
+      --mo-green:#86efac;--mo-red:#fda4af;--mo-blue:#93c5fd;--mo-shadow:0 10px 30px rgba(0,0,0,.26)
+    }
+    *{box-sizing:border-box}
+    body{margin:0;background:var(--mo-bg)!important;color:var(--mo-text)}
+    .mo-header{position:sticky;top:0;z-index:1000;background:var(--mo-card);border-bottom:1px solid var(--mo-border)}
+    .mo-head-inner{width:min(1200px,calc(100% - 32px));min-height:72px;margin:auto;display:flex;align-items:center;justify-content:space-between}
+    .mo-logo{text-decoration:none;font-size:27px;font-weight:900;color:var(--mo-text)}
+    .mo-logo b{color:var(--mo-orange)}
+    .mo-nav{display:flex;gap:8px}
+    .mo-nav a{position:relative;min-width:58px;padding:7px 9px;border-radius:11px;color:var(--mo-muted);text-decoration:none;text-align:center;font-size:11px}
+    .mo-nav a i{display:block;font-size:19px;margin-bottom:3px}
+    .mo-nav a:hover,.mo-nav a.active{color:var(--mo-orange);background:var(--mo-orange-soft)}
+    .mo-main{width:min(1200px,calc(100% - 32px));margin:auto;padding:27px 0 50px}
+    .mo-hero{position:relative;overflow:hidden;padding:25px 27px;border-radius:20px;background:linear-gradient(120deg,#25364c,#1d2b3d 58%,#ff6500 160%);color:#fff;box-shadow:var(--mo-shadow)}
+    .mo-hero:after{content:"";position:absolute;width:260px;height:260px;right:-85px;top:-125px;border-radius:50%;background:radial-gradient(circle,rgba(255,101,0,.55),transparent 70%)}
+    .mo-hero>*{position:relative;z-index:1}
+    .mo-hero h1{margin:0 0 6px;font-size:27px}.mo-hero p{margin:0;color:rgba(255,255,255,.76);font-size:12px}
+    .mo-summary{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin:18px 0}
+    .mo-stat{padding:17px;border:1px solid var(--mo-border);border-radius:14px;background:var(--mo-card);box-shadow:var(--mo-shadow);position:relative}
+    .mo-stat small{display:block;color:var(--mo-muted);font-size:10px}.mo-stat strong{display:block;margin-top:3px;font-size:24px}
+    .mo-stat i{position:absolute;right:16px;top:17px;color:var(--mo-orange);font-size:20px}
+    .mo-toolbar{display:flex;align-items:center;justify-content:space-between;gap:12px;margin:21px 0 13px}
+    .mo-toolbar h2{margin:0;font-size:18px}
+    .mo-filter{display:flex;gap:6px;flex-wrap:wrap}
+    .mo-filter button{border:1px solid var(--mo-border);border-radius:999px;padding:7px 11px;background:var(--mo-card);color:var(--mo-muted);font:inherit;font-size:10px;font-weight:800;cursor:pointer}
+    .mo-filter button.active{background:var(--mo-orange);border-color:var(--mo-orange);color:#fff}
+    .mo-orders{display:grid;gap:15px}
+    .mo-order{overflow:hidden;border:1px solid var(--mo-border);border-radius:16px;background:var(--mo-card);box-shadow:var(--mo-shadow)}
+    .mo-order-head{padding:17px 19px;display:flex;justify-content:space-between;gap:15px;border-bottom:1px solid var(--mo-border);background:var(--mo-card2)}
+    .mo-order-head small{display:block;color:var(--mo-muted);font-size:8px;font-weight:900}.mo-order-head h2{margin:2px 0;font-size:15px}.mo-order-head>div>span{color:var(--mo-muted);font-size:10px}
+    .mo-status{align-self:flex-start;padding:6px 9px;border-radius:999px;font-size:9px;font-weight:900;background:var(--mo-orange-soft);color:var(--mo-orange)}
+    .mo-status.delivered{background:rgba(21,128,61,.12);color:var(--mo-green)}
+    .mo-status.cancelled{background:rgba(190,18,60,.11);color:var(--mo-red)}
+    .mo-status.moving{background:rgba(37,99,235,.10);color:var(--mo-blue)}
+    .mo-items{padding:6px 19px}
+    .mo-item{display:grid;grid-template-columns:38px minmax(0,1fr) auto;gap:10px;align-items:center;padding:12px 0;border-bottom:1px solid var(--mo-border)}
+    .mo-item:last-child{border-bottom:0}
+    .mo-item-icon{width:38px;height:38px;border-radius:10px;display:grid;place-items:center;background:var(--mo-orange-soft);color:var(--mo-orange)}
+    .mo-item-copy strong{display:block;font-size:12px}.mo-item-copy span{display:block;margin-top:3px;color:var(--mo-muted);font-size:9px}.mo-item>b{font-size:11px}
+    .mo-no-items{padding:15px 0;color:var(--mo-muted);font-size:11px}
+    .mo-order-foot{padding:14px 19px;border-top:1px solid var(--mo-border);display:flex;align-items:center;gap:25px;flex-wrap:wrap}
+    .mo-order-foot>div span{display:block;color:var(--mo-muted);font-size:8px}.mo-order-foot>div strong{display:block;margin-top:2px;font-size:11px;text-transform:capitalize}
+    .mo-order-foot .mo-total{margin-left:auto}.mo-order-foot .mo-total strong{font-size:15px}
+    .mo-track{padding:9px 11px;border-radius:9px;background:var(--mo-orange);color:#fff;text-decoration:none;font-size:10px;font-weight:900}
+    .mo-return{border:1px solid var(--mo-orange);padding:8px 10px;border-radius:9px;background:transparent;color:var(--mo-orange);font:inherit;font-size:10px;font-weight:900;cursor:pointer}
+    .mo-return-status{display:inline-flex;align-items:center;padding:7px 10px;border-radius:9px;background:rgba(37,99,235,.1);color:var(--mo-blue);font-size:9px;font-weight:900}
+    .mo-return-otp{display:inline-flex;align-items:center;gap:7px;padding:7px 10px;border-radius:9px;background:rgba(255,107,0,.12);color:var(--mo-orange);font-size:9px;font-weight:900}
+    .mo-return-otp b{font-size:14px;letter-spacing:2px;color:var(--mo-orange)}
+    .mo-return-otp small{font-size:8px;color:var(--mo-muted);font-weight:700}
+    .mo-item-actions{display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-top:7px}
+    .mo-modal{position:fixed;inset:0;background:rgba(0,0,0,.68);z-index:3000;display:none;align-items:center;justify-content:center;padding:18px}
+    .mo-modal.show{display:flex}.mo-modal-card{width:min(480px,100%);background:var(--mo-card);border:1px solid var(--mo-border);border-radius:18px;padding:22px;box-shadow:var(--mo-shadow)}
+    .mo-modal-card h2{margin:0 0 6px}.mo-modal-card p{color:var(--mo-muted);font-size:11px}
+    .mo-modal-card label{display:block;font-size:10px;font-weight:800;margin:13px 0 5px}
+    .mo-modal-card select,.mo-modal-card textarea{width:100%;box-sizing:border-box;border:1px solid var(--mo-border);border-radius:10px;background:var(--mo-card2);color:var(--mo-text);padding:11px;font:inherit}
+    .mo-modal-card textarea{min-height:90px;resize:vertical}.mo-modal-actions{display:flex;gap:9px;justify-content:flex-end;margin-top:16px}
+    .mo-modal-actions button{border:0;border-radius:9px;padding:10px 13px;font:inherit;font-size:10px;font-weight:900;cursor:pointer}
+    .mo-cancel-modal{background:var(--mo-card2);color:var(--mo-text);border:1px solid var(--mo-border)!important}.mo-submit-return{background:var(--mo-orange);color:#fff}
+    .mo-loading,.mo-empty{min-height:210px;padding:30px;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;color:var(--mo-muted);border:1px dashed var(--mo-border);border-radius:16px;background:var(--mo-card)}
+    .mo-loading i,.mo-empty>i{font-size:28px;color:var(--mo-orange);margin-bottom:8px}.mo-empty h3{margin:3px 0;color:var(--mo-text)}.mo-empty p{font-size:11px}.mo-empty a,.mo-empty button{border:0;border-radius:9px;padding:10px 13px;background:var(--mo-orange);color:#fff;text-decoration:none;font:inherit;font-size:10px;font-weight:900;cursor:pointer}
+    .mo-footer{text-align:center;padding:25px;color:var(--mo-muted);font-size:11px}
+    @media(max-width:650px){.mo-head-inner,.mo-main{width:min(100% - 20px,1200px)}.mo-nav a span{display:none}.mo-nav a{min-width:42px}.mo-summary{grid-template-columns:1fr}.mo-toolbar{align-items:flex-start;flex-direction:column}.mo-order-foot{gap:13px}.mo-order-foot .mo-total{margin-left:0}.mo-track{width:100%;text-align:center}}
+
+    /* ================= v0.21 Customer Orders ================= */
+    .mo-main{width:min(1180px,calc(100% - 32px));padding-top:24px}
+    .mo-hero{display:flex;align-items:center;justify-content:space-between;gap:18px;padding:22px 24px}
+    .mo-hero-copy h1{font-size:28px}.mo-hero-copy p{font-size:12px}
+    .mo-hero-help{display:inline-flex;align-items:center;gap:7px;padding:10px 13px;border-radius:10px;background:rgba(255,255,255,.11);color:#fff;text-decoration:none;font-size:11px;font-weight:800}
+    .mo-summary{grid-template-columns:repeat(3,minmax(0,1fr));gap:12px}
+    .mo-toolbar{padding-top:2px}.mo-toolbar h2{font-size:20px}
+    .mo-order{border-radius:18px}
+    .mo-order-head{align-items:center}
+    .mo-order-head h2{font-size:17px}
+    .mo-order-overview{display:flex;align-items:center;gap:16px;flex-wrap:wrap}
+    .mo-order-count{color:var(--mo-muted);font-size:10px}
+    .mo-items{padding:5px 19px}
+    .mo-item{grid-template-columns:58px minmax(0,1fr) auto;gap:13px}
+    .mo-item-icon{width:58px;height:58px;border-radius:12px;overflow:hidden}
+    .mo-item-icon img{width:100%;height:100%;object-fit:cover;background:#fff}
+    .mo-item-copy strong{font-size:13px}
+    .mo-item-copy span{font-size:10px}
+    .mo-order-foot{gap:18px;padding:13px 19px}
+    .mo-track,.mo-details,.mo-help,.mo-buy-again{display:inline-flex;align-items:center;justify-content:center;gap:6px;padding:9px 11px;border-radius:9px;text-decoration:none;font-size:10px;font-weight:900}
+    .mo-track{background:var(--mo-orange);color:#fff}
+    .mo-details,.mo-help,.mo-buy-again{border:1px solid var(--mo-border);background:var(--mo-card2);color:var(--mo-text)}
+    .mo-help{color:var(--mo-orange);border-color:rgba(255,101,0,.35)}
+    .mo-order-actions{display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-left:auto}
+    .mo-total{margin-left:0!important}
+    .mo-customer-note{margin:0 19px 14px;padding:10px 12px;border-radius:10px;background:var(--mo-orange-soft);color:var(--mo-muted);font-size:10px;line-height:1.5}
+    .mo-customer-note i{color:var(--mo-orange);margin-right:5px}
+    .mo-tabs-mobile{display:none}
+    .mobile-bottom-nav{display:none}
+    @media(max-width:650px){
+      body{padding-bottom:68px}
+      .mo-header{position:sticky}
+      .mo-head-inner{min-height:62px}.mo-logo{font-size:22px}.mo-nav{display:none}
+      .mo-main{width:min(100% - 20px,1180px);padding-top:14px}
+      .mo-hero{padding:18px}.mo-hero-help{display:none}
+      .mo-summary{grid-template-columns:repeat(3,1fr);gap:7px}.mo-stat{padding:12px}.mo-stat strong{font-size:19px}.mo-stat i{display:none}
+      .mo-toolbar{display:block}.mo-filter{margin-top:10px;overflow-x:auto;flex-wrap:nowrap;padding-bottom:3px}.mo-filter button{white-space:nowrap}
+      .mo-order-head{padding:14px}.mo-order-head h2{font-size:15px}
+      .mo-items{padding:4px 14px}.mo-item{grid-template-columns:50px minmax(0,1fr) auto}.mo-item-icon{width:50px;height:50px}
+      .mo-order-foot{padding:12px 14px;gap:12px}.mo-order-foot>div{min-width:calc(50% - 8px)}.mo-order-actions{width:100%;margin-left:0}.mo-order-actions>a,.mo-order-actions>button{flex:1}
+      .mobile-bottom-nav{position:fixed;left:0;right:0;bottom:0;height:64px;z-index:2000;background:var(--mo-card);border-top:1px solid var(--mo-border);display:grid;grid-template-columns:repeat(5,1fr)}
+      .mobile-bottom-nav a{position:relative;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;color:var(--mo-muted);text-decoration:none;font-size:9px;font-weight:800}.mobile-bottom-nav a i{font-size:17px}.mobile-bottom-nav a.active{color:var(--mo-orange)}
+    }
+
+  </style>
+
+<style id="tezOrdersV026">
+.mo-tez-badge{display:inline-flex;align-items:center;gap:4px;padding:5px 7px;border-radius:999px;background:rgba(255,101,0,.14);color:#ff7a1a;font-size:8px;font-weight:900}
+</style>
+
+  <link rel="stylesheet" href="../css/customer-footer.css?v=0.29.4">
+</head>
+<body>
+
+<header class="mo-header">
+  <div class="mo-head-inner">
+    <a href="../index.html" class="mo-logo"><b>Desi</b>Mall</a>
+    <nav class="mo-nav">
+      <a href="profile.html" id="userAuthLink">
+        <i class="fa-solid fa-circle-user"></i><span>Account</span>
+      </a>
+      <a href="my-orders.html" class="active">
+        <i class="fa-solid fa-box"></i><span>Orders</span>
+      </a>
+      <a href="support.html" title="Help & Support" aria-label="Help & Support"><i class="fa-solid fa-headset"></i><span>Support</span></a>
+      <a href="cart.html">
+        <i class="fa-solid fa-cart-shopping"></i><span>Cart</span>
+      </a>
+    </nav>
+  </div>
+</header>
+
+<main class="mo-main">
+  <section class="mo-hero">
+    <div class="mo-hero-copy">
+      <h1>My Orders</h1>
+      <p>Track purchases, delivery, returns and help from one place.</p>
+    </div>
+    <a class="mo-hero-help" href="support.html"><i class="fa-solid fa-headset"></i> Get Help</a>
+  </section>
+
+  <section class="mo-summary">
+    <article class="mo-stat">
+      <small>TOTAL ORDERS</small>
+      <strong id="sumTotal">0</strong>
+      <i class="fa-solid fa-receipt"></i>
+    </article>
+    <article class="mo-stat">
+      <small>ACTIVE</small>
+      <strong id="sumActive">0</strong>
+      <i class="fa-solid fa-truck-fast"></i>
+    </article>
+    <article class="mo-stat">
+      <small>DELIVERED</small>
+      <strong id="sumDelivered">0</strong>
+      <i class="fa-solid fa-circle-check"></i>
+    </article>
+  </section>
+
+  <div class="mo-toolbar">
+    <h2>Order History</h2>
+
+    <div class="mo-filter">
+      <button class="active" data-order-filter="all">All</button>
+      <button data-order-filter="active">Active</button>
+      <button data-order-filter="delivered">Delivered</button>
+      <button data-order-filter="cancelled">Cancelled / Returns</button>
+    </div>
+  </div>
+
+  <section id="ordersContainer" class="mo-orders">
+    <div class="mo-loading">
+      <i class="fa-solid fa-spinner fa-spin"></i>
+      Loading your orders...
+    </div>
+  </section>
+</main>
+
+<div class="mo-modal" id="returnModal">
+  <div class="mo-modal-card">
+    <h2>Request a Return</h2>
+    <p id="returnItemName">Delivered item</p>
+
+    <label for="returnReason">Reason</label>
+    <select id="returnReason">
+      <option value="">Select a reason</option>
+      <option>Wrong item received</option>
+      <option>Damaged item</option>
+      <option>Item not as described</option>
+      <option>Quality issue</option>
+      <option>Missing parts / quantity</option>
+      <option>Other</option>
+    </select>
+
+    <label for="returnDescription">Details (optional)</label>
+    <textarea id="returnDescription" placeholder="Tell us what went wrong"></textarea>
+
+    <div class="mo-modal-actions">
+      <button type="button" class="mo-cancel-modal" id="closeReturnModal">Cancel</button>
+      <button type="button" class="mo-submit-return" id="submitReturnRequest">Submit Return</button>
+    </div>
+  </div>
+</div>
+
+
+<nav class="mobile-bottom-nav" aria-label="Customer navigation">
+  <a href="../index.html"><i class="fa-solid fa-house"></i><span>Home</span></a>
+  <a href="../index.html#productSection"><i class="fa-solid fa-magnifying-glass"></i><span>Search</span></a>
+  <a href="my-orders.html" class="active"><i class="fa-solid fa-box"></i><span>Orders</span></a>
+  <a href="cart.html"><i class="fa-solid fa-cart-shopping"></i><span>Cart</span></a>
+  <a href="profile.html"><i class="fa-solid fa-user"></i><span>Account</span></a>
+</nav>
+
+<footer class="mo-footer">
+  © 2026 DesiMall · Powered by Riddhi Rithvi Traders (RRT)
+</footer>
+
+<script src="../js/auth.js"></script>
+<script src="../js/api.js"></script>
+  <script src="../js/product-image-resolver.js?v=0.21.3"></script>
+<script src="../js/customer-orders.js?v=0.26.0"></script>
+<script src="../js/pwa.js"></script>
+<script src="../js/ui-preferences.js?v=0.29.7"></script>
+
+  <script src="../js/customer-footer.js?v=0.29.4"></script>
+</body>
+</html>

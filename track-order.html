@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="theme-color" content="#ff6b00">
+<meta name="description" content="Track your DesiMall order.">
+<meta name="referrer" content="strict-origin-when-cross-origin">
+<title>Track Order | DesiMall</title>
+<link rel="manifest" href="../manifest.webmanifest">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+<link rel="stylesheet" href="../css/style.css">
+<link rel="stylesheet" href="../css/tracking.css?v=0.30.1">
+<link rel="stylesheet" href="../css/global-theme.css?v=0.29.7">
+  <link rel="stylesheet" href="../css/customer-footer.css?v=0.29.4">
+</head>
+<body>
+<header class="navbar-header">
+  <div class="container header-container">
+    <a class="brand" href="../index.html">
+      <span class="brand-icon"><i class="fa-solid fa-store"></i></span>
+      <span class="brand-copy"><strong>Desi<span>Mall</span></strong><small>Order Tracking</small></span>
+    </a>
+    <nav class="nav-actions">
+      <a class="nav-item" id="userAuthLink" href="login.html"><i class="fa-regular fa-user"></i><span>Login</span></a>
+      <a class="nav-item" href="my-orders.html"><i class="fa-solid fa-box"></i><span>Orders</span></a>
+      <a class="nav-item" href="cart.html"><i class="fa-solid fa-cart-shopping"></i><span>Cart</span><b class="badge" id="cartBadge">0</b></a>
+    </nav>
+  </div>
+</header>
+
+<main class="container tracking-page">
+  <div class="tracking-hero">
+    <span class="eyebrow">DELIVERY UPDATE</span>
+    <h1>Track your order</h1>
+    <p>See a simple customer-friendly delivery timeline for your DesiMall order.</p>
+    <form id="trackingForm">
+      <i class="fa-solid fa-magnifying-glass"></i>
+      <input id="trackingOrderId" required placeholder="Example: DM-840B69A4EB" autocomplete="off">
+      <button type="submit">Track order</button>
+    </form>
+  </div>
+  <section id="trackingResult" class="hidden"></section>
+</main>
+
+<footer class="site-footer compact-footer">
+  <div class="footer-bottom">
+    <div class="container"><span>© 2026 DesiMall</span><strong>Founder &amp; Developed by Suraj Kumar</strong></div>
+  </div>
+</footer>
+<nav class="tracking-mobile-nav">
+  <a href="../index.html"><i class="fa-solid fa-house"></i><span>Home</span></a>
+  <a href="my-orders.html" class="active"><i class="fa-solid fa-box"></i><span>Orders</span></a>
+  <a href="cart.html"><i class="fa-solid fa-cart-shopping"></i><span>Cart</span></a>
+  <a href="profile.html"><i class="fa-solid fa-user"></i><span>Account</span></a>
+</nav>
+
+<script src="../js/auth.js"></script>
+<script src="../js/api.js"></script>
+<script src="../js/cart.js"></script>
+<script src="../js/ui-preferences.js?v=0.29.7"></script>
+<script src="../js/analytics.js"></script>
+<script src="../js/tracking.js?v=0.30.1"></script>
+<script src="../js/pwa.js"></script>
+  <script src="../js/customer-footer.js?v=0.29.4"></script>
+</body>
+</html>

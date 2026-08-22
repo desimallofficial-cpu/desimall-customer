@@ -1,0 +1,171 @@
+.identity-support{background:linear-gradient(135deg,#17412b,#57321f)}.support-layout{display:grid;grid-template-columns:minmax(330px,.85fr) minmax(0,1.4fr);gap:18px;margin-top:18px}.ticket-list{display:grid;gap:11px;max-height:650px;overflow:auto}.ticket-item{border:1px solid var(--dm-line);background:#1c3024;border-radius:14px;padding:14px;cursor:pointer;transition:.18s}.ticket-item:hover,.ticket-item.active{border-color:var(--dm-orange);transform:translateY(-1px)}.ticket-row{display:flex;justify-content:space-between;gap:10px}.ticket-item h3{font-size:15px;margin:7px 0}.ticket-meta{display:flex;gap:7px;flex-wrap:wrap;color:var(--dm-muted);font-size:11px}.ticket-badge{border-radius:20px;padding:4px 9px;font-size:10px;font-weight:900}.priority-Urgent,.priority-High{background:#682128;color:#ffd2d5}.priority-Medium{background:#60410f;color:#ffe3a2}.priority-Low{background:#17462d;color:#a7efbf}.status-Open,.status-Waiting-Admin{background:#71420e;color:#ffdda0}.status-In-Progress{background:#153d67;color:#badeff}.status-Waiting-Seller{background:#4c3271;color:#e4d2ff}.status-Resolved,.status-Closed{background:#16492c;color:#b7efc8}.support-empty{min-height:360px;display:grid;place-content:center;text-align:center;color:var(--dm-muted);gap:8px}.support-empty i{font-size:42px;color:var(--dm-orange)}.ticket-detail-head{display:flex;justify-content:space-between;gap:12px;border-bottom:1px solid var(--dm-line);padding-bottom:15px}.ticket-description{padding:14px;background:#182b20;border-radius:12px;margin:14px 0;white-space:pre-wrap}.support-chat{display:grid;gap:12px;max-height:370px;overflow:auto;padding:8px}.chat-message{max-width:84%;padding:12px 14px;border-radius:14px;background:#263d2e}.chat-message.seller{margin-left:auto;background:#59301f}.chat-message.admin{margin-right:auto}.chat-message small{display:block;color:var(--dm-muted);margin-top:7px}.reply-box{display:flex;gap:9px;margin-top:14px}.reply-box textarea{flex:1;min-height:72px}.attachment-link{display:inline-flex;gap:6px;align-items:center;color:#ffbd7e;margin-top:8px}.support-modal{max-width:720px}.support-modal .form-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px}.support-modal .field{display:grid;gap:7px}.support-modal .full{grid-column:1/-1}#attachmentPreview img{max-width:170px;max-height:120px;border-radius:10px;margin-top:8px}@media(max-width:1050px){.support-layout{grid-template-columns:1fr}.ticket-list{max-height:360px}}@media(max-width:650px){.support-modal .form-grid{grid-template-columns:1fr}.support-modal .full{grid-column:auto}.reply-box{display:grid}}
+/* Support Chat v2 - functionality polish only */
+.live-pill{display:inline-flex;align-items:center;gap:7px;padding:9px 12px;border-radius:999px;background:#143b25;border:1px solid #2d7045;color:#9cf1b8;font-size:12px;font-weight:800}
+.live-pill i{font-size:8px;color:#2ee36f;animation:livePulse 1.5s infinite}
+@keyframes livePulse{0%,100%{opacity:.45}50%{opacity:1}}
+.chat-message{position:relative;box-shadow:0 8px 20px rgba(0,0,0,.12)}
+.chat-message .seen-line{font-size:10px;color:#9fd9b3;text-align:right;margin-top:6px}
+.chat-tools{display:flex;align-items:center;gap:8px;margin-top:14px}
+.chat-tools button{width:42px;height:42px;border-radius:12px;border:1px solid var(--dm-line);background:#203229;color:#fff;cursor:pointer}
+.chat-tools textarea{flex:1;min-height:72px}
+.emoji-row{display:none;flex-wrap:wrap;gap:6px;padding:9px;background:#16281e;border:1px solid var(--dm-line);border-radius:12px;margin-top:8px}
+.emoji-row.show{display:flex}.emoji-row button{background:#243b2c;border:0;border-radius:8px;padding:6px 9px;font-size:18px;cursor:pointer}
+.unread-dot{display:inline-grid;place-items:center;min-width:20px;height:20px;padding:0 5px;border-radius:999px;background:#ff6a00;color:white;font-size:10px;font-weight:900;margin-left:6px}
+.typing-indicator{display:none;color:var(--dm-muted);font-size:12px;padding:4px 8px}.typing-indicator.show{display:block}
+.support-chat{scroll-behavior:smooth}
+.ticket-item.unread{border-color:#ff8c32;box-shadow:0 0 0 1px rgba(255,106,0,.18)}
+
+
+/* ============================================================
+   DesiMall Support UI v0.15.6
+   Exact fixes for the real classes used by admin/customer UI.
+   ============================================================ */
+
+/* Do not stretch a few tickets to fill the whole left column. */
+.ticket-list{
+  align-content:start !important;
+  grid-auto-rows:max-content !important;
+}
+.ticket-item{
+  height:auto !important;
+  min-height:0 !important;
+  align-self:start !important;
+}
+
+/* Status badge must stay a small horizontal pill. */
+.ticket-detail-head{
+  align-items:flex-start !important;
+}
+.ticket-detail-head > .ticket-badge,
+.ticket-row > .ticket-badge{
+  display:inline-flex !important;
+  align-items:center !important;
+  justify-content:center !important;
+  align-self:flex-start !important;
+  flex:0 0 auto !important;
+  width:auto !important;
+  min-width:0 !important;
+  max-width:max-content !important;
+  height:28px !important;
+  min-height:28px !important;
+  max-height:28px !important;
+  padding:0 11px !important;
+  margin:0 !important;
+  border-radius:999px !important;
+  line-height:1 !important;
+  white-space:nowrap !important;
+  writing-mode:horizontal-tb !important;
+}
+
+/* Real reply container is .chat-tools (not .reply-box). */
+.chat-tools{
+  display:grid !important;
+  grid-template-columns:minmax(0,1fr) 104px !important;
+  align-items:stretch !important;
+  gap:10px !important;
+  margin-top:14px !important;
+  width:100% !important;
+}
+.chat-tools textarea{
+  width:100% !important;
+  min-width:0 !important;
+  min-height:92px !important;
+  box-sizing:border-box !important;
+  margin:0 !important;
+  resize:vertical !important;
+  border-radius:11px !important;
+}
+.chat-tools button,
+.chat-tools .a-btn,
+.chat-tools .cs-btn{
+  position:static !important;
+  display:inline-flex !important;
+  align-items:center !important;
+  justify-content:center !important;
+  gap:7px !important;
+  width:104px !important;
+  min-width:104px !important;
+  height:auto !important;
+  min-height:46px !important;
+  align-self:stretch !important;
+  margin:0 !important;
+  padding:10px 14px !important;
+  border-radius:11px !important;
+  white-space:nowrap !important;
+  overflow:visible !important;
+}
+
+/* Keep detail card content from forcing odd widths. */
+.ticket-detail-card,
+#adminTicketDetail,
+#customerTicketDetail{
+  min-width:0 !important;
+}
+.ticket-detail-head > div{
+  min-width:0 !important;
+}
+.ticket-detail-head h2{
+  overflow-wrap:anywhere;
+}
+
+/* Cleaner desktop spacing. */
+.support-chat{
+  align-content:start !important;
+}
+.chat-message{
+  height:auto !important;
+}
+
+/* Mobile: reply textarea first, full-width Send below it. */
+@media (max-width:700px){
+  .chat-tools{
+    grid-template-columns:1fr !important;
+  }
+  .chat-tools button,
+  .chat-tools .a-btn,
+  .chat-tools .cs-btn{
+    width:100% !important;
+    min-width:0 !important;
+    min-height:46px !important;
+  }
+}
+
+
+/* ============================================================
+   DesiMall Support UI v0.15.7 - Compact Send Button
+   Keeps v0.15.6 ticket/badge fixes unchanged.
+   ============================================================ */
+.chat-tools{
+  grid-template-columns:minmax(0,1fr) auto !important;
+  align-items:end !important;
+  gap:10px !important;
+}
+.chat-tools textarea{
+  min-height:92px !important;
+}
+.chat-tools button,
+.chat-tools .a-btn,
+.chat-tools .cs-btn{
+  width:auto !important;
+  min-width:92px !important;
+  height:46px !important;
+  min-height:46px !important;
+  max-height:46px !important;
+  align-self:end !important;
+  padding:0 16px !important;
+  border-radius:11px !important;
+  line-height:1 !important;
+}
+
+@media (max-width:700px){
+  .chat-tools{
+    grid-template-columns:1fr !important;
+  }
+  .chat-tools button,
+  .chat-tools .a-btn,
+  .chat-tools .cs-btn{
+    width:100% !important;
+    min-width:0 !important;
+    height:46px !important;
+  }
+}
