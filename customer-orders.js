@@ -9,6 +9,7 @@ const CustomerOrders = {
   returns: [],
   filter: 'all',
   selectedItem: null,
+  selectedCancelOrder: null,
 
   esc(value) {
     return String(value ?? '').replace(/[&<>"']/g, c => ({
@@ -69,6 +70,16 @@ const CustomerOrders = {
       if (e.target === returnModal) this.closeReturn();
     };
     submitReturnRequest.onclick = () => this.submitReturn();
+
+    const cancelModal = document.getElementById('cancelOrderModal');
+    const closeCancelOrderModal = document.getElementById('closeCancelOrderModal');
+    const confirmCancelOrder = document.getElementById('confirmCancelOrder');
+
+    closeCancelOrderModal.onclick = () => this.closeCancelOrder();
+    cancelModal.onclick = e => {
+      if (e.target === cancelModal) this.closeCancelOrder();
+    };
+    confirmCancelOrder.onclick = () => this.submitCancelOrder();
 
     await this.load();
   },
@@ -176,6 +187,15 @@ const CustomerOrders = {
     const showTrack = !['Delivered','Cancelled'].includes(status);
     const delivered = status === 'Delivered';
 
+    const rawOrderStatus = String(order.Status || order.status || '').toLowerCase();
+    const itemStatuses = items.map(item => String(item.Status || item.status || rawOrderStatus).toLowerCase());
+    const cancellationBlocked = itemStatuses.some(x =>
+      ['picked_up','out_for_delivery','reached_customer','delivered'].includes(x)
+    ) || ['picked_up','out_for_delivery','reached_customer','delivered','cancelled','rejected'].includes(rawOrderStatus);
+
+    const canCancel = !cancellationBlocked &&
+      ['new','accepted','preparing','ready','ready_for_pickup','pickup_assigned'].includes(rawOrderStatus);
+
     return `
       <article class="mo-order">
         <header class="mo-order-head">
@@ -229,6 +249,12 @@ const CustomerOrders = {
               <a class="mo-track" href="track-order.html?order=${encodeURIComponent(code)}">
                 <i class="fa-solid fa-location-dot"></i> Track Order
               </a>
+            ` : ''}
+            ${canCancel ? `
+              <button type="button" class="mo-cancel-order"
+                onclick="CustomerOrders.openCancelOrder('${this.esc(order.OrderID || order.id || '')}','${this.esc(code)}')">
+                <i class="fa-solid fa-xmark"></i> Cancel Order
+              </button>
             ` : ''}
             ${delivered ? `
               <a class="mo-buy-again" href="../index.html">
@@ -297,6 +323,60 @@ const CustomerOrders = {
         <b>${this.money(total)}</b>
       </div>
     `;
+  },
+
+
+  openCancelOrder(orderId, orderCode) {
+    this.selectedCancelOrder = {
+      orderId: String(orderId || ''),
+      orderCode: String(orderCode || '')
+    };
+
+    document.getElementById('cancelOrderCode').textContent =
+      `Order ${this.selectedCancelOrder.orderCode}`;
+
+    document.getElementById('cancelOrderReason').value = '';
+    document.getElementById('cancelOrderDetails').value = '';
+
+    document.getElementById('cancelOrderModal').classList.add('show');
+  },
+
+  closeCancelOrder() {
+    this.selectedCancelOrder = null;
+    document.getElementById('cancelOrderModal').classList.remove('show');
+  },
+
+  async submitCancelOrder() {
+    const selected = this.selectedCancelOrder;
+    if (!selected?.orderId) return;
+
+    const reason = String(document.getElementById('cancelOrderReason').value || '').trim();
+    const details = String(document.getElementById('cancelOrderDetails').value || '').trim();
+
+    if (!reason) {
+      alert('Please select a cancellation reason.');
+      return;
+    }
+
+    const button = document.getElementById('confirmCancelOrder');
+    const oldText = button.textContent;
+    button.disabled = true;
+    button.textContent = 'Cancelling...';
+
+    try {
+      await DesiMallAPI.cancelOrder(
+        selected.orderId,
+        details ? `${reason}: ${details}` : reason
+      );
+
+      this.closeCancelOrder();
+      await this.load();
+    } catch (error) {
+      alert(error?.message || 'Could not cancel this order.');
+    } finally {
+      button.disabled = false;
+      button.textContent = oldText;
+    }
   },
 
   openReturn(itemId) {
