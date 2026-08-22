@@ -1,4 +1,4 @@
-const CACHE='desimall-customer-v0.30.5-order-actions-20260822';
+const CACHE='desimall-customer-v0.30.6-otp-route-20260822';
 const CORE=['./','./index.html','./offline.html','./manifest.webmanifest','./pages/tez.html','./css/style.css','./js/pwa.js','./assets/icons/icon-192.png','./assets/icons/icon-512.png'];
 self.addEventListener('install',event=>event.waitUntil(caches.open(CACHE).then(c=>c.addAll(CORE)).then(()=>self.skipWaiting())));
 self.addEventListener('activate',event=>event.waitUntil(caches.keys().then(keys=>Promise.all(keys.filter(k=>k!==CACHE).map(k=>caches.delete(k)))).then(()=>self.clients.claim())));

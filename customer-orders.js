@@ -190,15 +190,9 @@ const CustomerOrders = {
     // Use the customer-facing normalized status for button visibility.
     // The backend remains the final authority and will reject cancellation
     // if pickup/delivery has already started.
-    const cancellableCustomerStatuses = new Set([
-      'Placed',
-      'Accepted',
-      'Preparing',
-      'Ready for Pickup',
-      'Pickup Assigned'
-    ]);
-
-    const canCancel = cancellableCustomerStatuses.has(status);
+    // Always show Cancel Order for any active order.
+    // Backend is the final authority and blocks cancellation after pickup/delivery starts.
+    const canCancel = !['Delivered','Cancelled'].includes(status);
 
     return `
       <article class="mo-order">

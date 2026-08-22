@@ -153,20 +153,38 @@ const TrackingApp = {
           </section>
         ` : ''}
 
-        ${isTez ? `
+        ${isTez && !cancelled && currentKey !== 'delivered' ? `
           <section class="tez-live-panel" id="tezLivePanel">
             <div class="tez-live-top">
               <div>
-                <small>TEZ LIVE TRACKING</small>
-                <h3 id="tezLiveEta">Estimated arrival: within 25 min</h3>
-                <p id="tezLiveStatus">Waiting for rider live location…</p>
+                <small>TEZ DELIVERY</small>
+                <h3 id="tezLiveEta">Checking delivery status…</h3>
+                <p id="tezLiveStatus">Live tracking starts after rider pickup.</p>
               </div>
               <span class="tez-live-dot" id="tezLiveDot"></span>
             </div>
-            <iframe id="tezLiveMap" class="tez-live-map" title="Rider live location map" loading="lazy"></iframe>
+
+            <div class="tez-delivery-otp hidden" id="tezDeliveryOtpBox">
+              <span>DELIVERY OTP</span>
+              <strong id="tezDeliveryOtp">------</strong>
+              <small>Order receive karne ke baad hi rider ko OTP batayein.</small>
+            </div>
+
+            <iframe id="tezLiveMap" class="tez-live-map hidden" title="Rider live location map" loading="lazy"></iframe>
+
             <div class="tez-live-actions">
-              <a id="tezOpenMap" href="#" target="_blank" rel="noopener" hidden><i class="fa-solid fa-map-location-dot"></i> Open map</a>
+              <a id="tezOpenMap" href="#" target="_blank" rel="noopener" hidden>
+                <i class="fa-solid fa-map-location-dot"></i> Open map
+              </a>
               <span id="tezLocationUpdated"></span>
+            </div>
+          </section>
+        ` : currentKey === 'delivered' && isTez ? `
+          <section class="tez-delivered-card">
+            <i class="fa-solid fa-circle-check"></i>
+            <div>
+              <strong>Tez order delivered</strong>
+              <p>Delivery OTP verified. Rider live location has been stopped.</p>
             </div>
           </section>
         ` : ''}
@@ -210,34 +228,85 @@ const TrackingApp = {
   async loadLiveTracking(orderId) {
     try {
       const data = await DesiMallAPI.getOrderLiveTracking(orderId);
-      const eta = Math.max(0, Math.min(25, Number(data?.etaMinutes ?? 25)));
       const etaEl = document.getElementById('tezLiveEta');
       const statusEl = document.getElementById('tezLiveStatus');
       const map = document.getElementById('tezLiveMap');
       const openMap = document.getElementById('tezOpenMap');
       const updated = document.getElementById('tezLocationUpdated');
       const dot = document.getElementById('tezLiveDot');
+      const otpBox = document.getElementById('tezDeliveryOtpBox');
+      const otpEl = document.getElementById('tezDeliveryOtp');
 
-      if (etaEl) etaEl.textContent = eta > 0 ? `Estimated arrival: about ${eta} min` : 'Promised time reached — rider should arrive now';
+      if (data?.delivered) {
+        if (this.liveTimer) {
+          clearInterval(this.liveTimer);
+          this.liveTimer = null;
+        }
+        return;
+      }
+
+      if (!data?.liveTrackingAvailable) {
+        if (etaEl) etaEl.textContent = 'Live tracking starts after rider pickup';
+        if (statusEl) statusEl.textContent = 'Seller is preparing your order / rider is heading to pickup.';
+        if (map) map.classList.add('hidden');
+        if (openMap) openMap.hidden = true;
+        if (otpBox) otpBox.classList.add('hidden');
+        if (dot) dot.classList.remove('live');
+        return;
+      }
+
+      const eta = Math.max(0, Math.min(25, Number(data?.etaMinutes ?? 25)));
+
+      if (etaEl) {
+        etaEl.textContent = eta > 0
+          ? `Estimated arrival: about ${eta} min`
+          : 'Rider should arrive now';
+      }
+
+      if (otpBox && otpEl && data?.deliveryOtp) {
+        otpEl.textContent = String(data.deliveryOtp);
+        otpBox.classList.remove('hidden');
+      }
 
       const loc = data?.location;
+
       if (!loc || !Number.isFinite(Number(loc.latitude)) || !Number.isFinite(Number(loc.longitude))) {
-        if (statusEl) statusEl.textContent = 'Rider location will appear after assignment and GPS permission.';
-        if (map) map.removeAttribute('src');
+        if (statusEl) statusEl.textContent = 'Rider picked up your order. Waiting for live GPS signal…';
+        if (map) map.classList.add('hidden');
         if (openMap) openMap.hidden = true;
         if (dot) dot.classList.remove('live');
         return;
       }
 
-      const lat = Number(loc.latitude), lon = Number(loc.longitude), delta = 0.006;
+      const lat = Number(loc.latitude);
+      const lon = Number(loc.longitude);
+      const delta = 0.006;
       const bbox = [lon-delta, lat-delta, lon+delta, lat+delta].join(',');
       const osm = `https://www.openstreetmap.org/export/embed.html?bbox=${encodeURIComponent(bbox)}&layer=mapnik&marker=${encodeURIComponent(lat+','+lon)}`;
       const mapUrl = `https://www.openstreetmap.org/?mlat=${encodeURIComponent(lat)}&mlon=${encodeURIComponent(lon)}#map=17/${encodeURIComponent(lat)}/${encodeURIComponent(lon)}`;
 
-      if (map) map.src = osm;
-      if (openMap) { openMap.href = mapUrl; openMap.hidden = false; }
-      if (statusEl) statusEl.textContent = data.live ? 'Rider location is live' : 'Showing the rider’s latest available location';
-      if (updated) updated.textContent = loc.ageSeconds == null ? '' : `Updated ${loc.ageSeconds <= 5 ? 'just now' : `${loc.ageSeconds}s ago`}`;
+      if (map) {
+        map.src = osm;
+        map.classList.remove('hidden');
+      }
+
+      if (openMap) {
+        openMap.href = mapUrl;
+        openMap.hidden = false;
+      }
+
+      if (statusEl) {
+        statusEl.textContent = data.live
+          ? 'Rider location is live'
+          : 'Showing rider’s latest available location';
+      }
+
+      if (updated) {
+        updated.textContent = loc.ageSeconds == null
+          ? ''
+          : `Updated ${loc.ageSeconds <= 5 ? 'just now' : `${loc.ageSeconds}s ago`}`;
+      }
+
       if (dot) dot.classList.toggle('live', Boolean(data.live));
     } catch (error) {
       const statusEl = document.getElementById('tezLiveStatus');

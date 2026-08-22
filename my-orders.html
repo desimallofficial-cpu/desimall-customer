@@ -79,8 +79,24 @@
     .mo-modal-card textarea{min-height:90px;resize:vertical}.mo-modal-actions{display:flex;gap:9px;justify-content:flex-end;margin-top:16px}
     .mo-modal-actions button{border:0;border-radius:9px;padding:10px 13px;font:inherit;font-size:10px;font-weight:900;cursor:pointer}
     .mo-cancel-modal{background:var(--mo-card2);color:var(--mo-text);border:1px solid var(--mo-border)!important}.mo-submit-return{background:var(--mo-orange);color:#fff}
-    .mo-cancel-order{background:transparent;color:var(--mo-red);border:1px solid rgba(190,18,60,.26)!important}
-    .mo-cancel-order:hover{background:rgba(190,18,60,.08)}
+    .mo-cancel-order{
+      display:inline-flex;align-items:center;justify-content:center;gap:6px;
+      min-height:34px;padding:9px 12px;border-radius:9px;
+      border:1px solid rgba(244,63,94,.45)!important;
+      background:rgba(244,63,94,.08);color:#fb7185;
+      font:inherit;font-size:10px;font-weight:900;text-decoration:none;
+      cursor:pointer;transition:transform .16s ease,background .16s ease,border-color .16s ease,box-shadow .16s ease;
+    }
+    .mo-cancel-order:hover{
+      background:rgba(244,63,94,.16);border-color:rgba(244,63,94,.72)!important;
+      box-shadow:0 6px 18px rgba(244,63,94,.10);transform:translateY(-1px);
+    }
+    .mo-cancel-order:active{transform:translateY(0);box-shadow:none}
+    .mo-cancel-order:focus-visible{outline:3px solid rgba(244,63,94,.22);outline-offset:2px}
+    .mo-cancel-order:disabled{opacity:.55;cursor:not-allowed;transform:none;box-shadow:none}
+    .mo-order-actions a,.mo-order-actions button{cursor:pointer;white-space:nowrap;transition:transform .16s ease,filter .16s ease,background .16s ease}
+    .mo-order-actions a:hover,.mo-order-actions button:hover{transform:translateY(-1px)}
+    .mo-order-actions a:active,.mo-order-actions button:active{transform:translateY(0)}
     .mo-danger-confirm{background:var(--mo-red);color:#fff}
     .mo-modal-warning{padding:10px 12px;border-radius:10px;background:rgba(190,18,60,.08);color:var(--mo-red);font-size:10px;line-height:1.5;margin:8px 0 14px}
 
@@ -108,7 +124,7 @@
     .mo-item-copy strong{font-size:13px}
     .mo-item-copy span{font-size:10px}
     .mo-order-foot{gap:18px;padding:13px 19px}
-    .mo-track,.mo-details,.mo-help,.mo-buy-again{display:inline-flex;align-items:center;justify-content:center;gap:6px;padding:9px 11px;border-radius:9px;text-decoration:none;font-size:10px;font-weight:900}
+    .mo-track,.mo-details,.mo-help,.mo-buy-again{display:inline-flex;align-items:center;justify-content:center;gap:6px;min-height:34px;padding:9px 12px;border-radius:9px;text-decoration:none;font-size:10px;font-weight:900;cursor:pointer}
     .mo-track{background:var(--mo-orange);color:#fff}
     .mo-details,.mo-help,.mo-buy-again{border:1px solid var(--mo-border);background:var(--mo-card2);color:var(--mo-text)}
     .mo-help{color:var(--mo-orange);border-color:rgba(255,101,0,.35)}
@@ -282,10 +298,14 @@
 <script src="../js/auth.js"></script>
 <script src="../js/api.js"></script>
   <script src="../js/product-image-resolver.js?v=0.21.3"></script>
-<script src="../js/customer-orders.js?v=0.30.3"></script>
+<script src="../js/customer-orders.js?v=0.30.5"></script>
 <script src="../js/pwa.js"></script>
 <script src="../js/ui-preferences.js?v=0.29.7"></script>
 
   <script src="../js/customer-footer.js?v=0.29.4"></script>
+<script>
+  window.DESIMALL_CUSTOMER_BUILD = 'v0.30.5';
+  console.info('DesiMall Customer build v0.30.5 - Order action UI polish');
+</script>
 </body>
 </html>
