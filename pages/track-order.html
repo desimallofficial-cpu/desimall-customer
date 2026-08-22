@@ -21,9 +21,9 @@
 
 <script>
 (function(){
-  window.DESIMALL_TRACKING_BUILD = 'v0.31.3';
+  window.DESIMALL_TRACKING_BUILD = 'v0.31.5';
   try {
-    localStorage.setItem('desimall_tracking_build', 'v0.31.3');
+    localStorage.setItem('desimall_tracking_build', 'v0.31.5');
   } catch (_) {}
 
   if ('serviceWorker' in navigator) {
@@ -161,8 +161,174 @@
 
 </style>
 
+
+<style id="dmTrackingCSS_v0315">
+/* DesiMall Tracking v0.31.2 */
+
+.tracking-page{min-height:70vh;padding-top:38px;padding-bottom:70px}
+.tracking-hero{text-align:center;max-width:760px;margin:auto}.tracking-hero h1{font-size:clamp(30px,5vw,46px);margin:5px 0 10px}.tracking-hero>p{color:var(--muted);margin-bottom:22px}
+.tracking-hero form{height:56px;background:var(--surface,#fff);border:1px solid var(--line);border-radius:14px;display:flex;align-items:center;padding-left:18px;box-shadow:var(--shadow-sm);overflow:hidden}.tracking-hero form i{color:var(--muted)}.tracking-hero input{flex:1;height:100%;padding:0 14px;border:0;background:transparent;color:var(--ink);outline:0;font-size:15px}.tracking-hero button{height:100%;border:0;padding:0 25px;background:var(--primary);color:#fff;font-weight:800}
+.tracking-card{max-width:920px;margin:30px auto 0;background:var(--surface,#fff);border:1px solid var(--line);border-radius:20px;box-shadow:var(--shadow-md);padding:26px}
+.tracking-head,.tracking-meta{display:flex;justify-content:space-between;gap:18px;align-items:center}.tracking-head span{font-size:10px;color:var(--muted);font-weight:900;letter-spacing:1px}.tracking-head h2{font-size:22px}.tracking-status{padding:8px 13px;background:#eaf8ee;color:#137333;border-radius:999px;font-size:12px}.tracking-status.cancelled{background:#ffebee;color:#b3261e}
+.tracking-meta{margin:18px 0 22px;padding:13px 15px;background:var(--soft-surface,#f8fafc);border-radius:12px;flex-wrap:wrap;color:var(--muted);font-size:12px}.tracking-meta i{color:var(--primary);margin-right:5px}
+.tracking-timeline{display:grid;grid-template-columns:repeat(6,1fr);list-style:none;margin:30px 0;padding:0}.tracking-timeline li{position:relative;text-align:center;color:#98a2b3}.tracking-timeline li:not(:last-child)::after{content:"";position:absolute;height:3px;background:#e5e7eb;left:55%;right:-45%;top:19px}.tracking-timeline li.complete:not(:last-child)::after{background:var(--primary)}
+.tracking-timeline li>span{width:40px;height:40px;border-radius:50%;display:grid;place-items:center;background:#e5e7eb;color:#fff;margin:0 auto 10px;position:relative;z-index:2}.tracking-timeline li.complete>span{background:var(--primary)}.tracking-timeline li.current>span{box-shadow:0 0 0 5px rgba(255,101,0,.13)}.tracking-timeline strong{display:block;font-size:11px;color:inherit}.tracking-timeline li.complete strong{color:var(--ink)}.tracking-timeline small{font-size:9px}
+.rider-live-card{display:grid;grid-template-columns:auto 1fr auto;align-items:center;gap:14px;padding:16px;border-radius:15px;border:1px solid rgba(255,101,0,.28);background:linear-gradient(120deg,rgba(255,101,0,.12),rgba(37,99,235,.07));margin-bottom:10px}.rider-live-icon{width:48px;height:48px;border-radius:14px;display:grid;place-items:center;background:var(--primary);color:#fff;font-size:20px}.rider-live-card small{color:var(--primary);font-size:9px;font-weight:900}.rider-live-card h3{margin:3px 0;font-size:16px}.rider-live-card p{margin:0;color:var(--muted);font-size:11px}.rider-actions{display:flex;gap:8px}.rider-actions a,.tracking-help a{padding:9px 11px;border-radius:9px;text-decoration:none;border:1px solid var(--line);color:var(--ink);font-size:10px;font-weight:800;background:var(--surface)}.rider-actions a:first-child{background:var(--primary);color:#fff;border-color:var(--primary)}
+.tracking-help{display:flex;justify-content:flex-end;gap:8px;border-top:1px solid var(--line);padding-top:15px;margin-top:5px}
+.tracking-address{border-top:1px solid var(--line);padding-top:18px;margin-top:18px}.tracking-address h3{font-size:14px;margin-bottom:7px}.tracking-address p{font-size:12px;color:var(--muted);line-height:1.7}
+.tracking-empty{text-align:center;max-width:600px;margin:35px auto;background:var(--surface,#fff);padding:45px;border-radius:18px;border:1px solid var(--line)}.tracking-empty i{font-size:45px;color:#b8c0cc}.tracking-empty h2{margin:12px 0 5px}.tracking-empty p{color:var(--muted)}.cancelled-message{text-align:center;padding:30px;color:#b3261e;font-weight:800}.compact-footer{margin-top:0}.tracking-mobile-nav{display:none}
+@media(max-width:700px){
+ body{padding-bottom:65px}.tracking-page{padding-top:24px}.tracking-hero form{height:auto;flex-wrap:wrap;padding:9px}.tracking-hero input{height:44px;min-width:0}.tracking-hero button{width:100%;height:44px;border-radius:9px}.tracking-card{padding:17px}.tracking-head{align-items:flex-start}.tracking-meta{align-items:flex-start;flex-direction:column}
+ .rider-live-card{grid-template-columns:auto 1fr}.rider-actions{grid-column:1/-1}.rider-actions a{flex:1;text-align:center}
+ .tracking-timeline{grid-template-columns:1fr;gap:0}.tracking-timeline li{display:flex;text-align:left;gap:12px;min-height:66px}.tracking-timeline li>span{margin:0}.tracking-timeline li:not(:last-child)::after{width:3px;height:auto;left:19px;top:40px;bottom:0;right:auto}.tracking-timeline li div{padding-top:4px}
+ .tracking-help a{flex:1;text-align:center}.tracking-mobile-nav{position:fixed;left:0;right:0;bottom:0;height:62px;z-index:2000;background:var(--surface,#fff);border-top:1px solid var(--line);display:grid;grid-template-columns:repeat(4,1fr)}.tracking-mobile-nav a{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;color:var(--muted);text-decoration:none;font-size:9px;font-weight:800}.tracking-mobile-nav a i{font-size:17px}.tracking-mobile-nav a.active{color:var(--primary)}
+}
+
+.tracking-tez-banner{display:flex;align-items:center;gap:7px;margin:14px 0 0;padding:9px 11px;border-radius:10px;background:rgba(255,101,0,.12);border:1px solid rgba(255,101,0,.28);font-size:10px}.tracking-tez-banner i{color:#ff6500}.tracking-tez-banner span{color:var(--muted);margin-left:auto}
+
+.tez-live-panel{margin:18px 0 22px;padding:16px;border:1px solid var(--line);border-radius:16px;background:var(--soft-surface,#f8fafc)}
+.tez-live-top{display:flex;justify-content:space-between;gap:16px;align-items:flex-start}.tez-live-top small{font-weight:900;color:#ff6b00;letter-spacing:.08em}
+.tez-live-top h3{margin:4px 0;font-size:19px}.tez-live-top p{margin:0;color:var(--muted)}
+.tez-live-dot{width:13px;height:13px;border-radius:50%;background:#98a2b3;box-shadow:0 0 0 5px rgba(152,162,179,.14)}
+.tez-live-dot.live{background:#12b76a;box-shadow:0 0 0 5px rgba(18,183,106,.16)}
+.tez-live-map{width:100%;height:300px;border:0;border-radius:13px;margin-top:14px;background:#e9eef5}
+.tez-live-actions{display:flex;justify-content:space-between;gap:14px;align-items:center;margin-top:10px;font-size:12px;color:var(--muted)}
+.tez-live-actions a{color:#ff6b00;text-decoration:none;font-weight:850}@media(max-width:600px){.tez-live-map{height:240px}}
+
+.hidden{display:none!important}
+.tez-delivery-otp{margin-top:14px;padding:14px;border:1px dashed #ff6b00;border-radius:12px;background:rgba(255,107,0,.08);text-align:center}
+.tez-delivery-otp span{display:block;font-size:9px;font-weight:900;letter-spacing:.12em;color:#ff6b00}.tez-delivery-otp strong{display:block;margin:5px 0;font-size:28px;letter-spacing:.18em}.tez-delivery-otp small{color:var(--muted)}
+.tez-delivered-card{display:flex;align-items:center;gap:13px;margin:18px 0;padding:16px;border:1px solid rgba(18,183,106,.28);border-radius:14px;background:rgba(18,183,106,.08)}
+.tez-delivered-card>i{font-size:28px;color:#12b76a}.tez-delivered-card strong{display:block}.tez-delivered-card p{margin:3px 0 0;color:var(--muted)}
+
+/* Tez live ETA v0.30.9 */
+.tez-live-actions{
+  justify-content:flex-end!important;
+}
+#tezLocationUpdated{
+  margin-left:auto;
+}
+
+/* ===== DesiMall animated bike tracking v0.31.0 ===== */
+.tez-live-map{
+  position:relative;
+  width:100%;
+  min-height:330px;
+  overflow:hidden;
+  border-radius:14px;
+  background:#e9eef5;
+}
+.tez-live-map .leaflet-control-attribution{
+  font-size:8px;
+}
+.dm-bike-marker-wrap,
+.dm-customer-marker-wrap{
+  background:transparent!important;
+  border:0!important;
+}
+.dm-bike-marker{
+  width:52px;
+  height:52px;
+  position:relative;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  transition:transform .25s ease;
+}
+.dm-bike-circle{
+  position:relative;
+  z-index:3;
+  width:42px;
+  height:42px;
+  border-radius:50%;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  background:#ff6b00;
+  color:#fff;
+  border:3px solid #fff;
+  box-shadow:0 6px 16px rgba(0,0,0,.28);
+  font-size:18px;
+}
+.dm-bike-pulse{
+  position:absolute;
+  inset:4px;
+  border-radius:50%;
+  background:rgba(255,107,0,.28);
+  animation:dmBikePulse 1.8s ease-out infinite;
+}
+@keyframes dmBikePulse{
+  0%{transform:scale(.72);opacity:.9}
+  100%{transform:scale(1.55);opacity:0}
+}
+.dm-customer-marker{
+  width:38px;
+  height:38px;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  border-radius:50% 50% 50% 8px;
+  transform:rotate(-45deg);
+  background:#14213d;
+  color:#fff;
+  border:3px solid #fff;
+  box-shadow:0 6px 16px rgba(0,0,0,.24);
+}
+.dm-customer-marker i{
+  transform:rotate(45deg);
+  font-size:14px;
+}
+#tezLocationUpdated{
+  margin-left:auto;
+}
+
+/* v0.31.3 track button fix */
+#trackingForm button{
+  cursor:pointer!important;
+}
+#trackingForm button:active{
+  transform:translateY(1px);
+}
+
+/* v0.31.5 rider-to-customer route tracking */
+.tez-live-map{
+  min-height:360px;
+}
+.tez-live-map::after{
+  content:"";
+  position:absolute;
+  pointer-events:none;
+  inset:0;
+  border-radius:14px;
+  box-shadow:inset 0 0 0 1px rgba(15,23,42,.08);
+  z-index:400;
+}
+.leaflet-overlay-pane path{
+  stroke:#ff6b00;
+}
+.dm-bike-circle{
+  background:#ff6b00;
+}
+
+</style>
+
+<script>
+if ('serviceWorker' in navigator) {
+  navigator.serviceWorker.getRegistrations().then(rs => rs.forEach(r => r.unregister())).catch(()=>{});
+}
+if ('caches' in window) {
+  caches.keys().then(keys => keys.forEach(k => caches.delete(k))).catch(()=>{});
+}
+</script>
 </head>
 <body>
+<div id="dmSingleFileProof" style="
+position:fixed;left:50%;top:8px;transform:translateX(-50%);
+z-index:999999;background:#16a34a;color:white;border-radius:999px;
+padding:7px 14px;font:800 11px Arial,sans-serif;box-shadow:0 5px 18px rgba(0,0,0,.3)">
+LIVE TRACKING v0.31.5 SINGLE-FILE
+</div>
+
 <header class="navbar-header">
   <div class="container header-container">
     <a class="brand" href="../index.html">
@@ -212,7 +378,736 @@
     integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo="
     crossorigin=""
   ></script>
-<script src="../js/tracking.js?v=0.31.3"></script>
+<script id="dmTrackingJS_v0315">
+// DesiMall Tracking v0.31.3
+document.addEventListener('DOMContentLoaded', () => TrackingApp.init());
+
+const TrackingApp = {
+  liveTimer: null,
+  lastDisplayedEta: null,
+  tezMap: null,
+  riderMarker: null,
+  customerMarker: null,
+  riderMarkerLatLng: null,
+  markerAnimFrame: null,
+  routeLine: null,
+  routeCoords: [],
+  routeFetchedAt: 0,
+  lastRouteOrigin: null,
+  lastRouteDestination: null,
+  stages: [
+    { key:'placed', label:'Order placed', icon:'fa-receipt' },
+    { key:'accepted', label:'Seller accepted', icon:'fa-store' },
+    { key:'preparing', label:'Preparing', icon:'fa-box-open' },
+    { key:'picked_up', label:'Rider picked up', icon:'fa-motorcycle' },
+    { key:'on_the_way', label:'On the way', icon:'fa-route' },
+    { key:'delivered', label:'Delivered', icon:'fa-circle-check' }
+  ],
+
+  esc(value) {
+    return String(value ?? '').replace(/[&<>"']/g, c => ({
+      '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'
+    }[c]));
+  },
+
+  stageKey(status) {
+    const raw = String(status || '').trim().toLowerCase().replace(/\s+/g,'_');
+    const map = {
+      new:'placed', placed:'placed',
+      accepted:'accepted',
+      preparing:'preparing',
+      ready:'preparing', ready_for_pickup:'preparing',
+      pickup_assigned:'preparing',
+      picked_up:'picked_up',
+      out_for_delivery:'on_the_way', on_the_way:'on_the_way',
+      reached_customer:'on_the_way',
+      delivered:'delivered',
+      cancelled:'cancelled', canceled:'cancelled', rejected:'cancelled'
+    };
+    return map[raw] || 'placed';
+  },
+
+  customerStatus(status) {
+    const key=this.stageKey(status);
+    if(key==='cancelled') return 'Cancelled';
+    return this.stages.find(x=>x.key===key)?.label || 'Order placed';
+  },
+
+  async init() {
+    const params = new URLSearchParams(location.search);
+    const orderId = params.get('order') || '';
+    const input = document.getElementById('trackingOrderId');
+    if (input) input.value = orderId;
+
+    document.getElementById('trackingForm')?.addEventListener('submit', e => {
+      e.preventDefault(); this.track();
+    });
+
+    DesiMallAuth?.updateHeader?.();
+    CartManager?.updateCartBadge?.();
+
+    if (orderId) await this.track();
+  },
+
+  findOrder(orders, id) {
+    const wanted = String(id || '').trim().toLowerCase();
+    return (orders || []).find(order => {
+      const code = order.OrderCode || order.order_code || order.OrderID || '';
+      const internal = order.OrderID || order.id || order.InternalOrderID || '';
+      return String(code).toLowerCase() === wanted || String(internal).toLowerCase() === wanted;
+    }) || null;
+  },
+
+  async track() {
+    const input = document.getElementById('trackingOrderId');
+    const id = String(input?.value || '').trim();
+    const result = document.getElementById('trackingResult');
+
+    if (!id || !result) return;
+
+    // Keep the shareable URL in sync without reloading the page.
+    try {
+      const url = new URL(location.href);
+      url.searchParams.set('order', id);
+      history.replaceState({}, '', url);
+    } catch (_) {}
+
+    result.innerHTML = `
+      <div class="tracking-empty">
+        <i class="fa-solid fa-spinner fa-spin"></i>
+        <h2>Loading latest status...</h2>
+        <p>Please wait a moment.</p>
+      </div>`;
+    result.classList.remove('hidden');
+
+    try {
+      const orders = await DesiMallAPI.getMyOrders();
+      const list = Array.isArray(orders)
+        ? orders
+        : Array.isArray(orders?.orders)
+          ? orders.orders
+          : [];
+
+      const order = this.findOrder(list, id);
+
+      if (!order) {
+        result.innerHTML = `
+          <div class="tracking-empty">
+            <i class="fa-solid fa-box-open"></i>
+            <h2>Order not found</h2>
+            <p>Check the order ID or open it from My Orders.</p>
+          </div>`;
+        return;
+      }
+
+      this.render(order);
+    } catch (error) {
+      const authEnded =
+        error?.status === 401 ||
+        error?.code === 'SESSION_ENDED' ||
+        error?.code === 'INVALID_SESSION';
+
+      result.innerHTML = `
+        <div class="tracking-empty">
+          <i class="fa-solid ${authEnded ? 'fa-user-lock' : 'fa-triangle-exclamation'}"></i>
+          <h2>${authEnded ? 'Login required' : 'Could not load order'}</h2>
+          <p>${this.esc(
+            authEnded
+              ? 'Please login again, then open Track Order from My Orders.'
+              : (error?.message || 'Please try again in a moment.')
+          )}</p>
+        </div>`;
+    }
+  },
+
+  render(order) {
+    const result = document.getElementById('trackingResult');
+    const orderCode = order.OrderCode || order.order_code || order.OrderID || '—';
+    const rawStatus = order.TrackingStatus || order.tracking_status || order.Status || order.status || order.DeliveryStatus || 'Placed';
+    const currentKey = this.stageKey(rawStatus);
+    const cancelled = currentKey === 'cancelled';
+    const currentIndex = this.stages.findIndex(s => s.key === currentKey);
+    const createdAt = order.CreatedAt || order.created_at || order.OrderDate || new Date().toISOString();
+    const orderedDate = new Date(createdAt);
+    const total = Number(order.TotalAmount ?? order.total_amount ?? 0);
+    const address = order.DeliveryAddress || order.delivery_address || null;
+    const internalOrderId = order.OrderID || order.id || order.InternalOrderID || '';
+    if (this.liveTimer) { clearInterval(this.liveTimer); this.liveTimer = null; }
+
+    const riderName = order.RiderName || order.rider_name || order.AssignedRiderName || '';
+    const riderMobile = order.RiderMobile || order.rider_mobile || order.AssignedRiderMobile || '';
+    const etaText = order.EstimatedArrival || order.estimated_arrival || order.ETA || '';
+    const isTez = Boolean(
+      order.IsTez ||
+      String(order.FulfillmentMode || order.fulfillment_mode || '').toLowerCase() === 'tez'
+    );
+    const tezMin = Number(order.DeliveryTargetMinMinutes || order.delivery_target_min_minutes || 0);
+    const tezMax = Number(order.DeliveryTargetMaxMinutes || order.delivery_target_max_minutes || 0);
+
+    result.innerHTML = `<article class="tracking-card">
+      <div class="tracking-head">
+        <div><span>ORDER</span><h2>${this.esc(orderCode)}</h2></div>
+        <strong class="tracking-status ${cancelled ? 'cancelled' : ''}">${this.esc(cancelled ? 'Cancelled' : this.customerStatus(rawStatus))}</strong>
+      </div>
+
+      ${isTez ? `
+        <div class="tracking-tez-banner">
+          <i class="fa-solid fa-bolt"></i>
+          <strong>Tez Delivery</strong>
+          <span>${tezMin && tezMax ? `Target ${tezMin}–${tezMax} min` : 'Fast-delivery order'}</span>
+        </div>
+      ` : ''}
+
+      <div class="tracking-meta">
+        <span><i class="fa-solid fa-calendar"></i> Ordered ${orderedDate.toLocaleDateString('en-IN',{day:'numeric',month:'short',year:'numeric'})}</span>
+        <span><i class="fa-solid fa-indian-rupee-sign"></i> ${total.toLocaleString('en-IN')}</span>
+      </div>
+
+      ${cancelled ? `
+        <div class="cancelled-message"><i class="fa-solid fa-circle-xmark"></i> This order was cancelled.</div>
+      ` : `
+        ${currentKey === 'on_the_way' ? `
+          <section class="rider-live-card">
+            <div class="rider-live-icon"><i class="fa-solid fa-motorcycle"></i></div>
+            <div>
+              <small>YOUR ORDER IS ON THE WAY</small>
+              <h3>${riderName ? `Rider: ${this.esc(riderName)}` : 'Rider is heading to you'}</h3>
+              ${etaText ? `<p>Estimated arrival: ${this.esc(etaText)}</p>` : '<p>Follow the live order status here.</p>'}
+            </div>
+            <div class="rider-actions">
+              ${riderMobile ? `<a href="tel:${this.esc(riderMobile)}"><i class="fa-solid fa-phone"></i> Call Rider</a>` : ''}
+              <a href="support.html"><i class="fa-solid fa-headset"></i> Get Help</a>
+            </div>
+          </section>
+        ` : ''}
+
+        ${isTez && !cancelled && currentKey !== 'delivered' ? `
+          <section class="tez-live-panel" id="tezLivePanel">
+            <div class="tez-live-top">
+              <div>
+                <small>TEZ DELIVERY</small>
+                <h3 id="tezLiveEta">Checking delivery status…</h3>
+                <p id="tezLiveStatus">Live tracking starts after rider pickup.</p>
+              </div>
+              <span class="tez-live-dot" id="tezLiveDot"></span>
+            </div>
+
+            <div class="tez-delivery-otp hidden" id="tezDeliveryOtpBox">
+              <span>DELIVERY OTP</span>
+              <strong id="tezDeliveryOtp">------</strong>
+              <small>Order receive karne ke baad hi rider ko OTP batayein.</small>
+            </div>
+
+            <div id="tezLiveMap" class="tez-live-map hidden" aria-label="Rider live location map"></div>
+            <div class="tez-live-actions">
+              <span id="tezLocationUpdated"></span>
+            </div>
+          </section>
+        ` : currentKey === 'delivered' && isTez ? `
+          <section class="tez-delivered-card">
+            <i class="fa-solid fa-circle-check"></i>
+            <div>
+              <strong>Tez order delivered</strong>
+              <p>Delivery OTP verified. Rider live location has been stopped.</p>
+            </div>
+          </section>
+        ` : ''}
+
+        <ol class="tracking-timeline">
+          ${this.stages.map((stage,index)=>{
+            const complete=index<=Math.max(0,currentIndex);
+            const current=index===Math.max(0,currentIndex);
+            return `<li class="${complete?'complete':''} ${current?'current':''}">
+              <span><i class="fa-solid ${complete && !current ? 'fa-check' : stage.icon}"></i></span>
+              <div>
+                <strong>${stage.label}</strong>
+                <small>${current?'Current status':complete?'Completed':'Pending'}</small>
+              </div>
+            </li>`;
+          }).join('')}
+        </ol>
+      `}
+
+      <div class="tracking-help">
+        <a href="my-orders.html"><i class="fa-solid fa-arrow-left"></i> My Orders</a>
+        <a href="support.html"><i class="fa-solid fa-headset"></i> Get Help</a>
+      </div>
+
+      ${this.renderAddress(address)}
+    </article>`;
+
+    result.classList.remove('hidden');
+    if (isTez && internalOrderId && !cancelled && currentKey !== 'delivered') {
+      this.startLiveTracking(internalOrderId);
+    }
+    DesiMallAnalytics?.track?.('track_order', {orderId: orderCode, status: rawStatus});
+  },
+
+  startLiveTracking(orderId) {
+    const load = () => this.loadLiveTracking(orderId);
+    load();
+    this.liveTimer = setInterval(load, 8000);
+  },
+
+  ensureTezMap() {
+    const el = document.getElementById('tezLiveMap');
+    if (!el || typeof L === 'undefined') return null;
+
+    if (!this.tezMap) {
+      this.tezMap = L.map(el, {
+        zoomControl: true,
+        attributionControl: true
+      });
+
+      L.tileLayer(
+        'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',
+        {
+          maxZoom: 19,
+          attribution: '&copy; OpenStreetMap contributors'
+        }
+      ).addTo(this.tezMap);
+
+      setTimeout(() => {
+        try { this.tezMap.invalidateSize(); } catch (_) {}
+      }, 80);
+    }
+
+    return this.tezMap;
+  },
+
+  bikeIcon(heading = 0) {
+    const safeHeading = Number.isFinite(Number(heading)) ? Number(heading) : 0;
+
+    return L.divIcon({
+      className: 'dm-bike-marker-wrap',
+      html: `
+        <div class="dm-bike-marker" style="transform:rotate(${safeHeading}deg)">
+          <div class="dm-bike-pulse"></div>
+          <div class="dm-bike-circle">
+            <i class="fa-solid fa-motorcycle"></i>
+          </div>
+        </div>
+      `,
+      iconSize: [52, 52],
+      iconAnchor: [26, 26]
+    });
+  },
+
+  customerIcon() {
+    return L.divIcon({
+      className: 'dm-customer-marker-wrap',
+      html: `
+        <div class="dm-customer-marker">
+          <i class="fa-solid fa-house"></i>
+        </div>
+      `,
+      iconSize: [38, 38],
+      iconAnchor: [19, 34]
+    });
+  },
+
+  animateRiderMarker(nextLat, nextLon, heading = 0) {
+    const map = this.ensureTezMap();
+    if (!map) return;
+
+    const target = L.latLng(Number(nextLat), Number(nextLon));
+
+    if (!this.riderMarker) {
+      this.riderMarker = L.marker(target, {
+        icon: this.bikeIcon(heading),
+        zIndexOffset: 1000
+      }).addTo(map);
+
+      this.riderMarkerLatLng = target;
+      map.setView(target, 16);
+      return;
+    }
+
+    if (this.markerAnimFrame) {
+      cancelAnimationFrame(this.markerAnimFrame);
+      this.markerAnimFrame = null;
+    }
+
+    const start = this.riderMarker.getLatLng();
+    const startTime = performance.now();
+    const duration = 3500;
+
+    this.riderMarker.setIcon(this.bikeIcon(heading));
+
+    const step = (now) => {
+      const progress = Math.min(1, (now - startTime) / duration);
+      const eased = progress < 0.5
+        ? 2 * progress * progress
+        : 1 - Math.pow(-2 * progress + 2, 2) / 2;
+
+      const lat = start.lat + (target.lat - start.lat) * eased;
+      const lng = start.lng + (target.lng - start.lng) * eased;
+
+      this.riderMarker.setLatLng([lat, lng]);
+      this.riderMarkerLatLng = L.latLng(lat, lng);
+
+      if (progress < 1) {
+        this.markerAnimFrame = requestAnimationFrame(step);
+      } else {
+        this.markerAnimFrame = null;
+        this.riderMarkerLatLng = target;
+      }
+    };
+
+    this.markerAnimFrame = requestAnimationFrame(step);
+  },
+
+  updateCustomerMarker(destination) {
+    const map = this.ensureTezMap();
+    if (!map || !destination) return;
+
+    const lat = Number(destination.latitude);
+    const lon = Number(destination.longitude);
+
+    if (!Number.isFinite(lat) || !Number.isFinite(lon)) return;
+
+    if (!this.customerMarker) {
+      this.customerMarker = L.marker([lat, lon], {
+        icon: this.customerIcon(),
+        zIndexOffset: 500
+      }).addTo(map);
+    } else {
+      this.customerMarker.setLatLng([lat, lon]);
+    }
+  },
+
+  fitTezMap(riderLat, riderLon, destination) {
+    const map = this.ensureTezMap();
+    if (!map) return;
+
+    const points = [];
+
+    if (Number.isFinite(Number(riderLat)) && Number.isFinite(Number(riderLon))) {
+      points.push([Number(riderLat), Number(riderLon)]);
+    }
+
+    if (
+      destination &&
+      Number.isFinite(Number(destination.latitude)) &&
+      Number.isFinite(Number(destination.longitude))
+    ) {
+      points.push([
+        Number(destination.latitude),
+        Number(destination.longitude)
+      ]);
+    }
+
+    if (points.length >= 2) {
+      map.fitBounds(points, {
+        padding: [50, 50],
+        maxZoom: 16
+      });
+    } else if (points.length === 1) {
+      map.setView(points[0], 16);
+    }
+
+    setTimeout(() => {
+      try { map.invalidateSize(); } catch (_) {}
+    }, 50);
+  },
+
+  nearestRoutePoint(lat, lon) {
+    if (!Array.isArray(this.routeCoords) || !this.routeCoords.length) {
+      return { lat:Number(lat), lon:Number(lon) };
+    }
+
+    let best = null;
+    let bestScore = Infinity;
+
+    for (const point of this.routeCoords) {
+      const dLat = Number(point[0]) - Number(lat);
+      const dLon = Number(point[1]) - Number(lon);
+      const score = dLat*dLat + dLon*dLon;
+
+      if (score < bestScore) {
+        bestScore = score;
+        best = point;
+      }
+    }
+
+    return best
+      ? { lat:Number(best[0]), lon:Number(best[1]) }
+      : { lat:Number(lat), lon:Number(lon) };
+  },
+
+  routeNeedsRefresh(riderLat, riderLon, destination) {
+    if (!destination) return false;
+
+    const now = Date.now();
+    if (!this.routeFetchedAt || now - this.routeFetchedAt > 30000) {
+      return true;
+    }
+
+    if (!this.lastRouteOrigin || !this.lastRouteDestination) {
+      return true;
+    }
+
+    const moved =
+      Math.abs(Number(riderLat) - Number(this.lastRouteOrigin.lat)) +
+      Math.abs(Number(riderLon) - Number(this.lastRouteOrigin.lon));
+
+    const destMoved =
+      Math.abs(Number(destination.latitude) - Number(this.lastRouteDestination.lat)) +
+      Math.abs(Number(destination.longitude) - Number(this.lastRouteDestination.lon));
+
+    return moved > 0.001 || destMoved > 0.0002;
+  },
+
+  async updateRoadRoute(riderLat, riderLon, destination) {
+    const map = this.ensureTezMap();
+    if (!map || !destination) return null;
+
+    const dLat = Number(destination.latitude);
+    const dLon = Number(destination.longitude);
+
+    if (![riderLat, riderLon, dLat, dLon].every(v => Number.isFinite(Number(v)))) {
+      return null;
+    }
+
+    if (!this.routeNeedsRefresh(riderLat, riderLon, destination)) {
+      return null;
+    }
+
+    this.routeFetchedAt = Date.now();
+    this.lastRouteOrigin = { lat:Number(riderLat), lon:Number(riderLon) };
+    this.lastRouteDestination = { lat:dLat, lon:dLon };
+
+    try {
+      const url =
+        `https://router.project-osrm.org/route/v1/driving/` +
+        `${Number(riderLon)},${Number(riderLat)};${dLon},${dLat}` +
+        `?overview=full&geometries=geojson&steps=false`;
+
+      const response = await fetch(url, {
+        method:'GET',
+        cache:'no-store'
+      });
+
+      if (!response.ok) throw new Error('Route service unavailable');
+
+      const data = await response.json();
+      const route = data?.routes?.[0];
+
+      if (!route?.geometry?.coordinates?.length) {
+        throw new Error('Road route not found');
+      }
+
+      this.routeCoords = route.geometry.coordinates.map(([lon, lat]) => [lat, lon]);
+
+      if (this.routeLine) {
+        try { map.removeLayer(this.routeLine); } catch (_) {}
+      }
+
+      this.routeLine = L.polyline(
+        this.routeCoords,
+        {
+          weight:6,
+          opacity:.85,
+          lineCap:'round',
+          lineJoin:'round'
+        }
+      ).addTo(map);
+
+      map.fitBounds(
+        this.routeLine.getBounds(),
+        { padding:[45,45], maxZoom:16 }
+      );
+
+      return {
+        durationMinutes: Math.max(1, Math.ceil(Number(route.duration || 0) / 60)),
+        distanceKm: Number(route.distance || 0) / 1000
+      };
+    } catch (error) {
+      console.warn('Road route:', error);
+      return null;
+    }
+  },
+
+  async loadLiveTracking(orderId) {
+    try {
+      const data = await DesiMallAPI.getOrderLiveTracking(orderId);
+
+      const etaEl = document.getElementById('tezLiveEta');
+      const statusEl = document.getElementById('tezLiveStatus');
+      const mapEl = document.getElementById('tezLiveMap');
+      const updated = document.getElementById('tezLocationUpdated');
+      const dot = document.getElementById('tezLiveDot');
+      const otpBox = document.getElementById('tezDeliveryOtpBox');
+      const otpEl = document.getElementById('tezDeliveryOtp');
+
+      if (data?.delivered) {
+        if (this.liveTimer) {
+          clearInterval(this.liveTimer);
+          this.liveTimer = null;
+        }
+        if (this.markerAnimFrame) {
+          cancelAnimationFrame(this.markerAnimFrame);
+          this.markerAnimFrame = null;
+        }
+        this.lastDisplayedEta = null;
+        return;
+      }
+
+      if (!data?.liveTrackingAvailable) {
+        this.lastDisplayedEta = null;
+        if (etaEl) etaEl.textContent = 'Live tracking starts after rider pickup';
+        if (statusEl) statusEl.textContent = 'Seller is preparing your order / rider is heading to pickup.';
+        if (mapEl) mapEl.classList.add('hidden');
+        if (otpBox) otpBox.classList.add('hidden');
+        if (dot) dot.classList.remove('live');
+        if (updated) updated.textContent = '';
+        return;
+      }
+
+      if (otpBox && otpEl && data?.deliveryOtp) {
+        otpEl.textContent = String(data.deliveryOtp);
+        otpBox.classList.remove('hidden');
+      }
+
+      const loc = data?.location;
+      const stale = Boolean(data?.locationStale);
+      const valid = data?.locationValid !== false;
+
+      if (!valid) {
+        if (etaEl) etaEl.textContent = 'Waiting for correct rider GPS';
+        if (statusEl) statusEl.textContent = 'Rider GPS looks incorrect. Waiting for a fresh valid location.';
+        if (mapEl) mapEl.classList.add('hidden');
+        if (dot) dot.classList.remove('live');
+        if (updated) updated.textContent = '';
+        return;
+      }
+
+      if (
+        !loc ||
+        !Number.isFinite(Number(loc.latitude)) ||
+        !Number.isFinite(Number(loc.longitude))
+      ) {
+        if (etaEl) etaEl.textContent = 'Waiting for rider location';
+        if (statusEl) statusEl.textContent = 'Rider picked up your order. Waiting for GPS signal…';
+        if (mapEl) mapEl.classList.add('hidden');
+        if (dot) dot.classList.remove('live');
+        return;
+      }
+
+      if (stale || Number(loc.ageSeconds || 0) > 90) {
+        if (etaEl) etaEl.textContent = 'Location update delayed';
+        if (statusEl) statusEl.textContent = 'Waiting for a fresh rider location…';
+        if (dot) dot.classList.remove('live');
+        if (updated) updated.textContent = `Last update ${Number(loc.ageSeconds || 0)}s ago`;
+        return;
+      }
+
+      const lat = Number(loc.latitude);
+      const lon = Number(loc.longitude);
+      const destination = data?.destination || null;
+
+      if (mapEl) mapEl.classList.remove('hidden');
+      this.ensureTezMap();
+      this.updateCustomerMarker(destination);
+
+      const routeInfo = await this.updateRoadRoute(lat, lon, destination);
+
+      // Keep the bike visually on the road route.
+      const snapped = this.nearestRoutePoint(lat, lon);
+      this.animateRiderMarker(
+        snapped.lat,
+        snapped.lon,
+        Number(loc.headingDeg || 0)
+      );
+
+      if (!this.routeLine) {
+        this.fitTezMap(lat, lon, destination);
+      }
+
+      let eta = Number(data?.etaMinutes ?? 25);
+
+      if (routeInfo?.durationMinutes) {
+        eta = Math.min(25, routeInfo.durationMinutes);
+      }
+
+      eta = Math.max(1, Math.min(25, Number(eta)));
+
+      // ETA should not jump upward during one live session.
+      if (
+        Number.isFinite(this.lastDisplayedEta) &&
+        eta > this.lastDisplayedEta
+      ) {
+        eta = this.lastDisplayedEta;
+      }
+
+      this.lastDisplayedEta = eta;
+
+      if (etaEl) {
+        etaEl.textContent =
+          eta <= 1
+            ? 'Rider is almost there'
+            : `Estimated arrival: about ${eta} min`;
+      }
+
+      if (statusEl) {
+        const distance =
+          routeInfo?.distanceKm != null
+            ? Number(routeInfo.distanceKm)
+            : Number(data?.distanceKm);
+
+        if (Number.isFinite(distance)) {
+          statusEl.textContent =
+            distance < 0.15
+              ? 'Rider is very close to your delivery location'
+              : distance < 1
+                ? `Rider is about ${Math.round(distance * 1000)} m away`
+                : `Rider is about ${distance.toFixed(1)} km away`;
+        } else {
+          statusEl.textContent = 'Rider location is live';
+        }
+      }
+
+      if (updated) {
+        updated.textContent =
+          loc.ageSeconds == null
+            ? ''
+            : `Updated ${
+                loc.ageSeconds <= 5
+                  ? 'just now'
+                  : `${loc.ageSeconds}s ago`
+              }`;
+      }
+
+      if (dot) dot.classList.toggle('live', Boolean(data.live));
+    } catch (error) {
+      const statusEl = document.getElementById('tezLiveStatus');
+      if (statusEl) {
+        statusEl.textContent =
+          error?.message || 'Live tracking temporarily unavailable.';
+      }
+    }
+  },
+
+  renderAddress(address) {
+    if (!address) {
+      return '<div class="tracking-address"><h3>Delivery address</h3><p>Saved delivery address unavailable.</p></div>';
+    }
+    const fullName = address.FullName || address.recipient_name || '';
+    const mobile = address.Mobile || address.mobile || '';
+    const line1 = address.Address || address.AddressLine1 || address.line1 || '';
+    const line2 = address.Landmark || address.AddressLine2 || address.line2 || '';
+    const city = address.City || address.city || '';
+    const district = address.District || address.district || '';
+    const state = address.State || address.state || '';
+    const pincode = address.Pincode || address.pincode || '';
+    const locality = [city, district && district !== city ? district : '', state].filter(Boolean).join(', ');
+    const lines = [fullName, line1, line2, `${locality}${pincode ? ` - ${pincode}` : ''}`.trim(), mobile].filter(Boolean);
+    return `<div class="tracking-address"><h3>Delivery address</h3><p>${lines.map(v => this.esc(v)).join('<br>')}</p></div>`;
+  }
+};
+
+</script>
+
 <script src="../js/pwa.js"></script>
   <script src="../js/customer-footer.js?v=0.29.4"></script>
 
@@ -221,7 +1116,7 @@
   background:#111827;color:#94a3b8;border:1px solid #334155;
   border-radius:999px;padding:5px 9px;font:700 10px/1.2 Arial,sans-serif;
   box-shadow:0 4px 14px rgba(0,0,0,.25);opacity:.9">
-  Tracking v0.31.3
+  Tracking v0.31.5 SINGLE
 </div>
 
 </body>
