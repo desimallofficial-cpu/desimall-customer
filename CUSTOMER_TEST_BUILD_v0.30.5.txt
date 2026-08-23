@@ -1,0 +1,10 @@
+DESIMALL CUSTOMER TEST BUILD v0.30.5
+
+UI polish only:
+- Cancel Order now has proper pointer cursor/finger.
+- Cancel Order redesigned as a compact red-outline action button matching Track Order/Get Help.
+- Consistent height, spacing, hover, press and keyboard focus feedback for order actions.
+- Cancellation functionality and backend safety rules unchanged.
+- Cache bumped to v0.30.5.
+
+Backend change: NOT REQUIRED.
