@@ -21,9 +21,9 @@
 
 <script>
 (function(){
-  window.DESIMALL_TRACKING_BUILD = 'v0.31.8';
+  window.DESIMALL_TRACKING_BUILD = 'v0.31.9';
   try {
-    localStorage.setItem('desimall_tracking_build', 'v0.31.8');
+    localStorage.setItem('desimall_tracking_build', 'v0.31.9');
   } catch (_) {}
 
   if ('serviceWorker' in navigator) {
@@ -290,7 +290,7 @@
   transform:translateY(1px);
 }
 
-/* v0.31.8 rider-to-customer route tracking */
+/* v0.31.9 rider-to-customer route tracking */
 .tez-live-map{
   min-height:360px;
 }
@@ -332,7 +332,7 @@ CUSTOMER EXACT PATH /pages/track-order.html
 position:fixed;left:50%;top:8px;transform:translateX(-50%);
 z-index:999999;background:#16a34a;color:white;border-radius:999px;
 padding:7px 14px;font:800 11px Arial,sans-serif;box-shadow:0 5px 18px rgba(0,0,0,.3)">
-LIVE TRACKING v0.31.8 SINGLE-FILE
+LIVE TRACKING v0.31.9 SINGLE-FILE
 </div>
 
 <header class="navbar-header">
@@ -1039,8 +1039,8 @@ const TrackingApp = {
       const valid = data?.locationValid !== false;
 
       if (!valid) {
-        if (etaEl) etaEl.textContent = 'Waiting for correct rider GPS';
-        if (statusEl) statusEl.textContent = 'Rider GPS looks incorrect. Waiting for a fresh valid location.';
+        if (etaEl) etaEl.textContent = 'Waiting for valid live GPS';
+        if (statusEl) statusEl.textContent = 'Checking rider and customer coordinates. Fresh precise GPS is required.';
         if (mapEl) mapEl.classList.add('hidden');
         if (dot) dot.classList.remove('live');
         if (updated) updated.textContent = '';
@@ -1181,7 +1181,7 @@ const TrackingApp = {
   background:#111827;color:#94a3b8;border:1px solid #334155;
   border-radius:999px;padding:5px 9px;font:700 10px/1.2 Arial,sans-serif;
   box-shadow:0 4px 14px rgba(0,0,0,.25);opacity:.9">
-  Tracking v0.31.8 SINGLE
+  Tracking v0.31.9 SINGLE
 </div>
 
 </body>
