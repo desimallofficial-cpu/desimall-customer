@@ -207,3 +207,45 @@ const DesiMallApp = {
 };
 
 document.addEventListener('DOMContentLoaded',()=>DesiMallApp.init());
+
+
+// DesiMall Customer Location Bootstrap v0.32.1
+(function(){
+  const KEY='desimall_customer_live_location';
+  const MAX_AGE=6*60*60*1000;
+
+  function recent(){
+    try{
+      const x=JSON.parse(localStorage.getItem(KEY)||'null');
+      return x && Number(x.capturedAt) && Date.now()-Number(x.capturedAt)<MAX_AGE;
+    }catch(_){ return false; }
+  }
+
+  function capture(){
+    if(!navigator.geolocation || recent()) return;
+
+    navigator.geolocation.getCurrentPosition(
+      pos=>{
+        const lat=Number(pos.coords.latitude);
+        const lon=Number(pos.coords.longitude);
+        if(!Number.isFinite(lat)||!Number.isFinite(lon))return;
+        try{
+          localStorage.setItem(KEY,JSON.stringify({
+            latitude:lat,
+            longitude:lon,
+            accuracy:Number(pos.coords.accuracy||0),
+            capturedAt:Date.now()
+          }));
+        }catch(_){}
+      },
+      ()=>{},
+      {enableHighAccuracy:true,maximumAge:0,timeout:12000}
+    );
+  }
+
+  if(document.readyState==='loading'){
+    document.addEventListener('DOMContentLoaded',capture,{once:true});
+  }else{
+    capture();
+  }
+})();

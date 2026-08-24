@@ -282,6 +282,19 @@ html[data-theme="dark"] .coupon-chip{
 </style>
 
   <link rel="stylesheet" href="../css/customer-footer.css?v=0.29.4">
+
+<style id="checkout-gps-v0321">
+.co-gps-state{display:inline-flex;align-items:center;gap:5px;margin-top:8px;padding:5px 7px;border-radius:999px;font-size:9px;font-weight:900}
+.co-gps-state.ready{background:rgba(16,185,129,.1);color:#16a34a}
+.co-gps-state.missing{background:rgba(239,68,68,.08);color:#dc2626}
+.co-gps-required{display:grid;grid-template-columns:auto 1fr auto;gap:10px;align-items:center;margin-top:12px;padding:13px;border:1px solid #fdba74;border-radius:12px;background:#fff7ed;color:#9a3412}
+.co-gps-required.good{border-color:#86efac;background:#f0fdf4;color:#166534}
+.co-gps-required strong,.co-gps-required span{display:block}
+.co-gps-required span{margin-top:3px;font-size:10px;opacity:.8}
+.co-gps-required button{border:0;border-radius:9px;padding:10px 12px;background:#ff6500;color:white;font-weight:850;cursor:pointer!important}
+@media(max-width:700px){.co-gps-required{grid-template-columns:1fr}.co-gps-required>i{display:none}}
+</style>
+
 </head>
 <body>
 
@@ -343,6 +356,7 @@ html[data-theme="dark"] .coupon-chip{
 
         <div class="ck-card-body">
           <div id="checkoutAddressList"></div>
+<div id="checkoutGpsRequirement"></div>
         </div>
       </article>
 
@@ -464,7 +478,7 @@ html[data-theme="dark"] .coupon-chip{
 <script src="../js/cart.js?v=0.26.0"></script>
 <script src="../js/coupons.js"></script>
 <script src="../js/product-image-resolver.js?v=0.23.0"></script>
-<script src="../js/checkout.js?v=0.26.3"></script>
+<script src="../js/checkout.js?v=0.32.1?v=0.26.3"></script>
 <script src="../js/pwa.js"></script>
 <script src="../js/ui-preferences.js?v=0.29.7"></script>
 <script src="../js/analytics.js"></script>

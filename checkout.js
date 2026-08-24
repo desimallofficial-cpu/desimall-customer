@@ -431,10 +431,33 @@ const CheckoutApp = {
               <i class="fa-solid fa-phone"></i>
               +91 ${this.esc(address.Mobile || address.mobile || '')}
             </small>
+            <div class="co-gps-state ${this.validAddressGps(address) ? 'ready' : 'missing'}">
+              <i class="fa-solid ${this.validAddressGps(address) ? 'fa-location-dot' : 'fa-triangle-exclamation'}"></i>
+              ${this.validAddressGps(address) ? 'Exact GPS saved' : 'Exact GPS required before order'}
+            </div>
           </div>
         </label>
       `;
     }).join('');
+
+    const selected = this.selectedAddress();
+    const gpsReady = this.validAddressGps(selected);
+    const gpsBox = document.getElementById('checkoutGpsRequirement');
+
+    if (gpsBox) {
+      gpsBox.innerHTML = gpsReady
+        ? `<div class="co-gps-required good">
+            <i class="fa-solid fa-circle-check"></i>
+            <div><strong>Exact delivery GPS confirmed</strong><span>Order can be placed to this saved location.</span></div>
+          </div>`
+        : `<div class="co-gps-required">
+            <i class="fa-solid fa-location-crosshairs"></i>
+            <div><strong>Exact location required</strong><span>Order place karne se pahle selected address ka current GPS confirm karein.</span></div>
+            <button id="btnConfirmCheckoutGps" type="button" onclick="CheckoutApp.confirmSelectedAddressLocation()">
+              <i class="fa-solid fa-location-dot"></i> Confirm Current Location
+            </button>
+          </div>`;
+    }
 
     box.querySelectorAll('input[name="deliveryAddress"]').forEach(input => {
       input.onchange = () => {
@@ -447,6 +470,7 @@ const CheckoutApp = {
           card.classList.toggle('selected', Boolean(radio?.checked));
         });
 
+        this.renderAddresses();
         if (this.fulfillmentMode === 'tez') {
           this.refreshTezForSelectedAddress();
         }
@@ -661,6 +685,101 @@ const CheckoutApp = {
     });
   },
 
+  validAddressGps(address) {
+    const lat = Number(address?.Latitude ?? address?.latitude);
+    const lon = Number(address?.Longitude ?? address?.longitude);
+    return Number.isFinite(lat) && Number.isFinite(lon) &&
+      lat >= -90 && lat <= 90 && lon >= -180 && lon <= 180 &&
+      !(Math.abs(lat) < 0.0001 && Math.abs(lon) < 0.0001);
+  },
+
+  async confirmSelectedAddressLocation() {
+    const address = this.selectedAddress();
+
+    if (!address) {
+      this.showAlert('Please select a delivery address first.');
+      return false;
+    }
+
+    if (!navigator.geolocation) {
+      this.showAlert('This browser cannot access GPS location.');
+      return false;
+    }
+
+    const button = document.getElementById('btnConfirmCheckoutGps');
+    if (button) {
+      button.disabled = true;
+      button.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Confirming location…';
+    }
+
+    try {
+      const position = await new Promise((resolve, reject) => {
+        navigator.geolocation.getCurrentPosition(resolve, reject, {
+          enableHighAccuracy: true,
+          maximumAge: 0,
+          timeout: 20000
+        });
+      });
+
+      const lat = Number(position.coords.latitude);
+      const lon = Number(position.coords.longitude);
+
+      if (!Number.isFinite(lat) || !Number.isFinite(lon) ||
+          (Math.abs(lat) < 0.0001 && Math.abs(lon) < 0.0001)) {
+        throw new Error('Invalid GPS received.');
+      }
+
+      const payload = {
+        ...address,
+        AddressID: address.AddressID || address.id,
+        Label: address.Label || address.label || 'Home',
+        FullName: address.FullName || address.recipient_name || '',
+        Mobile: address.Mobile || address.mobile || '',
+        Pincode: address.Pincode || address.pincode || '',
+        City: address.City || address.city || '',
+        District: address.District || address.district || address.City || address.city || '',
+        State: address.State || address.state || '',
+        AddressLine1: address.AddressLine1 || address.Address || address.line1 || '',
+        AddressLine2: address.AddressLine2 || address.line2 || '',
+        Latitude: lat,
+        Longitude: lon,
+        IsDefault: Boolean(address.IsDefault ?? address.is_default)
+      };
+
+      await DesiMallAPI.saveAddress(payload);
+
+      address.Latitude = lat;
+      address.Longitude = lon;
+      address.latitude = lat;
+      address.longitude = lon;
+
+      try {
+        localStorage.setItem('desimall_customer_live_location', JSON.stringify({
+          latitude: lat,
+          longitude: lon,
+          accuracy: Number(position.coords.accuracy || 0),
+          capturedAt: Date.now()
+        }));
+      } catch (_) {}
+
+      this.renderAddresses();
+      this.showAlert('Exact delivery location confirmed. You can place the order now.', 'success');
+      return true;
+    } catch (error) {
+      this.showAlert(
+        error?.code === 1
+          ? 'Location permission denied. Allow Precise Location to place the order.'
+          : (error?.message || 'Could not confirm delivery location.')
+      );
+      return false;
+    } finally {
+      if (button) {
+        button.disabled = false;
+        button.innerHTML = '<i class="fa-solid fa-location-crosshairs"></i> Confirm Current Location';
+      }
+    }
+  },
+
   async placeOrder() {
     if (this.busy) return;
 
@@ -673,6 +792,13 @@ const CheckoutApp = {
 
     if (!this.selectedAddressId) {
       this.showAlert('Please select a saved delivery address.');
+      return;
+    }
+
+    const selectedAddress = this.selectedAddress();
+    if (!this.validAddressGps(selectedAddress)) {
+      this.showAlert('Order place karne se pahle exact delivery location confirm karna compulsory hai.');
+      await this.confirmSelectedAddressLocation();
       return;
     }
 
