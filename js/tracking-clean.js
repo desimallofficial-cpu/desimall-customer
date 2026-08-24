@@ -27,6 +27,15 @@ const TrackingClean = {
   },
 
   async api(path) {
+    try {
+      if (
+        typeof DesiMallAuth !== 'undefined' &&
+        typeof DesiMallAuth.refreshIfNeeded === 'function'
+      ) {
+        await DesiMallAuth.refreshIfNeeded(false);
+      }
+    } catch (_) {}
+
     const token = this.getToken();
     const headers = token ? { Authorization: `Bearer ${token}` } : {};
     const base =
@@ -51,10 +60,23 @@ const TrackingClean = {
 
   getToken() {
     try {
+      if (
+        typeof DesiMallAuth !== 'undefined' &&
+        typeof DesiMallAuth.getAccessToken === 'function'
+      ) {
+        const sharedToken = DesiMallAuth.getAccessToken();
+        if (sharedToken) return sharedToken;
+      }
+
+      const session = JSON.parse(
+        localStorage.getItem('desimall_session') || 'null'
+      );
+
       return (
+        session?.accessToken ||
+        session?.access_token ||
         localStorage.getItem('desimall_access_token') ||
         localStorage.getItem('access_token') ||
-        JSON.parse(localStorage.getItem('desimall_session') || 'null')?.access_token ||
         ''
       );
     } catch (_) {
@@ -89,7 +111,7 @@ const TrackingClean = {
 
     const id = order.OrderID || order.order_id || this.orderId;
     const status = String(order.Status || order.status || data?.status || 'Placed');
-    const modeRaw = String(order.FulfillmentMode || order.fulfillment_mode || data?.fulfillmentMode || 'desimall').toLowerCase();
+    const modeRaw = String(order.FulfillmentMode || order.fulfillment_mode || data?.fulfillmentMode || data?.mode || 'desimall').toLowerCase();
     const mode = this.modeLabel(modeRaw);
 
     document.getElementById('orderIdText').textContent = id;
