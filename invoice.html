@@ -1,27 +1,30 @@
-<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="theme-color" content="#ff6b00"><title>Tax Invoice - DesiMall</title><link rel="manifest" href="../manifest.webmanifest"><link rel="stylesheet" href="../css/style.css?v=0.32.3"><link rel="stylesheet" href="../css/invoice.css?v=0.32.3">  <meta name="referrer" content="strict-origin-when-cross-origin">
-  <link rel="stylesheet" href="../css/global-theme.css?v=0.32.3">
-  <link rel="stylesheet" href="../css/customer-footer.css?v=0.32.3">
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="theme-color" content="#ff6b00"><title>Tax Invoice - DesiMall</title><link rel="manifest" href="../manifest.webmanifest"><link rel="stylesheet" href="../css/style.css?v=1.0.1"><link rel="stylesheet" href="../css/invoice.css?v=1.0.1">  <meta name="referrer" content="strict-origin-when-cross-origin">
+  <link rel="stylesheet" href="../css/global-theme.css?v=1.0.1">
+  <link rel="stylesheet" href="../css/customer-footer.css?v=1.0.1">
 
-<script id="dmReleaseBootstrap">
+<script id="dmCleanV1Bootstrap">
 (() => {
-  const RELEASE = 'v0.32.3';
-  window.DESIMALL_RELEASE = RELEASE;
+  const RELEASE = '1.0.0';
+  window.DESIMALL_CUSTOMER_BUILD = 'clean-v1.0.1';
+
   try {
-    const prev = localStorage.getItem('desimall_release');
-    if (prev !== RELEASE) {
-      localStorage.setItem('desimall_release', RELEASE);
+    const key = 'desimall_customer_release';
+    if (localStorage.getItem(key) !== RELEASE) {
+      localStorage.setItem(key, RELEASE);
       if ('caches' in window) {
         caches.keys().then(keys => Promise.all(keys.map(k => caches.delete(k)))).catch(() => {});
       }
       if ('serviceWorker' in navigator) {
-        navigator.serviceWorker.getRegistrations().then(regs => regs.forEach(r => r.update())).catch(() => {});
+        navigator.serviceWorker.getRegistrations()
+          .then(regs => regs.forEach(r => r.update()))
+          .catch(() => {});
       }
     }
   } catch (_) {}
 })();
 </script>
 
-</head><body><main class="invoice-shell"><div class="invoice-toolbar"><a class="btn-back" href="my-orders.html">← My Orders</a><button class="btn-print" onclick="window.print()">Print / Save PDF</button></div><article class="invoice-paper" id="invoicePaper"><header class="invoice-head"><div><div class="invoice-logo"><span>Desi</span>Mall</div><p>Founder &amp; Developed by Suraj Kumar</p></div><div class="invoice-meta"><h1>INVOICE</h1><p>Invoice No: <strong id="invoiceNo"></strong></p><p>Date: <span id="invoiceDate"></span></p></div></header><section class="invoice-grid"><div class="invoice-block"><h3>Billed &amp; Shipped To</h3><p id="customerAddress"></p></div><div class="invoice-block"><h3>Payment Details</h3><p>Method: <strong id="paymentMethod"></strong></p><p>Place of Supply: India</p></div></section><table class="invoice-table"><thead><tr><th>#</th><th>Item</th><th>Qty</th><th class="text-right">Rate</th><th class="text-right">Amount</th></tr></thead><tbody id="invoiceItems"></tbody></table><div class="invoice-totals"><div class="invoice-total-row"><span>Subtotal</span><strong id="subtotal"></strong></div><div class="invoice-total-row"><span>Delivery</span><strong id="delivery"></strong></div><div class="invoice-total-row" id="couponRow"><span>Coupon Discount</span><strong id="coupon"></strong></div><div class="invoice-total-row grand"><span>Total</span><span id="grandTotal"></span></div></div><p class="invoice-note">Thank you for shopping with DesiMall. This is a computer-generated invoice.</p></article></main><script src="../js/invoice.js?v=0.32.3"></script><script src="../js/pwa.js?v=0.32.3"></script>  <script src="../js/ui-preferences.js?v=0.32.3"></script>
-  <script src="../js/analytics.js?v=0.32.3"></script>
-  <script src="../js/customer-footer.js?v=0.32.3"></script>
+</head><body><main class="invoice-shell"><div class="invoice-toolbar"><a class="btn-back" href="my-orders.html">← My Orders</a><button class="btn-print" onclick="window.print()">Print / Save PDF</button></div><article class="invoice-paper" id="invoicePaper"><header class="invoice-head"><div><div class="invoice-logo"><span>Desi</span>Mall</div><p>Founder &amp; Developed by Suraj Kumar</p></div><div class="invoice-meta"><h1>INVOICE</h1><p>Invoice No: <strong id="invoiceNo"></strong></p><p>Date: <span id="invoiceDate"></span></p></div></header><section class="invoice-grid"><div class="invoice-block"><h3>Billed &amp; Shipped To</h3><p id="customerAddress"></p></div><div class="invoice-block"><h3>Payment Details</h3><p>Method: <strong id="paymentMethod"></strong></p><p>Place of Supply: India</p></div></section><table class="invoice-table"><thead><tr><th>#</th><th>Item</th><th>Qty</th><th class="text-right">Rate</th><th class="text-right">Amount</th></tr></thead><tbody id="invoiceItems"></tbody></table><div class="invoice-totals"><div class="invoice-total-row"><span>Subtotal</span><strong id="subtotal"></strong></div><div class="invoice-total-row"><span>Delivery</span><strong id="delivery"></strong></div><div class="invoice-total-row" id="couponRow"><span>Coupon Discount</span><strong id="coupon"></strong></div><div class="invoice-total-row grand"><span>Total</span><span id="grandTotal"></span></div></div><p class="invoice-note">Thank you for shopping with DesiMall. This is a computer-generated invoice.</p></article></main><script src="../js/invoice.js?v=1.0.1"></script><script src="../js/pwa.js?v=1.0.1"></script>  <script src="../js/ui-preferences.js?v=1.0.1"></script>
+  <script src="../js/analytics.js?v=1.0.1"></script>
+  <script src="../js/customer-footer.js?v=1.0.1"></script>
 </body></html>

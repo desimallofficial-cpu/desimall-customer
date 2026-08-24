@@ -1,21 +1,24 @@
-<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="theme-color" content="#ff6b00"><title>My Wishlist - DesiMall</title><meta name="description" content="View and manage saved products on DesiMall."><link rel="stylesheet" href="../css/style.css?v=0.32.3"><link rel="stylesheet" href="../css/wishlist.css?v=0.32.3"><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css?v=0.32.3">    <link rel="manifest" href="../manifest.webmanifest">
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="theme-color" content="#ff6b00"><title>My Wishlist - DesiMall</title><meta name="description" content="View and manage saved products on DesiMall."><link rel="stylesheet" href="../css/style.css?v=1.0.1"><link rel="stylesheet" href="../css/wishlist.css?v=1.0.1"><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css?v=1.0.1">    <link rel="manifest" href="../manifest.webmanifest">
   <meta name="referrer" content="strict-origin-when-cross-origin">
-  <link rel="stylesheet" href="../css/global-theme.css?v=0.32.3">
-  <link rel="stylesheet" href="../css/customer-footer.css?v=0.32.3">
+  <link rel="stylesheet" href="../css/global-theme.css?v=1.0.1">
+  <link rel="stylesheet" href="../css/customer-footer.css?v=1.0.1">
 
-<script id="dmReleaseBootstrap">
+<script id="dmCleanV1Bootstrap">
 (() => {
-  const RELEASE = 'v0.32.3';
-  window.DESIMALL_RELEASE = RELEASE;
+  const RELEASE = '1.0.0';
+  window.DESIMALL_CUSTOMER_BUILD = 'clean-v1.0.1';
+
   try {
-    const prev = localStorage.getItem('desimall_release');
-    if (prev !== RELEASE) {
-      localStorage.setItem('desimall_release', RELEASE);
+    const key = 'desimall_customer_release';
+    if (localStorage.getItem(key) !== RELEASE) {
+      localStorage.setItem(key, RELEASE);
       if ('caches' in window) {
         caches.keys().then(keys => Promise.all(keys.map(k => caches.delete(k)))).catch(() => {});
       }
       if ('serviceWorker' in navigator) {
-        navigator.serviceWorker.getRegistrations().then(regs => regs.forEach(r => r.update())).catch(() => {});
+        navigator.serviceWorker.getRegistrations()
+          .then(regs => regs.forEach(r => r.update()))
+          .catch(() => {});
       }
     }
   } catch (_) {}
@@ -29,9 +32,9 @@
                 </a>
                 <a href="cart.html" class="nav-item"><i class="fa-solid fa-cart-shopping"></i><span>Cart</span><span class="badge" id="cartBadge">0</span></a></nav></div></header>
 <main class="main-layout"><nav class="breadcrumb-container"><ul class="breadcrumb"><li><a href="../index.html">Home</a></li><li class="active">Wishlist</li></ul></nav><div class="wishlist-heading"><div><h1><i class="fa-solid fa-heart"></i> My Wishlist</h1><p><span id="wishlistCount">0</span> saved products</p></div><button id="clearWishlist" class="btn-clear"><i class="fa-regular fa-trash-can"></i> Clear all</button></div><section id="wishlistGrid" class="wishlist-grid"></section><section id="emptyWishlist" class="empty-wishlist hidden"><i class="fa-regular fa-heart"></i><h2>Your wishlist is empty</h2><p>Save products you love and find them here anytime.</p><a href="../index.html">Explore products</a></section></main>
-<footer class="footer"><div class="footer-bottom"><p>Founder &amp; Developed by Suraj Kumar</p></div></footer><script src="../js/auth.js?v=0.32.3"></script>
-    <script src="../js/cart.js?v=0.32.3"></script><script src="../js/wishlist.js?v=0.32.3"></script><script src="../js/wishlistpage.js?v=0.32.3"></script>    <script src="../js/pwa.js?v=0.32.3"></script>
-  <script src="../js/ui-preferences.js?v=0.32.3"></script>
-  <script src="../js/analytics.js?v=0.32.3"></script>
-  <script src="../js/customer-footer.js?v=0.32.3"></script>
+<footer class="footer"><div class="footer-bottom"><p>Founder &amp; Developed by Suraj Kumar</p></div></footer><script src="../js/auth.js?v=1.0.1"></script>
+    <script src="../js/cart.js?v=1.0.1"></script><script src="../js/wishlist.js?v=1.0.1"></script><script src="../js/wishlistpage.js?v=1.0.1"></script>    <script src="../js/pwa.js?v=1.0.1"></script>
+  <script src="../js/ui-preferences.js?v=1.0.1"></script>
+  <script src="../js/analytics.js?v=1.0.1"></script>
+  <script src="../js/customer-footer.js?v=1.0.1"></script>
 </body></html>

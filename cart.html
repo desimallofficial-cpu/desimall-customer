@@ -6,12 +6,12 @@
     <meta name="theme-color" content="#ff6b00">
     <title>Shopping Cart - Desi Mall</title>
 
-    <link rel="stylesheet" href="../css/style.css?v=0.32.3">
-    <link rel="stylesheet" href="../css/cart.css?v=0.32.3">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css?v=0.32.3">
+    <link rel="stylesheet" href="../css/style.css?v=1.0.1">
+    <link rel="stylesheet" href="../css/cart.css?v=1.0.1">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css?v=1.0.1">
     <link rel="manifest" href="../manifest.webmanifest">
   <meta name="referrer" content="strict-origin-when-cross-origin">
-  <link rel="stylesheet" href="../css/global-theme.css?v=0.32.3">
+  <link rel="stylesheet" href="../css/global-theme.css?v=1.0.1">
 <style>
 .cart-architecture-note{display:flex;gap:12px;align-items:flex-start;padding:14px 16px;margin-bottom:14px;border:1px solid #31445c;border-radius:12px;background:#142135;color:#e8eef7}
 .cart-architecture-note i{color:#ff6b00;margin-top:3px}.cart-architecture-note div{display:flex;flex-direction:column;gap:3px}.cart-architecture-note span{font-size:12px;color:#9fb0c4;line-height:1.45}
@@ -31,21 +31,24 @@
 .cart-fulfilment-note.warning{border-color:#76502a;background:#362719;color:#ffd0a8}
 </style>
 
-  <link rel="stylesheet" href="../css/customer-footer.css?v=0.32.3">
+  <link rel="stylesheet" href="../css/customer-footer.css?v=1.0.1">
 
-<script id="dmReleaseBootstrap">
+<script id="dmCleanV1Bootstrap">
 (() => {
-  const RELEASE = 'v0.32.3';
-  window.DESIMALL_RELEASE = RELEASE;
+  const RELEASE = '1.0.0';
+  window.DESIMALL_CUSTOMER_BUILD = 'clean-v1.0.1';
+
   try {
-    const prev = localStorage.getItem('desimall_release');
-    if (prev !== RELEASE) {
-      localStorage.setItem('desimall_release', RELEASE);
+    const key = 'desimall_customer_release';
+    if (localStorage.getItem(key) !== RELEASE) {
+      localStorage.setItem(key, RELEASE);
       if ('caches' in window) {
         caches.keys().then(keys => Promise.all(keys.map(k => caches.delete(k)))).catch(() => {});
       }
       if ('serviceWorker' in navigator) {
-        navigator.serviceWorker.getRegistrations().then(regs => regs.forEach(r => r.update())).catch(() => {});
+        navigator.serviceWorker.getRegistrations()
+          .then(regs => regs.forEach(r => r.update()))
+          .catch(() => {});
       }
     }
   } catch (_) {}
@@ -184,14 +187,14 @@
     </footer>
 
     <!-- Core Scripts -->
-    <script src="../js/auth.js?v=0.32.3"></script>
-    <script src="../js/api.js?v=0.32.3"></script>
-    <script src="../js/cart.js?v=0.32.3"></script>
-    <script src="../js/cartpage.js?v=0.32.3"></script>
-    <script src="../js/pwa.js?v=0.32.3"></script>
-  <script src="../js/ui-preferences.js?v=0.32.3"></script>
-  <script src="../js/analytics.js?v=0.32.3"></script>
-  <script src="../js/product-image-resolver.js?v=0.32.3"></script>
-  <script src="../js/customer-footer.js?v=0.32.3"></script>
+    <script src="../js/auth.js?v=1.0.1"></script>
+    <script src="../js/api.js?v=1.0.1"></script>
+    <script src="../js/cart.js?v=1.0.1"></script>
+    <script src="../js/cartpage.js?v=1.0.1"></script>
+    <script src="../js/pwa.js?v=1.0.1"></script>
+  <script src="../js/ui-preferences.js?v=1.0.1"></script>
+  <script src="../js/analytics.js?v=1.0.1"></script>
+  <script src="../js/product-image-resolver.js?v=1.0.1"></script>
+  <script src="../js/customer-footer.js?v=1.0.1"></script>
 </body>
 </html>

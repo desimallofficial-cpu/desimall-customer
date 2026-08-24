@@ -1,7 +1,7 @@
 <!doctype html><html lang="en" data-theme="dark"><head>
 <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Help & Support - DesiMall</title>
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css?v=0.32.3">
-<link rel="stylesheet" href="../css/global-theme.css?v=0.32.3"><link rel="stylesheet" href="../css/support.css?v=0.32.3">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css?v=1.0.1">
+<link rel="stylesheet" href="../css/global-theme.css?v=1.0.1"><link rel="stylesheet" href="../css/support.css?v=1.0.1">
 <style>
 body{margin:0;background:#0e151f;color:#fff;font-family:Arial,sans-serif}.cs-wrap{width:min(1180px,calc(100% - 32px));margin:0 auto;padding:28px 0 60px}.cs-top{display:flex;justify-content:space-between;gap:16px;align-items:center;margin-bottom:20px}.cs-top a{color:#ff6b00;text-decoration:none}.cs-actions{display:flex;gap:10px}.cs-btn{border:0;border-radius:10px;padding:11px 15px;font-weight:800;cursor:pointer;background:#243952;color:#fff}.cs-btn.primary{background:#ff6b00}.cs-grid{display:grid;grid-template-columns:360px 1fr;gap:16px}.cs-card{background:#172538;border:1px solid #31445e;border-radius:14px;padding:16px}.cs-form{display:grid;gap:10px}.cs-form input,.cs-form select,.cs-form textarea{width:100%;box-sizing:border-box;background:#101a28;border:1px solid #3a4e68;border-radius:9px;color:#fff;padding:11px}.ticket-item{cursor:pointer}@media(max-width:800px){.cs-grid{grid-template-columns:1fr}}
 </style>
@@ -154,21 +154,24 @@ button[type="submit"].send-btn,.send-btn{
 }
 </style>
 
-  <link rel="stylesheet" href="../css/customer-footer.css?v=0.32.3">
+  <link rel="stylesheet" href="../css/customer-footer.css?v=1.0.1">
 
-<script id="dmReleaseBootstrap">
+<script id="dmCleanV1Bootstrap">
 (() => {
-  const RELEASE = 'v0.32.3';
-  window.DESIMALL_RELEASE = RELEASE;
+  const RELEASE = '1.0.0';
+  window.DESIMALL_CUSTOMER_BUILD = 'clean-v1.0.1';
+
   try {
-    const prev = localStorage.getItem('desimall_release');
-    if (prev !== RELEASE) {
-      localStorage.setItem('desimall_release', RELEASE);
+    const key = 'desimall_customer_release';
+    if (localStorage.getItem(key) !== RELEASE) {
+      localStorage.setItem(key, RELEASE);
       if ('caches' in window) {
         caches.keys().then(keys => Promise.all(keys.map(k => caches.delete(k)))).catch(() => {});
       }
       if ('serviceWorker' in navigator) {
-        navigator.serviceWorker.getRegistrations().then(regs => regs.forEach(r => r.update())).catch(() => {});
+        navigator.serviceWorker.getRegistrations()
+          .then(regs => regs.forEach(r => r.update()))
+          .catch(() => {});
       }
     }
   } catch (_) {}
@@ -193,5 +196,5 @@ button[type="submit"].send-btn,.send-btn{
 <section class="cs-grid"><article class="cs-card"><h2>My Tickets</h2><div id="customerTicketList" class="ticket-list"></div></article><article class="cs-card"><div id="customerTicketDetail" class="support-empty"><i class="fa-solid fa-comments"></i><strong>Select a ticket</strong></div></article></section>
 </main>
 <div class="modal" id="customerTicketModal"><div class="modal-box support-modal"><div class="modal-head"><h2>New Support Ticket</h2><button class="close-btn" id="closeCustomerTicket">×</button></div><form id="customerTicketForm" class="cs-form"><select id="customerCategory" required><option value="">Select category</option><option>Order</option><option>Payment / Refund</option><option>Return</option><option>Delivery</option><option>Product</option><option>Account</option><option>Other</option></select><select id="customerPriority"><option>Low</option><option selected>Medium</option><option>High</option><option>Urgent</option></select><input id="customerOrderCode" placeholder="Order ID (optional)"><input id="customerReturnCode" placeholder="Return ID (optional)"><input id="customerSubject" maxlength="160" placeholder="Subject" required><textarea id="customerDescription" rows="6" maxlength="5000" placeholder="Describe the problem" required></textarea><button class="cs-btn primary">Submit Ticket</button></form></div></div>
-<script src="../js/api.js?v=0.32.3"></script><script src="../js/auth.js?v=0.32.3"></script><script src="../js/customer-support.js?v=0.32.3"></script>  <script src="../js/customer-footer.js?v=0.32.3"></script>
+<script src="../js/api.js?v=1.0.1"></script><script src="../js/auth.js?v=1.0.1"></script><script src="../js/customer-support.js?v=1.0.1"></script>  <script src="../js/customer-footer.js?v=1.0.1"></script>
 </body></html>

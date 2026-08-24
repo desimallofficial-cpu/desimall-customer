@@ -209,7 +209,7 @@ const DesiMallApp = {
 document.addEventListener('DOMContentLoaded',()=>DesiMallApp.init());
 
 
-// DesiMall Customer Location Bootstrap v0.32.2
+// DesiMall Customer Location Bootstrap v0.32.1
 (function(){
   const KEY='desimall_customer_live_location';
   const MAX_AGE=6*60*60*1000;
