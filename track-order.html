@@ -21,9 +21,9 @@
 
 <script>
 (function(){
-  window.DESIMALL_TRACKING_BUILD = 'v0.31.9';
+  window.DESIMALL_TRACKING_BUILD = 'v0.32.2';
   try {
-    localStorage.setItem('desimall_tracking_build', 'v0.31.9');
+    localStorage.setItem('desimall_tracking_build', 'v0.32.2');
   } catch (_) {}
 
   if ('serviceWorker' in navigator) {
@@ -290,7 +290,7 @@
   transform:translateY(1px);
 }
 
-/* v0.31.9 rider-to-customer route tracking */
+/* v0.32.2 rider-to-customer route tracking */
 .tez-live-map{
   min-height:360px;
 }
@@ -322,17 +322,24 @@ if ('caches' in window) {
 </script>
 </head>
 <body>
+<div id="dmCompleteReleaseBadge" style="
+position:fixed;left:50%;top:8px;transform:translateX(-50%);
+z-index:999999;background:#15803d;color:white;border-radius:999px;
+padding:7px 14px;font:800 11px Arial,sans-serif;box-shadow:0 5px 18px rgba(0,0,0,.25)">
+COMPLETE TRACKING v0.32.2
+</div>
+
 <div style="position:fixed;left:50%;top:42px;transform:translateX(-50%);
 z-index:999998;background:#0f766e;color:#fff;border-radius:999px;
 padding:5px 11px;font:800 10px Arial,sans-serif;box-shadow:0 5px 18px rgba(0,0,0,.25)">
-CUSTOMER EXACT PATH /pages/track-order.html
+ALL MODES LIVE TRACKING v0.32.2
 </div>
 
 <div id="dmSingleFileProof" style="
 position:fixed;left:50%;top:8px;transform:translateX(-50%);
 z-index:999999;background:#16a34a;color:white;border-radius:999px;
 padding:7px 14px;font:800 11px Arial,sans-serif;box-shadow:0 5px 18px rgba(0,0,0,.3)">
-LIVE TRACKING v0.31.9 SINGLE-FILE
+UNIVERSAL LIVE TRACKING v0.32.2
 </div>
 
 <header class="navbar-header">
@@ -625,7 +632,7 @@ const TrackingApp = {
             <div class="tez-delivery-otp hidden" id="tezDeliveryOtpBox">
               <span>DELIVERY OTP</span>
               <strong id="tezDeliveryOtp">------</strong>
-              <small>OTP sabhi modes me compulsory hai. Service me bhi completion OTP verify hoga.</small>
+              <small>OTP compulsory: DesiMall, Tez, Food, Service aur Try-On — correct OTP ke baad hi Delivered/Completed.</small>
             </div>
 
             <div id="tezLiveMap" class="tez-live-map hidden" aria-label="Rider live location map"></div>
@@ -989,7 +996,7 @@ const TrackingApp = {
       if (modeLabelEl) {
         modeLabelEl.textContent =
           mode === 'tez'
-            ? 'TEZ LIVE TRACKING'
+            ? 'LIVE ROUTE TRACKING'
             : mode === 'food'
               ? 'FOOD LIVE TRACKING'
               : mode === 'service'
@@ -1181,7 +1188,7 @@ const TrackingApp = {
   background:#111827;color:#94a3b8;border:1px solid #334155;
   border-radius:999px;padding:5px 9px;font:700 10px/1.2 Arial,sans-serif;
   box-shadow:0 4px 14px rgba(0,0,0,.25);opacity:.9">
-  Tracking v0.31.9 SINGLE
+  Tracking v0.32.2 UNIVERSAL
 </div>
 
 </body>
