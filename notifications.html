@@ -1,7 +1,27 @@
-<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Notifications - DesiMall</title><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css"><link rel="stylesheet" href="../css/panel.css">  <meta name="referrer" content="strict-origin-when-cross-origin">
-  <link rel="stylesheet" href="../css/global-theme.css?v=0.29.9">
-  <link rel="stylesheet" href="../css/customer-footer.css?v=0.29.4">
-</head><body><main class="panel-main" style="max-width:900px;margin:auto"><header class="panel-topbar"><div><h1>Notifications</h1><p>Order updates, offers and account alerts.</p></div><div class="top-actions"><button class="btn btn-light" id="markAllRead">Mark all read</button><a class="btn btn-primary" href="../index.html">Back to store</a></div></header><section class="panel-card"><div class="list" id="notificationList"></div></section></main><div class="toast-panel" id="panelToast"></div><script src="../js/auth.js"></script><script src="../js/api.js"></script><script src="../js/notifications.js?v=0.29.9"></script>  <script src="../js/ui-preferences.js?v=0.29.9"></script>
-  <script src="../js/analytics.js"></script>
-  <script src="../js/customer-footer.js?v=0.29.4"></script>
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Notifications - DesiMall</title><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css?v=0.32.3"><link rel="stylesheet" href="../css/panel.css?v=0.32.3">  <meta name="referrer" content="strict-origin-when-cross-origin">
+  <link rel="stylesheet" href="../css/global-theme.css?v=0.32.3">
+  <link rel="stylesheet" href="../css/customer-footer.css?v=0.32.3">
+
+<script id="dmReleaseBootstrap">
+(() => {
+  const RELEASE = 'v0.32.3';
+  window.DESIMALL_RELEASE = RELEASE;
+  try {
+    const prev = localStorage.getItem('desimall_release');
+    if (prev !== RELEASE) {
+      localStorage.setItem('desimall_release', RELEASE);
+      if ('caches' in window) {
+        caches.keys().then(keys => Promise.all(keys.map(k => caches.delete(k)))).catch(() => {});
+      }
+      if ('serviceWorker' in navigator) {
+        navigator.serviceWorker.getRegistrations().then(regs => regs.forEach(r => r.update())).catch(() => {});
+      }
+    }
+  } catch (_) {}
+})();
+</script>
+
+</head><body><main class="panel-main" style="max-width:900px;margin:auto"><header class="panel-topbar"><div><h1>Notifications</h1><p>Order updates, offers and account alerts.</p></div><div class="top-actions"><button class="btn btn-light" id="markAllRead">Mark all read</button><a class="btn btn-primary" href="../index.html">Back to store</a></div></header><section class="panel-card"><div class="list" id="notificationList"></div></section></main><div class="toast-panel" id="panelToast"></div><script src="../js/auth.js?v=0.32.3"></script><script src="../js/api.js?v=0.32.3"></script><script src="../js/notifications.js?v=0.32.3"></script>  <script src="../js/ui-preferences.js?v=0.32.3"></script>
+  <script src="../js/analytics.js?v=0.32.3"></script>
+  <script src="../js/customer-footer.js?v=0.32.3"></script>
 </body></html>

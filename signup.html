@@ -4,10 +4,10 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Create Account - DesiMall</title>
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css?v=0.32.3">
   <link rel="manifest" href="../manifest.webmanifest">
   <meta name="referrer" content="strict-origin-when-cross-origin">
-  <link rel="stylesheet" href="../css/global-theme.css?v=0.29.7">
+  <link rel="stylesheet" href="../css/global-theme.css?v=0.32.3">
   <style>
     *{box-sizing:border-box;margin:0;padding:0;font-family:'Segoe UI',Tahoma,Geneva,Verdana,sans-serif}
     body{background-color:#f4f6f9;color:#333;display:flex;flex-direction:column;min-height:100vh}
@@ -27,8 +27,28 @@
     .login-message{padding:10px 12px;border-radius:6px;margin-bottom:16px;font-size:13px}.login-message.info{background:#eef5ff;color:#315b8a}.login-message.success{background:#eaf8ef;color:#216e39}.login-message.error{background:#fff0f0;color:#a12626}
     footer{background:#1a1a1a;color:#b0b0b0;padding:20px 0;margin-top:auto;text-align:center;font-size:12px}
   </style>
-  <link rel="stylesheet" href="../css/customer-auth.css?v=0.29.9">
-  <link rel="stylesheet" href="../css/customer-footer.css?v=0.29.6">
+  <link rel="stylesheet" href="../css/customer-auth.css?v=0.32.3">
+  <link rel="stylesheet" href="../css/customer-footer.css?v=0.32.3">
+
+<script id="dmReleaseBootstrap">
+(() => {
+  const RELEASE = 'v0.32.3';
+  window.DESIMALL_RELEASE = RELEASE;
+  try {
+    const prev = localStorage.getItem('desimall_release');
+    if (prev !== RELEASE) {
+      localStorage.setItem('desimall_release', RELEASE);
+      if ('caches' in window) {
+        caches.keys().then(keys => Promise.all(keys.map(k => caches.delete(k)))).catch(() => {});
+      }
+      if ('serviceWorker' in navigator) {
+        navigator.serviceWorker.getRegistrations().then(regs => regs.forEach(r => r.update())).catch(() => {});
+      }
+    }
+  } catch (_) {}
+})();
+</script>
+
 </head>
 <body class="auth-page">
   <header>
@@ -75,12 +95,12 @@
 
   <footer><p>© 2026 DesiMall. Powered by Riddhi Rithvi Traders (RRT). All Rights Reserved.</p></footer>
 
-  <script src="../js/auth.js"></script>
-  <script src="../js/api.js"></script>
-  <script src="../js/signup.js"></script>
-  <script src="../js/pwa.js"></script>
-  <script src="../js/ui-preferences.js?v=0.29.9"></script>
-  <script src="../js/analytics.js"></script>
-  <script src="../js/customer-footer.js?v=0.29.6"></script>
+  <script src="../js/auth.js?v=0.32.3"></script>
+  <script src="../js/api.js?v=0.32.3"></script>
+  <script src="../js/signup.js?v=0.32.3"></script>
+  <script src="../js/pwa.js?v=0.32.3"></script>
+  <script src="../js/ui-preferences.js?v=0.32.3"></script>
+  <script src="../js/analytics.js?v=0.32.3"></script>
+  <script src="../js/customer-footer.js?v=0.32.3"></script>
 </body>
 </html>

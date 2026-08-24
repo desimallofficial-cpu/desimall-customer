@@ -8,22 +8,22 @@
 <meta name="referrer" content="strict-origin-when-cross-origin">
 <title>Track Order | DesiMall</title>
 <link rel="manifest" href="../manifest.webmanifest">
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
-<link rel="stylesheet" href="../css/style.css">
-<link rel="stylesheet" href="../css/global-theme.css?v=0.29.7">
-  <link rel="stylesheet" href="../css/customer-footer.css?v=0.29.4">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css?v=0.32.3">
+<link rel="stylesheet" href="../css/style.css?v=0.32.3">
+<link rel="stylesheet" href="../css/global-theme.css?v=0.32.3">
+  <link rel="stylesheet" href="../css/customer-footer.css?v=0.32.3">
   <link
     rel="stylesheet"
-    href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
+    href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css?v=0.32.3"
     integrity="sha256-p4NxAoJBhIINfQ3ynrU7A1SgI6pLSXzzhZbWR3iO0+s="
     crossorigin=""
   />
 
 <script>
 (function(){
-  window.DESIMALL_TRACKING_BUILD = 'v0.32.2';
+  window.DESIMALL_TRACKING_BUILD = 'v0.32.3';
   try {
-    localStorage.setItem('desimall_tracking_build', 'v0.32.2');
+    localStorage.setItem('desimall_tracking_build', 'v0.32.3');
   } catch (_) {}
 
   if ('serviceWorker' in navigator) {
@@ -290,7 +290,7 @@
   transform:translateY(1px);
 }
 
-/* v0.32.2 rider-to-customer route tracking */
+/* v0.32.3 rider-to-customer route tracking */
 .tez-live-map{
   min-height:360px;
 }
@@ -320,26 +320,46 @@ if ('caches' in window) {
   caches.keys().then(keys => keys.forEach(k => caches.delete(k))).catch(()=>{});
 }
 </script>
+
+<script id="dmReleaseBootstrap">
+(() => {
+  const RELEASE = 'v0.32.3';
+  window.DESIMALL_RELEASE = RELEASE;
+  try {
+    const prev = localStorage.getItem('desimall_release');
+    if (prev !== RELEASE) {
+      localStorage.setItem('desimall_release', RELEASE);
+      if ('caches' in window) {
+        caches.keys().then(keys => Promise.all(keys.map(k => caches.delete(k)))).catch(() => {});
+      }
+      if ('serviceWorker' in navigator) {
+        navigator.serviceWorker.getRegistrations().then(regs => regs.forEach(r => r.update())).catch(() => {});
+      }
+    }
+  } catch (_) {}
+})();
+</script>
+
 </head>
 <body>
 <div id="dmCompleteReleaseBadge" style="
 position:fixed;left:50%;top:8px;transform:translateX(-50%);
 z-index:999999;background:#15803d;color:white;border-radius:999px;
 padding:7px 14px;font:800 11px Arial,sans-serif;box-shadow:0 5px 18px rgba(0,0,0,.25)">
-COMPLETE TRACKING v0.32.2
+COMPLETE TRACKING v0.32.3
 </div>
 
 <div style="position:fixed;left:50%;top:42px;transform:translateX(-50%);
 z-index:999998;background:#0f766e;color:#fff;border-radius:999px;
 padding:5px 11px;font:800 10px Arial,sans-serif;box-shadow:0 5px 18px rgba(0,0,0,.25)">
-ALL MODES LIVE TRACKING v0.32.2
+ALL MODES LIVE TRACKING v0.32.3
 </div>
 
 <div id="dmSingleFileProof" style="
 position:fixed;left:50%;top:8px;transform:translateX(-50%);
 z-index:999999;background:#16a34a;color:white;border-radius:999px;
 padding:7px 14px;font:800 11px Arial,sans-serif;box-shadow:0 5px 18px rgba(0,0,0,.3)">
-UNIVERSAL LIVE TRACKING v0.32.2
+UNIVERSAL LIVE TRACKING v0.32.3
 </div>
 
 <header class="navbar-header">
@@ -382,12 +402,12 @@ UNIVERSAL LIVE TRACKING v0.32.2
   <a href="profile.html"><i class="fa-solid fa-user"></i><span>Account</span></a>
 </nav>
 
-<script src="../js/auth.js"></script>
-<script src="../js/api.js"></script>
-<script src="../js/cart.js"></script>
-<script src="../js/ui-preferences.js?v=0.29.7"></script>
-<script src="../js/analytics.js"></script>  <script
-    src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
+<script src="../js/auth.js?v=0.32.3"></script>
+<script src="../js/api.js?v=0.32.3"></script>
+<script src="../js/cart.js?v=0.32.3"></script>
+<script src="../js/ui-preferences.js?v=0.32.3"></script>
+<script src="../js/analytics.js?v=0.32.3"></script>  <script
+    src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js?v=0.32.3"
     integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo="
     crossorigin=""
   ></script>
@@ -1180,16 +1200,17 @@ const TrackingApp = {
 
 </script>
 
-<script src="../js/pwa.js"></script>
-  <script src="../js/customer-footer.js?v=0.29.4"></script>
+<script src="../js/pwa.js?v=0.32.3"></script>
+  <script src="../js/customer-footer.js?v=0.32.3"></script>
 
 <div id="dmTrackingBuildBadge" style="
   position:fixed;right:10px;bottom:10px;z-index:99999;
   background:#111827;color:#94a3b8;border:1px solid #334155;
   border-radius:999px;padding:5px 9px;font:700 10px/1.2 Arial,sans-serif;
   box-shadow:0 4px 14px rgba(0,0,0,.25);opacity:.9">
-  Tracking v0.32.2 UNIVERSAL
+  Tracking v0.32.3 UNIVERSAL
 </div>
 
+<div id="dmBuildBadge" style="position:fixed;right:12px;bottom:12px;z-index:999999;background:#111827;color:#e5e7eb;border:1px solid #475569;border-radius:999px;padding:6px 10px;font:800 10px Arial,sans-serif">Customer v0.32.3 LIVE</div>
 </body>
 </html>

@@ -7,9 +7,9 @@
   <meta name="referrer" content="strict-origin-when-cross-origin">
   <title>Secure Checkout - DesiMall</title>
 
-  <link rel="stylesheet" href="../css/style.css">
-  <link rel="stylesheet" href="../css/global-theme.css?v=0.29.7">
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <link rel="stylesheet" href="../css/style.css?v=0.32.3">
+  <link rel="stylesheet" href="../css/global-theme.css?v=0.32.3">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css?v=0.32.3">
   <link rel="manifest" href="../manifest.webmanifest">
 
   <style>
@@ -281,7 +281,7 @@ html[data-theme="dark"] .coupon-chip{
 }
 </style>
 
-  <link rel="stylesheet" href="../css/customer-footer.css?v=0.29.4">
+  <link rel="stylesheet" href="../css/customer-footer.css?v=0.32.3">
 
 <style id="checkout-gps-v0321">
 .co-gps-state{display:inline-flex;align-items:center;gap:5px;margin-top:8px;padding:5px 7px;border-radius:999px;font-size:9px;font-weight:900}
@@ -294,6 +294,26 @@ html[data-theme="dark"] .coupon-chip{
 .co-gps-required button{border:0;border-radius:9px;padding:10px 12px;background:#ff6500;color:white;font-weight:850;cursor:pointer!important}
 @media(max-width:700px){.co-gps-required{grid-template-columns:1fr}.co-gps-required>i{display:none}}
 </style>
+
+
+<script id="dmReleaseBootstrap">
+(() => {
+  const RELEASE = 'v0.32.3';
+  window.DESIMALL_RELEASE = RELEASE;
+  try {
+    const prev = localStorage.getItem('desimall_release');
+    if (prev !== RELEASE) {
+      localStorage.setItem('desimall_release', RELEASE);
+      if ('caches' in window) {
+        caches.keys().then(keys => Promise.all(keys.map(k => caches.delete(k)))).catch(() => {});
+      }
+      if ('serviceWorker' in navigator) {
+        navigator.serviceWorker.getRegistrations().then(regs => regs.forEach(r => r.update())).catch(() => {});
+      }
+    }
+  } catch (_) {}
+})();
+</script>
 
 </head>
 <body>
@@ -473,16 +493,16 @@ html[data-theme="dark"] .coupon-chip{
   © 2026 DesiMall · Powered by Riddhi Rithvi Traders (RRT)
 </footer>
 
-<script src="../js/auth.js"></script>
-<script src="../js/api.js"></script>
-<script src="../js/cart.js?v=0.26.0"></script>
-<script src="../js/coupons.js"></script>
-<script src="../js/product-image-resolver.js?v=0.23.0"></script>
-<script src="../js/checkout.js?v=0.32.1?v=0.26.3"></script>
-<script src="../js/pwa.js"></script>
-<script src="../js/ui-preferences.js?v=0.29.7"></script>
-<script src="../js/analytics.js"></script>
+<script src="../js/auth.js?v=0.32.3"></script>
+<script src="../js/api.js?v=0.32.3"></script>
+<script src="../js/cart.js?v=0.32.3"></script>
+<script src="../js/coupons.js?v=0.32.3"></script>
+<script src="../js/product-image-resolver.js?v=0.32.3"></script>
+<script src="../js/checkout.js?v=0.32.3"></script>
+<script src="../js/pwa.js?v=0.32.3"></script>
+<script src="../js/ui-preferences.js?v=0.32.3"></script>
+<script src="../js/analytics.js?v=0.32.3"></script>
 
-  <script src="../js/customer-footer.js?v=0.29.4"></script>
+  <script src="../js/customer-footer.js?v=0.32.3"></script>
 </body>
 </html>

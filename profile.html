@@ -8,12 +8,12 @@
 
     <title>My Account - DesiMall</title>
 
-    <link rel="stylesheet" href="../css/style.css">
-    <link rel="stylesheet" href="../css/global-theme.css?v=0.29.7">
+    <link rel="stylesheet" href="../css/style.css?v=0.32.3">
+    <link rel="stylesheet" href="../css/global-theme.css?v=0.32.3">
 
     <link
         rel="stylesheet"
-        href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
+        href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css?v=0.32.3"
     >
 
     <link rel="manifest" href="../manifest.webmanifest">
@@ -1153,7 +1153,27 @@ html[data-theme="dark"] .profile-header-link:hover{
 }
 </style>
 
-  <link rel="stylesheet" href="../css/customer-footer.css?v=0.29.4">
+  <link rel="stylesheet" href="../css/customer-footer.css?v=0.32.3">
+
+<script id="dmReleaseBootstrap">
+(() => {
+  const RELEASE = 'v0.32.3';
+  window.DESIMALL_RELEASE = RELEASE;
+  try {
+    const prev = localStorage.getItem('desimall_release');
+    if (prev !== RELEASE) {
+      localStorage.setItem('desimall_release', RELEASE);
+      if ('caches' in window) {
+        caches.keys().then(keys => Promise.all(keys.map(k => caches.delete(k)))).catch(() => {});
+      }
+      if ('serviceWorker' in navigator) {
+        navigator.serviceWorker.getRegistrations().then(regs => regs.forEach(r => r.update())).catch(() => {});
+      }
+    }
+  } catch (_) {}
+})();
+</script>
+
 </head>
 
 <body>
@@ -1784,9 +1804,9 @@ html[data-theme="dark"] .profile-header-link:hover{
          EXISTING SCRIPTS — FUNCTIONALITY PRESERVED
          ===================================================== -->
 
-    <script src="../js/auth.js"></script>
-    <script src="../js/cart.js"></script>
-    <script src="../js/profile.js"></script>
+    <script src="../js/auth.js?v=0.32.3"></script>
+    <script src="../js/cart.js?v=0.32.3"></script>
+    <script src="../js/profile.js?v=0.32.3"></script>
 
     <script>
         document.addEventListener('DOMContentLoaded', () => {
@@ -1794,9 +1814,9 @@ html[data-theme="dark"] .profile-header-link:hover{
         });
     </script>
 
-    <script src="../js/pwa.js"></script>
-    <script src="../js/ui-preferences.js?v=0.29.7"></script>
-    <script src="../js/analytics.js"></script>
+    <script src="../js/pwa.js?v=0.32.3"></script>
+    <script src="../js/ui-preferences.js?v=0.32.3"></script>
+    <script src="../js/analytics.js?v=0.32.3"></script>
 
 
 <nav class="account-mobile-nav" aria-label="Customer navigation">
@@ -1807,6 +1827,6 @@ html[data-theme="dark"] .profile-header-link:hover{
   <a href="profile.html" class="active"><i class="fa-solid fa-user"></i><span>Account</span></a>
 </nav>
 
-  <script src="../js/customer-footer.js?v=0.29.4"></script>
+  <script src="../js/customer-footer.js?v=0.32.3"></script>
 </body>
 </html>
