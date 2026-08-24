@@ -6,7 +6,7 @@
     <title>Login - DesiMall</title>
     
     <!-- FontAwesome Icons -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css?v=1.0.0">
     
     <style>
         * {
@@ -153,9 +153,32 @@
     </style>
     <link rel="manifest" href="../manifest.webmanifest">
   <meta name="referrer" content="strict-origin-when-cross-origin">
-  <link rel="stylesheet" href="../css/global-theme.css?v=0.29.7">
-  <link rel="stylesheet" href="../css/customer-auth.css?v=0.29.9">
-  <link rel="stylesheet" href="../css/customer-footer.css?v=0.29.6">
+  <link rel="stylesheet" href="../css/global-theme.css?v=1.0.0">
+  <link rel="stylesheet" href="../css/customer-auth.css?v=1.0.0">
+  <link rel="stylesheet" href="../css/customer-footer.css?v=1.0.0">
+
+<script id="dmCleanV1Bootstrap">
+(() => {
+  const RELEASE = '1.0.0';
+  window.DESIMALL_CUSTOMER_BUILD = 'clean-v1.0.0';
+
+  try {
+    const key = 'desimall_customer_release';
+    if (localStorage.getItem(key) !== RELEASE) {
+      localStorage.setItem(key, RELEASE);
+      if ('caches' in window) {
+        caches.keys().then(keys => Promise.all(keys.map(k => caches.delete(k)))).catch(() => {});
+      }
+      if ('serviceWorker' in navigator) {
+        navigator.serviceWorker.getRegistrations()
+          .then(regs => regs.forEach(r => r.update()))
+          .catch(() => {});
+      }
+    }
+  } catch (_) {}
+})();
+</script>
+
 </head>
 <body class="auth-page">
 
@@ -229,12 +252,12 @@
     </footer>
 
     <!-- Scripts -->
-    <script src="../js/auth.js"></script>
-    <script src="../js/api.js"></script>
-    <script src="../js/login.js"></script>
-    <script src="../js/pwa.js"></script>
-  <script src="../js/ui-preferences.js?v=0.29.9"></script>
-  <script src="../js/analytics.js"></script>
-  <script src="../js/customer-footer.js?v=0.29.6"></script>
+    <script src="../js/auth.js?v=1.0.0"></script>
+    <script src="../js/api.js?v=1.0.0"></script>
+    <script src="../js/login.js?v=1.0.0"></script>
+    <script src="../js/pwa.js?v=1.0.0"></script>
+  <script src="../js/ui-preferences.js?v=1.0.0"></script>
+  <script src="../js/analytics.js?v=1.0.0"></script>
+  <script src="../js/customer-footer.js?v=1.0.0"></script>
 </body>
 </html>

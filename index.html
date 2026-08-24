@@ -7,28 +7,31 @@
   <meta name="theme-color" content="#ff6b00">
   <title>DesiMall | Bharat Ka Apna Shopping Mall</title>
   <link rel="preconnect" href="https://cdnjs.cloudflare.com">
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css?v=0.32.3">
-  <link rel="stylesheet" href="css/style.css?v=0.32.3">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css?v=1.0.0">
+  <link rel="stylesheet" href="css/style.css?v=1.0.0">
     <link rel="manifest" href="manifest.webmanifest">
   <meta name="referrer" content="strict-origin-when-cross-origin">
-  <link rel="stylesheet" href="css/global-theme.css?v=0.32.3">
-  <link rel="stylesheet" href="css/customer-shell.css?v=0.32.3">
-  <link rel="stylesheet" href="css/customer-marketplace-v2.css?v=0.32.3">
-  <link rel="stylesheet" href="css/customer-footer.css?v=0.32.3">
+  <link rel="stylesheet" href="css/global-theme.css?v=1.0.0">
+  <link rel="stylesheet" href="css/customer-shell.css?v=1.0.0">
+  <link rel="stylesheet" href="css/customer-marketplace-v2.css?v=1.0.0">
+  <link rel="stylesheet" href="css/customer-footer.css?v=1.0.0">
 
-<script id="dmReleaseBootstrap">
+<script id="dmCleanV1Bootstrap">
 (() => {
-  const RELEASE = 'v0.32.3';
-  window.DESIMALL_RELEASE = RELEASE;
+  const RELEASE = '1.0.0';
+  window.DESIMALL_CUSTOMER_BUILD = 'clean-v1.0.0';
+
   try {
-    const prev = localStorage.getItem('desimall_release');
-    if (prev !== RELEASE) {
-      localStorage.setItem('desimall_release', RELEASE);
+    const key = 'desimall_customer_release';
+    if (localStorage.getItem(key) !== RELEASE) {
+      localStorage.setItem(key, RELEASE);
       if ('caches' in window) {
         caches.keys().then(keys => Promise.all(keys.map(k => caches.delete(k)))).catch(() => {});
       }
       if ('serviceWorker' in navigator) {
-        navigator.serviceWorker.getRegistrations().then(regs => regs.forEach(r => r.update())).catch(() => {});
+        navigator.serviceWorker.getRegistrations()
+          .then(regs => regs.forEach(r => r.update()))
+          .catch(() => {});
       }
     }
   } catch (_) {}
@@ -211,16 +214,16 @@
   </div>
 
   <div class="toast" id="toast" role="status" aria-live="polite"><i class="fa-solid fa-circle-check"></i><span id="toastMessage">Done</span></div>
-  <script src="js/auth.js?v=0.32.3"></script>
-    <script src="js/api.js?v=0.32.3"></script>
-  <script src="js/app.js?v=0.32.3"></script>
-  <script src="js/customer-shell.js?v=0.32.3"></script>
-    <script src="js/voice-search.js?v=0.32.3"></script>
-    <script src="js/pwa.js?v=0.32.3"></script>
-  <script src="js/ui-preferences.js?v=0.32.3"></script>
-  <script src="js/analytics.js?v=0.32.3"></script>
-  <script src="js/product-image-resolver.js?v=0.32.3"></script>
-  <script src="js/customer-footer.js?v=0.32.3"></script>
-  <script src="js/notification-badge.js?v=0.32.3"></script>
+  <script src="js/auth.js?v=1.0.0"></script>
+    <script src="js/api.js?v=1.0.0"></script>
+  <script src="js/app.js?v=1.0.0"></script>
+  <script src="js/customer-shell.js?v=1.0.0"></script>
+    <script src="js/voice-search.js?v=1.0.0"></script>
+    <script src="js/pwa.js?v=1.0.0"></script>
+  <script src="js/ui-preferences.js?v=1.0.0"></script>
+  <script src="js/analytics.js?v=1.0.0"></script>
+  <script src="js/product-image-resolver.js?v=1.0.0"></script>
+  <script src="js/customer-footer.js?v=1.0.0"></script>
+  <script src="js/notification-badge.js?v=1.0.0"></script>
 </body>
 </html>

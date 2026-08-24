@@ -190,6 +190,11 @@ const DesiMallProfileApp = {
 
         const form = document.getElementById('addressForm');
         const btnCancelEdit = document.getElementById('btnCancelAddressEdit');
+        const btnCaptureGps = document.getElementById('btnCaptureAddressGps');
+
+        if (btnCaptureGps) {
+            btnCaptureGps.onclick = () => this.captureAddressGps();
+        }
 
         if (btnCancelEdit && form) {
             btnCancelEdit.onclick = () => this.resetAddressForm();
@@ -251,6 +256,73 @@ const DesiMallProfileApp = {
         }
     },
 
+    captureAddressGps() {
+        const status = document.getElementById('addressGpsStatus');
+
+        if (!navigator.geolocation) {
+            if (status) {
+                status.textContent = 'Location is not supported in this browser.';
+                status.className = 'address-gps-status bad';
+            }
+            return;
+        }
+
+        if (status) {
+            status.textContent = 'Getting precise delivery location…';
+            status.className = 'address-gps-status';
+        }
+
+        navigator.geolocation.getCurrentPosition(
+            position => {
+                const lat = Number(position.coords.latitude);
+                const lon = Number(position.coords.longitude);
+                const accuracy = Number(position.coords.accuracy || 0);
+
+                if (!Number.isFinite(lat) || !Number.isFinite(lon) ||
+                    (Math.abs(lat) < 0.0001 && Math.abs(lon) < 0.0001)) {
+                    if (status) {
+                        status.textContent = 'Invalid GPS. Please try again.';
+                        status.className = 'address-gps-status bad';
+                    }
+                    return;
+                }
+
+                const latEl = document.getElementById('addrLatitude');
+                const lonEl = document.getElementById('addrLongitude');
+                if (latEl) latEl.value = lat.toFixed(7);
+                if (lonEl) lonEl.value = lon.toFixed(7);
+
+                try {
+                    localStorage.setItem('desimall_customer_live_location', JSON.stringify({
+                        latitude: lat,
+                        longitude: lon,
+                        accuracy,
+                        capturedAt: Date.now()
+                    }));
+                } catch (_) {}
+
+                if (status) {
+                    status.textContent = `Location confirmed: ${lat.toFixed(6)}, ${lon.toFixed(6)} · ±${Math.round(accuracy)}m`;
+                    status.className = 'address-gps-status good';
+                }
+            },
+            error => {
+                if (status) {
+                    status.textContent =
+                        error.code === 1
+                            ? 'Location permission denied. Allow Precise Location.'
+                            : 'Could not get location. Turn on GPS and try again.';
+                    status.className = 'address-gps-status bad';
+                }
+            },
+            {
+                enableHighAccuracy: true,
+                maximumAge: 0,
+                timeout: 20000
+            }
+        );
+    },
+
     async submitAddressForm() {
         if (this.addressBusy) return;
 
@@ -267,6 +339,8 @@ const DesiMallProfileApp = {
         const line1 = document.getElementById('addrFullText')?.value.trim() || '';
         const line2 = document.getElementById('addrLandmark')?.value.trim() || '';
         const isDefault = Boolean(document.getElementById('addrIsDefault')?.checked);
+        const latitude = Number(document.getElementById('addrLatitude')?.value);
+        const longitude = Number(document.getElementById('addrLongitude')?.value);
 
         if (!fullName) {
             return this.showAlert('Please enter recipient name.', 'error', 'addressAlert');
@@ -288,6 +362,15 @@ const DesiMallProfileApp = {
             );
         }
 
+        if (!Number.isFinite(latitude) || !Number.isFinite(longitude) ||
+            (Math.abs(latitude) < 0.0001 && Math.abs(longitude) < 0.0001)) {
+            return this.showAlert(
+                'Use Current Location se exact delivery GPS confirm karna compulsory hai.',
+                'error',
+                'addressAlert'
+            );
+        }
+
         const payload = {
             AddressID: addressId,
             Label: 'Home',
@@ -299,6 +382,8 @@ const DesiMallProfileApp = {
             State: state,
             AddressLine1: line1,
             AddressLine2: line2,
+            Latitude: latitude,
+            Longitude: longitude,
             IsDefault: isDefault
         };
 
