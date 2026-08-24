@@ -21,9 +21,9 @@
 
 <script>
 (function(){
-  window.DESIMALL_TRACKING_BUILD = 'v0.31.5';
+  window.DESIMALL_TRACKING_BUILD = 'v0.31.8';
   try {
-    localStorage.setItem('desimall_tracking_build', 'v0.31.5');
+    localStorage.setItem('desimall_tracking_build', 'v0.31.8');
   } catch (_) {}
 
   if ('serviceWorker' in navigator) {
@@ -290,7 +290,7 @@
   transform:translateY(1px);
 }
 
-/* v0.31.5 rider-to-customer route tracking */
+/* v0.31.8 rider-to-customer route tracking */
 .tez-live-map{
   min-height:360px;
 }
@@ -322,11 +322,17 @@ if ('caches' in window) {
 </script>
 </head>
 <body>
+<div style="position:fixed;left:50%;top:42px;transform:translateX(-50%);
+z-index:999998;background:#0f766e;color:#fff;border-radius:999px;
+padding:5px 11px;font:800 10px Arial,sans-serif;box-shadow:0 5px 18px rgba(0,0,0,.25)">
+CUSTOMER EXACT PATH /pages/track-order.html
+</div>
+
 <div id="dmSingleFileProof" style="
 position:fixed;left:50%;top:8px;transform:translateX(-50%);
 z-index:999999;background:#16a34a;color:white;border-radius:999px;
 padding:7px 14px;font:800 11px Arial,sans-serif;box-shadow:0 5px 18px rgba(0,0,0,.3)">
-LIVE TRACKING v0.31.5 SINGLE-FILE
+LIVE TRACKING v0.31.8 SINGLE-FILE
 </div>
 
 <header class="navbar-header">
@@ -537,10 +543,32 @@ const TrackingApp = {
     const riderName = order.RiderName || order.rider_name || order.AssignedRiderName || '';
     const riderMobile = order.RiderMobile || order.rider_mobile || order.AssignedRiderMobile || '';
     const etaText = order.EstimatedArrival || order.estimated_arrival || order.ETA || '';
-    const isTez = Boolean(
-      order.IsTez ||
-      String(order.FulfillmentMode || order.fulfillment_mode || '').toLowerCase() === 'tez'
-    );
+    const rawMode = String(order.FulfillmentMode || order.fulfillment_mode || 'marketplace').trim().toLowerCase();
+    const mode = ['try-on','try_on','tryon'].includes(rawMode)
+      ? 'try_on'
+      : (['services','service'].includes(rawMode)
+          ? 'service'
+          : (rawMode === 'food' ? 'food' : (rawMode === 'tez' ? 'tez' : 'marketplace')));
+    const isTez = mode === 'tez';
+    const mapEnabled = ['tez','food','service','try_on'].includes(mode);
+    const modeLabel = mode === 'tez'
+      ? 'Tez Delivery'
+      : mode === 'food'
+        ? 'Food Delivery'
+        : mode === 'service'
+          ? 'Service Partner'
+          : mode === 'try_on'
+            ? 'Try-On Agent'
+            : 'DesiMall Delivery';
+    const modeIcon = mode === 'food'
+      ? 'fa-utensils'
+      : mode === 'service'
+        ? 'fa-screwdriver-wrench'
+        : mode === 'try_on'
+          ? 'fa-shirt'
+          : mode === 'tez'
+            ? 'fa-bolt'
+            : 'fa-box';
     const tezMin = Number(order.DeliveryTargetMinMinutes || order.delivery_target_min_minutes || 0);
     const tezMax = Number(order.DeliveryTargetMaxMinutes || order.delivery_target_max_minutes || 0);
 
@@ -550,13 +578,15 @@ const TrackingApp = {
         <strong class="tracking-status ${cancelled ? 'cancelled' : ''}">${this.esc(cancelled ? 'Cancelled' : this.customerStatus(rawStatus))}</strong>
       </div>
 
-      ${isTez ? `
-        <div class="tracking-tez-banner">
-          <i class="fa-solid fa-bolt"></i>
-          <strong>Tez Delivery</strong>
-          <span>${tezMin && tezMax ? `Target ${tezMin}–${tezMax} min` : 'Fast-delivery order'}</span>
-        </div>
-      ` : ''}
+      <div class="tracking-tez-banner">
+        <i class="fa-solid ${modeIcon}"></i>
+        <strong>${modeLabel}</strong>
+        <span>${
+          isTez && tezMin && tezMax
+            ? `Target ${tezMin}–${tezMax} min`
+            : (mapEnabled ? 'Live location enabled' : 'OTP delivery verification')
+        }</span>
+      </div>
 
       <div class="tracking-meta">
         <span><i class="fa-solid fa-calendar"></i> Ordered ${orderedDate.toLocaleDateString('en-IN',{day:'numeric',month:'short',year:'numeric'})}</span>
@@ -581,11 +611,11 @@ const TrackingApp = {
           </section>
         ` : ''}
 
-        ${isTez && !cancelled && currentKey !== 'delivered' ? `
+        ${!cancelled && currentKey !== 'delivered' ? `
           <section class="tez-live-panel" id="tezLivePanel">
             <div class="tez-live-top">
               <div>
-                <small>TEZ DELIVERY</small>
+                <small id="trackingModeLabel">DELIVERY VERIFICATION</small>
                 <h3 id="tezLiveEta">Checking delivery status…</h3>
                 <p id="tezLiveStatus">Live tracking starts after rider pickup.</p>
               </div>
@@ -595,7 +625,7 @@ const TrackingApp = {
             <div class="tez-delivery-otp hidden" id="tezDeliveryOtpBox">
               <span>DELIVERY OTP</span>
               <strong id="tezDeliveryOtp">------</strong>
-              <small>Order receive karne ke baad hi rider ko OTP batayein.</small>
+              <small>OTP sabhi modes me compulsory hai. Service me bhi completion OTP verify hoga.</small>
             </div>
 
             <div id="tezLiveMap" class="tez-live-map hidden" aria-label="Rider live location map"></div>
@@ -637,7 +667,7 @@ const TrackingApp = {
     </article>`;
 
     result.classList.remove('hidden');
-    if (isTez && internalOrderId && !cancelled && currentKey !== 'delivered') {
+    if (internalOrderId && !cancelled && currentKey !== 'delivered') {
       this.startLiveTracking(internalOrderId);
     }
     DesiMallAnalytics?.track?.('track_order', {orderId: orderCode, status: rawStatus});
@@ -953,20 +983,55 @@ const TrackingApp = {
         return;
       }
 
-      if (!data?.liveTrackingAvailable) {
-        this.lastDisplayedEta = null;
-        if (etaEl) etaEl.textContent = 'Live tracking starts after rider pickup';
-        if (statusEl) statusEl.textContent = 'Seller is preparing your order / rider is heading to pickup.';
-        if (mapEl) mapEl.classList.add('hidden');
-        if (otpBox) otpBox.classList.add('hidden');
-        if (dot) dot.classList.remove('live');
-        if (updated) updated.textContent = '';
-        return;
+      const modeLabelEl = document.getElementById('trackingModeLabel');
+      const mode = String(data?.mode || 'marketplace');
+
+      if (modeLabelEl) {
+        modeLabelEl.textContent =
+          mode === 'tez'
+            ? 'TEZ LIVE TRACKING'
+            : mode === 'food'
+              ? 'FOOD LIVE TRACKING'
+              : mode === 'service'
+                ? 'SERVICE PARTNER TRACKING'
+                : mode === 'try_on'
+                  ? 'TRY-ON AGENT TRACKING'
+                  : 'DELIVERY VERIFICATION';
       }
 
       if (otpBox && otpEl && data?.deliveryOtp) {
         otpEl.textContent = String(data.deliveryOtp);
         otpBox.classList.remove('hidden');
+      } else if (otpBox) {
+        otpBox.classList.add('hidden');
+      }
+
+      if (!data?.mapEnabled) {
+        this.lastDisplayedEta = null;
+        if (etaEl) {
+          etaEl.textContent = data?.otpRequired
+            ? 'OTP verification required at delivery'
+            : 'Order delivery in progress';
+        }
+        if (statusEl) {
+          statusEl.textContent = data?.otpRequired
+            ? 'Customer OTP verify hone ke baad hi order Delivered hoga.'
+            : 'Live map is not enabled for normal DesiMall orders.';
+        }
+        if (mapEl) mapEl.classList.add('hidden');
+        if (dot) dot.classList.remove('live');
+        if (updated) updated.textContent = '';
+        return;
+      }
+
+      if (!data?.liveTrackingAvailable) {
+        this.lastDisplayedEta = null;
+        if (etaEl) etaEl.textContent = 'Live tracking starts after pickup / visit starts';
+        if (statusEl) statusEl.textContent = 'Waiting for the assigned partner to start the trip.';
+        if (mapEl) mapEl.classList.add('hidden');
+        if (dot) dot.classList.remove('live');
+        if (updated) updated.textContent = '';
+        return;
       }
 
       const loc = data?.location;
@@ -1027,10 +1092,10 @@ const TrackingApp = {
       let eta = Number(data?.etaMinutes ?? 25);
 
       if (routeInfo?.durationMinutes) {
-        eta = Math.min(25, routeInfo.durationMinutes);
+        eta = Math.min(Number(data?.targetMaxMinutes || 60), routeInfo.durationMinutes);
       }
 
-      eta = Math.max(1, Math.min(25, Number(eta)));
+      eta = Math.max(1, Math.min(Number(data?.targetMaxMinutes || 60), Number(eta)));
 
       // ETA should not jump upward during one live session.
       if (
@@ -1116,7 +1181,7 @@ const TrackingApp = {
   background:#111827;color:#94a3b8;border:1px solid #334155;
   border-radius:999px;padding:5px 9px;font:700 10px/1.2 Arial,sans-serif;
   box-shadow:0 4px 14px rgba(0,0,0,.25);opacity:.9">
-  Tracking v0.31.5 SINGLE
+  Tracking v0.31.8 SINGLE
 </div>
 
 </body>
