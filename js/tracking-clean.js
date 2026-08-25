@@ -489,11 +489,17 @@ const TrackingClean = {
     rules.forEach((r,i) => { if (r.test(normalized)) current = Math.max(current,i); });
 
     const timeline = document.getElementById('timeline');
-    timeline.innerHTML = labels.map((label,i) =>
-      `<div class="step ${i<current?'done':i===current?'current':''}">
-        <span>${this.escape(label)}</span>
-      </div>`
-    ).join('');
+    const currentIcon = service ? '⌖' : '♨';
+    timeline.innerHTML = labels.map((label,i) => {
+      const state = i < current ? 'done' : i === current ? 'current' : 'pending';
+      const sub = i < current ? 'Completed' : i === current ? (current === 5 ? 'Completed' : 'Current status') : 'Pending';
+      const icon = i < current ? '✓' : i === current ? currentIcon : '✓';
+      return `<div class="step ${state}">
+        <b class="dm-step-dot" aria-hidden="true">${icon}</b>
+        <span class="dm-step-label">${this.escape(label)}</span>
+        <small class="dm-step-state">${sub}</small>
+      </div>`;
+    }).join('');
   },
 
   validCoord(lat, lon) {

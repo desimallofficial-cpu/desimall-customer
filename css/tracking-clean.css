@@ -236,3 +236,42 @@ body{margin:0;background:var(--bg);color:var(--text);font-family:Inter,Arial,san
 .timeline-step small{
   min-height:14px;
 }
+
+/* Exact old-style timeline, based on actual #timeline > .step markup */
+#timeline{
+ position:relative;display:grid;grid-template-columns:repeat(6,1fr);
+ align-items:start;gap:0;margin-top:24px;padding:0 10px 10px;
+}
+#timeline::before{
+ content:"";position:absolute;left:8.5%;right:8.5%;top:25px;height:3px;
+ background:#687381;border-radius:999px;z-index:0;
+}
+#timeline .step{position:relative;z-index:1;text-align:center;min-width:0}
+#timeline .dm-step-dot{
+ width:50px;height:50px;border-radius:50%;margin:0 auto 10px;
+ display:flex;align-items:center;justify-content:center;box-sizing:border-box;
+ background:#eef2f6;color:#fff;font-size:24px;font-weight:900;line-height:1;
+ position:relative;
+}
+#timeline .step.done .dm-step-dot,
+#timeline .step.current .dm-step-dot{background:#ff6b00}
+#timeline .step.done:not(:first-child)::before,
+#timeline .step.current:not(:first-child)::before{
+ content:"";position:absolute;right:50%;top:24px;width:100%;height:3px;
+ background:#ff6b00;z-index:-1;
+}
+#timeline .step.current .dm-step-dot{
+ box-shadow:0 0 0 6px rgba(255,107,0,.22),0 0 0 10px rgba(255,107,0,.08);
+}
+#timeline .step.current .dm-step-dot{font-size:21px;transform:none}
+#timeline .dm-step-label{
+ display:block;color:#fff;font-size:12px;font-weight:800;line-height:1.25;
+}
+#timeline .step.pending .dm-step-label{color:#b8c3d0}
+#timeline .dm-step-state{
+ display:block;margin-top:7px;color:#8fa4bc;font-size:10px;font-weight:500;
+ line-height:1.2;white-space:nowrap;
+}
+@media(max-width:700px){
+ #timeline{overflow-x:auto;grid-template-columns:repeat(6,minmax(105px,1fr));padding-bottom:14px}
+}
