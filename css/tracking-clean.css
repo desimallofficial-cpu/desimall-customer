@@ -275,3 +275,101 @@ body{margin:0;background:var(--bg);color:var(--text);font-family:Inter,Arial,san
 @media(max-width:700px){
  #timeline{overflow-x:auto;grid-template-columns:repeat(6,minmax(105px,1fr));padding-bottom:14px}
 }
+
+/* =========================================================
+   v1.0.4.5 SINGLE TIMELINE FIX
+   Disable every legacy timeline circle/pseudo visual.
+   Keep only .dm-step-dot row.
+   ========================================================= */
+#timeline .step::before,
+#timeline .step::after{
+  content:none!important;
+  display:none!important;
+}
+
+#timeline .step > span:not(.dm-step-label),
+#timeline .step > b:not(.dm-step-dot){
+  display:none!important;
+}
+
+/* Reset legacy circle styling that was applied directly to .step */
+#timeline .step{
+  background:transparent!important;
+  border:0!important;
+  box-shadow:none!important;
+  width:auto!important;
+  height:auto!important;
+  border-radius:0!important;
+  padding:0!important;
+}
+
+/* One connector only */
+#timeline::before{
+  content:""!important;
+  display:block!important;
+  position:absolute!important;
+  left:8.5%!important;
+  right:8.5%!important;
+  top:25px!important;
+  height:3px!important;
+  background:#687381!important;
+  border-radius:999px!important;
+  z-index:0!important;
+}
+#timeline::after{
+  content:none!important;
+  display:none!important;
+}
+
+/* Completed orange line segments behind the single row */
+#timeline .step.done:not(:first-child) .dm-step-dot::before,
+#timeline .step.current:not(:first-child) .dm-step-dot::before{
+  content:"";
+  position:absolute;
+  right:50%;
+  top:50%;
+  width:calc(100% + 70px);
+  height:3px;
+  transform:translateY(-50%);
+  background:#ff6b00;
+  z-index:-1;
+}
+
+/* Ensure exactly one circle per step */
+#timeline .dm-step-dot{
+  position:relative!important;
+  z-index:2!important;
+  width:50px!important;
+  height:50px!important;
+  border-radius:50%!important;
+  margin:0 auto 10px!important;
+  display:flex!important;
+  align-items:center!important;
+  justify-content:center!important;
+  box-sizing:border-box!important;
+}
+
+#timeline .step.done .dm-step-dot,
+#timeline .step.current .dm-step-dot{
+  background:#ff6b00!important;
+  color:#fff!important;
+}
+#timeline .step.pending .dm-step-dot{
+  background:#eef2f6!important;
+  color:#fff!important;
+}
+
+#timeline .step.current .dm-step-dot{
+  box-shadow:0 0 0 6px rgba(255,107,0,.22),
+             0 0 0 10px rgba(255,107,0,.08)!important;
+}
+
+/* Labels stay directly under the single circle row */
+#timeline .dm-step-label{
+  display:block!important;
+  margin-top:0!important;
+}
+#timeline .dm-step-state{
+  display:block!important;
+  margin-top:7px!important;
+}
