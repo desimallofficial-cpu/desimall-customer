@@ -103,7 +103,7 @@ const TrackingClean = {
     try {
       const data = await this.api(`/api/v1/orders/${encodeURIComponent(orderId)}/tracking`);
       this.render(data);
-    this.renderTimelineFromStatus(data?.status || data?.orderStatus || data?.order?.status);
+    this.renderTimelineFromStatus(this.resolveTimelineStatus(data));
       history.replaceState(null, '', `?order=${encodeURIComponent(orderId)}`);
       this.pollTimer = setTimeout(() => this.track(orderId), 7000);
     } catch (error) {
@@ -231,6 +231,62 @@ const TrackingClean = {
     });
   },
 
+
+  resolveTimelineStatus(data) {
+    const candidates = [
+      data?.riderStatus,
+      data?.RiderStatus,
+      data?.deliveryStatus,
+      data?.DeliveryStatus,
+      data?.fulfillmentStatus,
+      data?.FulfillmentStatus,
+      data?.trackingStatus,
+      data?.TrackingStatus,
+      data?.orderStatus,
+      data?.OrderStatus,
+      data?.status,
+      data?.order?.rider_status,
+      data?.order?.delivery_status,
+      data?.order?.fulfillment_status,
+      data?.order?.status
+    ].filter(Boolean);
+
+    const rank = status => this.timelineStageIndex(status);
+
+    // Prefer the most advanced stage reported by backend.
+    let best = candidates[0] || 'pending';
+    let bestRank = rank(best);
+
+    for (const status of candidates.slice(1)) {
+      const r = rank(status);
+      if (r > bestRank) {
+        best = status;
+        bestRank = r;
+      }
+    }
+
+    // If live rider tracking is active, the order cannot logically be only "Order placed".
+    // Promote to On the way only when backend/live tracking confirms an active rider location.
+    const hasLiveRider = Boolean(
+      data?.rider?.latitude &&
+      data?.rider?.longitude &&
+      (
+        data?.rider?.isLive === true ||
+        data?.rider?.live === true ||
+        data?.liveTracking === true ||
+        data?.trackingActive === true ||
+        data?.rider?.updatedAt ||
+        data?.rider?.updated_at
+      )
+    );
+
+    if (hasLiveRider && bestRank < 4) {
+      return 'on_the_way';
+    }
+
+    return best;
+  },
+
   normalizeOrderStatus(status) {
     return String(status || '')
       .trim()
@@ -262,6 +318,7 @@ const TrackingClean = {
       pickup_completed: 3,
 
       out_for_delivery: 4,
+      on_way: 4,
       on_the_way: 4,
       on_theway: 4,
       in_transit: 4,
