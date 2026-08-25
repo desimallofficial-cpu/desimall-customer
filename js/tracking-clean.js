@@ -24,9 +24,14 @@ const TrackingClean = {
       const id = input.value.trim();
       if (id) this.track(id);
     });
+
+    document.getElementById('saveDeliveryGpsBtn')?.addEventListener(
+      'click',
+      () => this.saveCurrentDeliveryLocation()
+    );
   },
 
-  async api(path) {
+  async api(path, options = {}) {
     try {
       if (
         typeof DesiMallAuth !== 'undefined' &&
@@ -37,14 +42,19 @@ const TrackingClean = {
     } catch (_) {}
 
     const token = this.getToken();
-    const headers = token ? { Authorization: `Bearer ${token}` } : {};
+    const headers = {
+      ...(options.body ? { 'Content-Type': 'application/json' } : {}),
+      ...(token ? { Authorization: `Bearer ${token}` } : {})
+    };
     const base =
       window.DESIMALL_API_BASE ||
       localStorage.getItem('desimall_api_base') ||
       'https://desimall-backend.onrender.com';
 
     const res = await fetch(base.replace(/\/$/,'') + path, {
+      method: options.method || 'GET',
       headers,
+      body: options.body ? JSON.stringify(options.body) : undefined,
       cache: 'no-store'
     });
 
@@ -137,6 +147,66 @@ const TrackingClean = {
     this.renderLive(data, order, status, modeRaw);
   },
 
+
+  async saveCurrentDeliveryLocation() {
+    const box = document.getElementById('deliveryGpsRepair');
+    const btn = document.getElementById('saveDeliveryGpsBtn');
+    const msg = document.getElementById('deliveryGpsRepairMsg');
+
+    if (!navigator.geolocation) {
+      if (msg) msg.textContent = 'GPS is not supported on this device.';
+      box?.classList.add('error');
+      return;
+    }
+
+    if (btn) btn.disabled = true;
+    if (msg) msg.textContent = 'Getting precise location…';
+    box?.classList.remove('ok', 'error');
+
+    try {
+      const pos = await new Promise((resolve, reject) => {
+        navigator.geolocation.getCurrentPosition(resolve, reject, {
+          enableHighAccuracy: true,
+          maximumAge: 0,
+          timeout: 25000
+        });
+      });
+
+      const accuracy = Number(pos.coords.accuracy || 0);
+      if (accuracy > 1000) {
+        throw new Error(
+          `GPS accuracy weak (±${Math.round(accuracy)}m). Turn on Precise Location and retry.`
+        );
+      }
+
+      await this.api(
+        `/api/v1/orders/${encodeURIComponent(this.orderId)}/delivery-location`,
+        {
+          method: 'PATCH',
+          body: {
+            Latitude: pos.coords.latitude,
+            Longitude: pos.coords.longitude,
+            Accuracy: pos.coords.accuracy
+          }
+        }
+      );
+
+      if (msg) msg.textContent = 'Exact delivery GPS saved. Loading live route…';
+      box?.classList.add('ok');
+
+      await this.track(this.orderId);
+    } catch (error) {
+      let message = error?.message || 'Could not save location.';
+      if (Number(error?.code) === 1) message = 'Location permission denied.';
+      if (Number(error?.code) === 2) message = 'GPS location unavailable.';
+      if (Number(error?.code) === 3) message = 'GPS timed out. Try again outdoors.';
+      if (msg) msg.textContent = message;
+      box?.classList.add('error');
+    } finally {
+      if (btn) btn.disabled = false;
+    }
+  },
+
   modeLabel(mode) {
     if (mode === 'tez') return '⚡ Tez Delivery';
     if (mode === 'food') return '🍴 Food Delivery';
@@ -184,6 +254,8 @@ const TrackingClean = {
     const validCustomer = this.validCoord(cLat, cLon);
     const live = Boolean(data?.live ?? data?.isLive ?? data?.locationLive ?? false);
 
+    const gpsRepair = document.getElementById('deliveryGpsRepair');
+
     if (!validRider || !validCustomer) {
       mapWrap?.classList.add('hidden');
       dot?.classList.remove('on');
@@ -192,8 +264,14 @@ const TrackingClean = {
         ? 'Exact delivery location is missing for this address.'
         : 'Rider/partner has not shared a fresh precise GPS location yet.';
       eta.textContent = 'Waiting for GPS';
+
+      if (gpsRepair) {
+        gpsRepair.classList.toggle('hidden', validCustomer);
+      }
       return;
     }
+
+    gpsRepair?.classList.add('hidden');
 
     dot?.classList.toggle('on', live);
     mapWrap?.classList.remove('hidden');
