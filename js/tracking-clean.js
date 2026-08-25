@@ -103,7 +103,6 @@ const TrackingClean = {
     try {
       const data = await this.api(`/api/v1/orders/${encodeURIComponent(orderId)}/tracking`);
       this.render(data);
-    this.renderTimelineFromStatus(this.resolveTimelineStatus(data));
       history.replaceState(null, '', `?order=${encodeURIComponent(orderId)}`);
       this.pollTimer = setTimeout(() => this.track(orderId), 7000);
     } catch (error) {
@@ -121,7 +120,14 @@ const TrackingClean = {
     state?.classList.remove('hidden');
 
     const id = order.OrderID || order.order_id || this.orderId;
-    const status = String(order.Status || order.status || data?.status || 'Placed');
+    const rawOrderStatus = String(order.Status || order.status || data?.status || 'Placed');
+    const resolvedTimelineStatus = this.resolveTimelineStatus(data);
+    const status = String(
+      this.timelineStageIndex(resolvedTimelineStatus) >
+      this.timelineStageIndex(rawOrderStatus)
+        ? resolvedTimelineStatus
+        : rawOrderStatus
+    );
     const modeRaw = String(order.FulfillmentMode || order.fulfillment_mode || data?.fulfillmentMode || data?.mode || 'desimall').toLowerCase();
     const mode = this.modeLabel(modeRaw);
 
@@ -267,17 +273,28 @@ const TrackingClean = {
 
     // If live rider tracking is active, the order cannot logically be only "Order placed".
     // Promote to On the way only when backend/live tracking confirms an active rider location.
+    const riderLat = Number(
+      data?.rider?.latitude ??
+      data?.rider?.Latitude ??
+      data?.RiderLatitude ??
+      data?.riderLatitude ??
+      data?.live?.rider?.latitude ??
+      data?.tracking?.rider?.latitude
+    );
+    const riderLon = Number(
+      data?.rider?.longitude ??
+      data?.rider?.Longitude ??
+      data?.RiderLongitude ??
+      data?.riderLongitude ??
+      data?.live?.rider?.longitude ??
+      data?.tracking?.rider?.longitude
+    );
+
     const hasLiveRider = Boolean(
-      data?.rider?.latitude &&
-      data?.rider?.longitude &&
-      (
-        data?.rider?.isLive === true ||
-        data?.rider?.live === true ||
-        data?.liveTracking === true ||
-        data?.trackingActive === true ||
-        data?.rider?.updatedAt ||
-        data?.rider?.updated_at
-      )
+      Number.isFinite(riderLat) &&
+      Number.isFinite(riderLon) &&
+      Math.abs(riderLat) > 0.0001 &&
+      Math.abs(riderLon) > 0.0001
     );
 
     if (hasLiveRider && bestRank < 4) {
