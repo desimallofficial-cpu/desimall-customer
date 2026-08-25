@@ -79,3 +79,111 @@ body{margin:0;background:var(--bg);color:var(--text);font-family:Inter,Arial,san
   .gps-repair{grid-template-columns:1fr}
   .gps-repair button{width:100%}
 }
+
+/* =========================================================
+   Classic connected timeline UI v1.0.4.2
+   Restores the earlier DesiMall look:
+   orange completed nodes + connector line + glowing current node
+   ========================================================= */
+.timeline{
+  position:relative;
+  display:grid;
+  grid-template-columns:repeat(6,1fr);
+  gap:0;
+  align-items:start;
+  margin-top:22px;
+  padding:0 12px 8px;
+}
+.timeline::before{
+  content:"";
+  position:absolute;
+  left:8%;
+  right:8%;
+  top:22px;
+  height:3px;
+  background:#5f6b7a;
+  border-radius:999px;
+  z-index:0;
+}
+.timeline::after{
+  content:"";
+  position:absolute;
+  left:8%;
+  top:22px;
+  height:3px;
+  width:var(--timeline-progress,0%);
+  background:#ff6b00;
+  border-radius:999px;
+  z-index:1;
+  transition:width .3s ease;
+}
+.timeline-step{
+  position:relative;
+  z-index:2;
+  text-align:center;
+  min-width:0;
+}
+.timeline-step .step-dot,
+.timeline-step .timeline-dot,
+.timeline-step > .dot,
+.timeline-step > div:first-child{
+  width:44px;
+  height:44px;
+  margin:0 auto 8px;
+  border-radius:50%;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  background:#eef2f6;
+  color:#d4dbe3;
+  border:0;
+  box-shadow:none;
+  font-size:17px;
+  font-weight:900;
+}
+.timeline-step.done .step-dot,
+.timeline-step.done .timeline-dot,
+.timeline-step.done > .dot,
+.timeline-step.done > div:first-child{
+  background:#ff6b00;
+  color:#fff;
+}
+.timeline-step.current .step-dot,
+.timeline-step.current .timeline-dot,
+.timeline-step.current > .dot,
+.timeline-step.current > div:first-child{
+  background:#ff6b00;
+  color:#fff;
+  box-shadow:0 0 0 6px rgba(255,107,0,.18);
+}
+.timeline-step .step-label,
+.timeline-step .timeline-label,
+.timeline-step strong{
+  display:block;
+  color:#f8fafc;
+  font-size:12px;
+  font-weight:800;
+  line-height:1.25;
+}
+.timeline-step.pending .step-label,
+.timeline-step.pending .timeline-label,
+.timeline-step.pending strong{
+  color:#c5cfda;
+}
+.timeline-step .timeline-state,
+.timeline-step small{
+  display:block;
+  margin-top:5px;
+  color:#8fa3b8;
+  font-size:10px;
+  line-height:1.2;
+}
+@media(max-width:700px){
+  .timeline{
+    overflow-x:auto;
+    grid-template-columns:repeat(6,minmax(105px,1fr));
+    padding-bottom:12px;
+  }
+  .timeline::before{left:52px;right:52px}
+  .timeline::after{left:52px}
+}

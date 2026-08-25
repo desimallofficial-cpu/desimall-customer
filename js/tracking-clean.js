@@ -278,11 +278,18 @@ const TrackingClean = {
     this.ensureTimelineClasses();
     const stage = this.timelineStageIndex(status);
     const nodes = [...document.querySelectorAll('.timeline-step')];
+    const timeline = document.querySelector('.timeline');
 
     if (!nodes.length) return;
 
+    if (timeline) {
+      const maxStage = Math.max(nodes.length - 1, 1);
+      const progress = Math.max(0, Math.min(100, (stage / maxStage) * 84));
+      timeline.style.setProperty('--timeline-progress', `${progress}%`);
+    }
+
     nodes.forEach((node, index) => {
-      node.classList.remove('done', 'active', 'pending');
+      node.classList.remove('done', 'current', 'active', 'pending');
 
       const label = node.querySelector('.timeline-state');
 
@@ -290,7 +297,7 @@ const TrackingClean = {
         node.classList.add('done');
         if (label) label.textContent = 'Completed';
       } else if (index === stage) {
-        node.classList.add('active');
+        node.classList.add('current');
         if (label) label.textContent = stage === 5 ? 'Completed' : 'Current status';
       } else {
         node.classList.add('pending');
