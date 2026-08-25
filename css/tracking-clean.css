@@ -187,3 +187,52 @@ body{margin:0;background:var(--bg);color:var(--text);font-family:Inter,Arial,san
   .timeline::before{left:52px;right:52px}
   .timeline::after{left:52px}
 }
+
+/* Reference timeline polish v1.0.4.3 */
+.timeline-step .step-dot,
+.timeline-step .timeline-dot,
+.timeline-step > .dot,
+.timeline-step > div:first-child{
+  position:relative;
+  font-size:0;
+}
+.timeline-step.done .step-dot::after,
+.timeline-step.done .timeline-dot::after,
+.timeline-step.done > .dot::after,
+.timeline-step.done > div:first-child::after{
+  content:"✓";
+  font-size:22px;
+  line-height:1;
+  font-weight:900;
+  color:#fff;
+}
+.timeline-step.current .step-dot::after,
+.timeline-step.current .timeline-dot::after,
+.timeline-step.current > .dot::after,
+.timeline-step.current > div:first-child::after{
+  content:"♨";
+  font-size:20px;
+  line-height:1;
+  font-weight:900;
+  color:#fff;
+  transform:rotate(-12deg);
+}
+.timeline-step.current .step-dot,
+.timeline-step.current .timeline-dot,
+.timeline-step.current > .dot,
+.timeline-step.current > div:first-child{
+  box-shadow:0 0 0 6px rgba(255,107,0,.20), 0 0 0 11px rgba(255,107,0,.08);
+}
+.timeline-step.pending .step-dot::after,
+.timeline-step.pending .timeline-dot::after,
+.timeline-step.pending > .dot::after,
+.timeline-step.pending > div:first-child::after{
+  content:"✓";
+  font-size:14px;
+  color:#fff;
+  opacity:.8;
+}
+.timeline-step .timeline-state,
+.timeline-step small{
+  min-height:14px;
+}
