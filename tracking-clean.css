@@ -53,3 +53,13 @@ body{margin:0;background:var(--bg);color:var(--text);font-family:Inter,Arial,san
   .mode-bar,.map-meta{display:grid}.timeline{grid-template-columns:repeat(3,1fr);row-gap:18px}
   #liveMap{height:330px}
 }
+
+.gps-repair{margin-top:14px;border:1px solid rgba(245,158,11,.55);background:rgba(245,158,11,.08);border-radius:12px;padding:13px;display:grid;grid-template-columns:1fr auto;gap:10px;align-items:center}
+.gps-repair strong{display:block;color:#f8fafc;font-size:13px}
+.gps-repair span{display:block;margin-top:4px;color:#b9c6d7;font-size:11px;line-height:1.45}
+.gps-repair button{border:0;border-radius:10px;background:#ff6b00;color:#fff;font-weight:900;padding:11px 14px;cursor:pointer}
+.gps-repair button:disabled{opacity:.55;cursor:not-allowed}
+.gps-repair small{grid-column:1/-1;color:#fbbf24}
+.gps-repair.ok small{color:#34d399}
+.gps-repair.error small{color:#f87171}
+@media(max-width:700px){.gps-repair{grid-template-columns:1fr}.gps-repair button{width:100%}}
