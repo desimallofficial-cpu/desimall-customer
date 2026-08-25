@@ -536,7 +536,7 @@ const TrackingClean = {
       /accepted|approved/,
       /preparing|ready/,
       /picked/,
-      /on the way|reached/,
+      /out_for_delivery|on[_ ]the[_ ]way|reached/,
       /delivered|completed/
     ];
 
