@@ -121,7 +121,12 @@ const TrackingClean = {
 
     const id = order.OrderID || order.order_id || this.orderId;
     const rawOrderStatus = String(order.Status || order.status || 'Placed');
-    const resolvedTimelineStatus = String(this.resolveTimelineStatus(data) || rawOrderStatus);
+    const resolvedTimelineStatus = String(
+      data?.status ||
+      data?.Status ||
+      this.resolveTimelineStatus(data) ||
+      rawOrderStatus
+    );
     const status = resolvedTimelineStatus;
     const modeRaw = String(order.FulfillmentMode || order.fulfillment_mode || data?.fulfillmentMode || data?.mode || 'desimall').toLowerCase();
     const mode = this.modeLabel(modeRaw);
@@ -276,48 +281,62 @@ const TrackingClean = {
 
 
   normalizeOrderStatus(status) {
-    return String(status || '')
+    const raw = String(status || '')
       .trim()
       .toLowerCase()
       .replace(/[\s-]+/g, '_');
+
+    // Canonicalize backend statuses so timeline mapping is deterministic.
+    const canonical = {
+      placed: 'order_placed',
+      pending: 'order_placed',
+      created: 'order_placed',
+      order_placed: 'order_placed',
+
+      accepted: 'seller_accepted',
+      confirmed: 'seller_accepted',
+      seller_accepted: 'seller_accepted',
+
+      preparing: 'preparing',
+      processing: 'preparing',
+      ready: 'preparing',
+      ready_for_pickup: 'preparing',
+
+      picked_up: 'picked_up',
+      pickedup: 'picked_up',
+      rider_picked_up: 'picked_up',
+      pickup_completed: 'picked_up',
+
+      out_for_delivery: 'on_the_way',
+      on_the_way: 'on_the_way',
+      on_theway: 'on_the_way',
+      on_way: 'on_the_way',
+      in_transit: 'on_the_way',
+      reached_customer: 'on_the_way',
+
+      delivered: 'delivered',
+      completed: 'delivered'
+    };
+
+    return canonical[raw] || raw;
   },
+
 
   timelineStageIndex(status) {
     const s = this.normalizeOrderStatus(status);
 
     const map = {
-      pending: 0,
-      placed: 0,
       order_placed: 0,
-      created: 0,
-
-      accepted: 1,
       seller_accepted: 1,
-      confirmed: 1,
-
       preparing: 2,
-      processing: 2,
-      ready: 2,
-      ready_for_pickup: 2,
-
       picked_up: 3,
-      pickedup: 3,
-      rider_picked_up: 3,
-      pickup_completed: 3,
-
-      out_for_delivery: 4,
-      on_way: 4,
       on_the_way: 4,
-      on_theway: 4,
-      in_transit: 4,
-      reached_customer: 4,
-
-      delivered: 5,
-      completed: 5
+      delivered: 5
     };
 
     return Object.prototype.hasOwnProperty.call(map, s) ? map[s] : 0;
   },
+
 
   renderTimelineFromStatus(status) {
     this.ensureTimelineClasses();
