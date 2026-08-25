@@ -103,6 +103,7 @@ const TrackingClean = {
     try {
       const data = await this.api(`/api/v1/orders/${encodeURIComponent(orderId)}/tracking`);
       this.render(data);
+    this.renderTimelineFromStatus(data?.status || data?.orderStatus || data?.order?.status);
       history.replaceState(null, '', `?order=${encodeURIComponent(orderId)}`);
       this.pollTimer = setTimeout(() => this.track(orderId), 7000);
     } catch (error) {
@@ -205,6 +206,97 @@ const TrackingClean = {
     } finally {
       if (btn) btn.disabled = false;
     }
+  },
+
+
+
+  ensureTimelineClasses() {
+    const wanted = [
+      'Order placed',
+      'Seller accepted',
+      'Preparing',
+      'Picked up',
+      'On the way',
+      'Delivered'
+    ];
+
+    wanted.forEach(label => {
+      const all = [...document.querySelectorAll('div,li')];
+      const host = all.find(el => {
+        if (el.classList.contains('timeline-step')) return false;
+        const txt = (el.textContent || '').trim();
+        return txt.startsWith(label) && el.children.length <= 4;
+      });
+      if (host) host.classList.add('timeline-step');
+    });
+  },
+
+  normalizeOrderStatus(status) {
+    return String(status || '')
+      .trim()
+      .toLowerCase()
+      .replace(/[\s-]+/g, '_');
+  },
+
+  timelineStageIndex(status) {
+    const s = this.normalizeOrderStatus(status);
+
+    const map = {
+      pending: 0,
+      placed: 0,
+      order_placed: 0,
+      created: 0,
+
+      accepted: 1,
+      seller_accepted: 1,
+      confirmed: 1,
+
+      preparing: 2,
+      processing: 2,
+      ready: 2,
+      ready_for_pickup: 2,
+
+      picked_up: 3,
+      pickedup: 3,
+      rider_picked_up: 3,
+      pickup_completed: 3,
+
+      out_for_delivery: 4,
+      on_the_way: 4,
+      on_theway: 4,
+      in_transit: 4,
+      reached_customer: 4,
+
+      delivered: 5,
+      completed: 5
+    };
+
+    return Object.prototype.hasOwnProperty.call(map, s) ? map[s] : 0;
+  },
+
+  renderTimelineFromStatus(status) {
+    this.ensureTimelineClasses();
+    const stage = this.timelineStageIndex(status);
+    const nodes = [...document.querySelectorAll('.timeline-step')];
+
+    if (!nodes.length) return;
+
+    nodes.forEach((node, index) => {
+      node.classList.remove('done', 'active', 'pending');
+
+      const label = node.querySelector('.timeline-state');
+
+      if (index < stage) {
+        node.classList.add('done');
+        if (label) label.textContent = 'Completed';
+      } else if (index === stage) {
+        node.classList.add('active');
+        if (label) label.textContent = stage === 5 ? 'Completed' : 'Current status';
+      } else {
+        node.classList.add('pending');
+        if (label) label.textContent = 'Pending';
+      }
+    });
   },
 
   modeLabel(mode) {
