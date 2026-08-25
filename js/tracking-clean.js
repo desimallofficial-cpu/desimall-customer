@@ -120,14 +120,9 @@ const TrackingClean = {
     state?.classList.remove('hidden');
 
     const id = order.OrderID || order.order_id || this.orderId;
-    const rawOrderStatus = String(order.Status || order.status || data?.status || 'Placed');
-    const resolvedTimelineStatus = this.resolveTimelineStatus(data);
-    const status = String(
-      this.timelineStageIndex(resolvedTimelineStatus) >
-      this.timelineStageIndex(rawOrderStatus)
-        ? resolvedTimelineStatus
-        : rawOrderStatus
-    );
+    const rawOrderStatus = String(order.Status || order.status || 'Placed');
+    const resolvedTimelineStatus = String(this.resolveTimelineStatus(data) || rawOrderStatus);
+    const status = resolvedTimelineStatus;
     const modeRaw = String(order.FulfillmentMode || order.fulfillment_mode || data?.fulfillmentMode || data?.mode || 'desimall').toLowerCase();
     const mode = this.modeLabel(modeRaw);
 
@@ -239,6 +234,14 @@ const TrackingClean = {
 
 
   resolveTimelineStatus(data) {
+    // Exact backend tracking response confirmed in DevTools:
+    // data.status = "out_for_delivery"
+    const exactTopLevelStatus = data?.status ?? data?.Status;
+
+    if (exactTopLevelStatus) {
+      return exactTopLevelStatus;
+    }
+
     const candidates = [
       data?.riderStatus,
       data?.RiderStatus,
@@ -250,59 +253,27 @@ const TrackingClean = {
       data?.TrackingStatus,
       data?.orderStatus,
       data?.OrderStatus,
-      data?.status,
       data?.order?.rider_status,
       data?.order?.delivery_status,
       data?.order?.fulfillment_status,
-      data?.order?.status
+      data?.order?.status,
+      data?.Order?.Status
     ].filter(Boolean);
 
-    const rank = status => this.timelineStageIndex(status);
-
-    // Prefer the most advanced stage reported by backend.
     let best = candidates[0] || 'pending';
-    let bestRank = rank(best);
+    let bestRank = this.timelineStageIndex(best);
 
     for (const status of candidates.slice(1)) {
-      const r = rank(status);
-      if (r > bestRank) {
+      const rank = this.timelineStageIndex(status);
+      if (rank > bestRank) {
         best = status;
-        bestRank = r;
+        bestRank = rank;
       }
-    }
-
-    // If live rider tracking is active, the order cannot logically be only "Order placed".
-    // Promote to On the way only when backend/live tracking confirms an active rider location.
-    const riderLat = Number(
-      data?.rider?.latitude ??
-      data?.rider?.Latitude ??
-      data?.RiderLatitude ??
-      data?.riderLatitude ??
-      data?.live?.rider?.latitude ??
-      data?.tracking?.rider?.latitude
-    );
-    const riderLon = Number(
-      data?.rider?.longitude ??
-      data?.rider?.Longitude ??
-      data?.RiderLongitude ??
-      data?.riderLongitude ??
-      data?.live?.rider?.longitude ??
-      data?.tracking?.rider?.longitude
-    );
-
-    const hasLiveRider = Boolean(
-      Number.isFinite(riderLat) &&
-      Number.isFinite(riderLon) &&
-      Math.abs(riderLat) > 0.0001 &&
-      Math.abs(riderLon) > 0.0001
-    );
-
-    if (hasLiveRider && bestRank < 4) {
-      return 'on_the_way';
     }
 
     return best;
   },
+
 
   normalizeOrderStatus(status) {
     return String(status || '')
