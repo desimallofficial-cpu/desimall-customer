@@ -668,6 +668,33 @@ const DesiMallAPI = {
   // CUSTOMER CHECKOUT / ORDERS — SUPABASE / RENDER API v0.6.0
   // =========================================================
 
+
+  async getRazorpayConfig() {
+    const token = this._customerAccessToken();
+    if (!token) throw new Error('Please login again.');
+    return this._rest('/api/v1/payments/razorpay/config', { method:'GET', token });
+  },
+
+  async createRazorpayOrder(orderId) {
+    const token = this._customerAccessToken();
+    if (!token) throw new Error('Please login again.');
+    return this._rest('/api/v1/payments/razorpay/order', {
+      method:'POST',
+      data:{ order_id:orderId },
+      token
+    });
+  },
+
+  async verifyRazorpayPayment(payload) {
+    const token = this._customerAccessToken();
+    if (!token) throw new Error('Please login again.');
+    return this._rest('/api/v1/payments/razorpay/verify', {
+      method:'POST',
+      data:payload,
+      token
+    });
+  },
+
   placeOrder(data) {
     const token = this._customerAccessToken();
     if (!token) {

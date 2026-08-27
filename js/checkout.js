@@ -19,6 +19,7 @@ const CheckoutApp = {
   tezStatus: null,
   mixedFulfillment: false,
   busy: false,
+  paymentMethod: 'cod',
 
   money(value) {
     return `₹${Number(value || 0).toLocaleString('en-IN', {
@@ -162,6 +163,15 @@ const CheckoutApp = {
         }
       }
     );
+    document.querySelectorAll('input[name="paymentMethod"]').forEach(input => {
+      input.addEventListener('change', () => {
+        this.paymentMethod = input.checked ? input.value : this.paymentMethod;
+        document.querySelectorAll('.dm-pay-option').forEach(label => {
+          label.classList.toggle('selected', Boolean(label.querySelector('input')?.checked));
+        });
+        this.renderTotals();
+      });
+    });
   },
 
   renderItems() {
@@ -305,7 +315,9 @@ const CheckoutApp = {
 
     const placeButton = document.getElementById('btnPlaceOrder');
     if (placeButton && !this.busy) {
-      placeButton.innerHTML = `<i class="fa-solid fa-lock"></i> Place Order ${this.money(totals.total)}`;
+      placeButton.innerHTML = this.paymentMethod === 'razorpay'
+        ? `<i class="fa-solid fa-shield-halved"></i> Pay ${this.money(totals.total)}`
+        : `<i class="fa-solid fa-lock"></i> Place Order ${this.money(totals.total)}`;
     }
 
     document
@@ -828,7 +840,7 @@ const CheckoutApp = {
     try {
       const result = await DesiMallAPI.placeOrder({
         delivery_address_id: this.selectedAddressId,
-        payment_method: 'cod',
+        payment_method: this.paymentMethod,
         coupon_code: this.coupon?.code || '',
         client_request_id: clientRequestId,
         fulfillment_mode: this.fulfillmentMode,
@@ -843,6 +855,16 @@ const CheckoutApp = {
       }
 
       const order = result.order;
+
+      if (this.paymentMethod === 'razorpay') {
+        const paymentResult = await this.payWithRazorpay(order, user);
+        if (!paymentResult?.success) {
+          throw new Error(paymentResult?.message || 'Online payment was not completed.');
+        }
+        order.PaymentStatus = 'paid';
+        order.payment_status = 'paid';
+      }
+
       const selectedAddress = this.addresses.find(
         a => String(a.AddressID || a.id) === String(this.selectedAddressId)
       );
@@ -918,6 +940,70 @@ const CheckoutApp = {
     } finally {
       this.setBusy(false);
     }
+  },
+
+
+  async payWithRazorpay(order, user) {
+    if (typeof Razorpay === 'undefined') {
+      return { success:false, message:'Razorpay Checkout could not load. Check internet and try again.' };
+    }
+
+    const internalId = order.OrderID || order.id;
+    const rz = await DesiMallAPI.createRazorpayOrder(internalId);
+    if (!rz?.success || !rz?.razorpayOrderId || !rz?.keyId) {
+      return { success:false, message:rz?.message || 'Could not start online payment.' };
+    }
+
+    return await new Promise(resolve => {
+      let completed = false;
+      const finish = value => {
+        if (completed) return;
+        completed = true;
+        resolve(value);
+      };
+
+      const options = {
+        key: rz.keyId,
+        amount: rz.amount,
+        currency: rz.currency || 'INR',
+        name: 'DesiMall',
+        description: `Order ${rz.orderCode || ''}`,
+        order_id: rz.razorpayOrderId,
+        prefill: {
+          name: user.FullName || user.Name || '',
+          email: user.Email || '',
+          contact: user.Mobile || user.Phone || ''
+        },
+        theme: { color: '#ff6500' },
+        handler: async response => {
+          try {
+            const verified = await DesiMallAPI.verifyRazorpayPayment({
+              order_id: internalId,
+              razorpay_order_id: response.razorpay_order_id,
+              razorpay_payment_id: response.razorpay_payment_id,
+              razorpay_signature: response.razorpay_signature
+            });
+            finish(verified?.success && verified?.verified
+              ? { success:true, verified }
+              : { success:false, message:verified?.message || 'Payment verification failed.' });
+          } catch (error) {
+            finish({ success:false, message:error?.message || 'Payment verification failed.' });
+          }
+        },
+        modal: {
+          ondismiss: () => finish({ success:false, message:'Payment cancelled. Your order remains unpaid.' })
+        }
+      };
+
+      const instance = new Razorpay(options);
+      instance.on('payment.failed', response => {
+        finish({
+          success:false,
+          message:response?.error?.description || 'Payment failed. Please try again.'
+        });
+      });
+      instance.open();
+    });
   },
 
   customerStatus(status) {
