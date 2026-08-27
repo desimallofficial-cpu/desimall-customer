@@ -62,6 +62,9 @@ const CheckoutApp = {
       return;
     }
 
+    // Never carry an old Razorpay/checkout error into a fresh checkout view.
+    this.clearAlert();
+
     this.cart = CartManager
       .getCart()
       .map(item => CartManager.normalize(item))
@@ -165,6 +168,7 @@ const CheckoutApp = {
     );
     document.querySelectorAll('input[name="paymentMethod"]').forEach(input => {
       input.addEventListener('change', () => {
+        this.clearAlert();
         this.paymentMethod = input.checked ? input.value : this.paymentMethod;
         document.querySelectorAll('.dm-pay-option').forEach(label => {
           label.classList.toggle('selected', Boolean(label.querySelector('input')?.checked));
@@ -697,6 +701,13 @@ const CheckoutApp = {
     });
   },
 
+  clearAlert() {
+    const alertBox = document.getElementById('checkoutAlert');
+    if (!alertBox) return;
+    alertBox.textContent = '';
+    alertBox.className = 'checkout-alert hidden';
+  },
+
   validAddressGps(address) {
     const lat = Number(address?.Latitude ?? address?.latitude);
     const lon = Number(address?.Longitude ?? address?.longitude);
@@ -795,6 +806,8 @@ const CheckoutApp = {
   async placeOrder() {
     if (this.busy) return;
 
+    this.clearAlert();
+
     const user = this.getUser();
 
     if (!user?.UserID || !DesiMallAuth?.getAccessToken?.()) {
@@ -858,11 +871,29 @@ const CheckoutApp = {
 
       if (this.paymentMethod === 'razorpay') {
         const paymentResult = await this.payWithRazorpay(order, user);
-        if (!paymentResult?.success) {
-          throw new Error(paymentResult?.message || 'Online payment was not completed.');
+
+        if (paymentResult?.state === 'paid' || paymentResult?.success) {
+          this.clearAlert();
+          order.PaymentStatus = 'paid';
+          order.payment_status = 'paid';
+        } else if (paymentResult?.state === 'cancelled') {
+          throw new Error(
+            paymentResult?.message ||
+            'Payment was not captured. The unpaid order has been cancelled.'
+          );
+        } else if (paymentResult?.state === 'pending') {
+          this.showAlert(
+            paymentResult?.message ||
+            'Payment verification is pending. Please do not pay again for this order.',
+            'warning'
+          );
+          return;
+        } else {
+          throw new Error(
+            paymentResult?.message ||
+            'Online payment was not completed.'
+          );
         }
-        order.PaymentStatus = 'paid';
-        order.payment_status = 'paid';
       }
 
       const selectedAddress = this.addresses.find(
@@ -945,17 +976,101 @@ const CheckoutApp = {
 
   async payWithRazorpay(order, user) {
     if (typeof Razorpay === 'undefined') {
-      return { success:false, message:'Razorpay Checkout could not load. Check internet and try again.' };
+      return {
+        success:false,
+        state:'pending',
+        message:'Razorpay Checkout could not load. Payment has not been confirmed.'
+      };
     }
 
     const internalId = order.OrderID || order.id;
     const rz = await DesiMallAPI.createRazorpayOrder(internalId);
+
     if (!rz?.success || !rz?.razorpayOrderId || !rz?.keyId) {
-      return { success:false, message:rz?.message || 'Could not start online payment.' };
+      return {
+        success:false,
+        state:'pending',
+        message:rz?.message || 'Could not start online payment.'
+      };
     }
+
+    const reconcile = async (paymentId = '', immediateFinal = false) => {
+      const delays = immediateFinal ? [0, 1800, 3500] : [700, 2200, 4500];
+
+      for (let i = 0; i < delays.length; i += 1) {
+        if (delays[i]) {
+          await new Promise(resolve => setTimeout(resolve, delays[i]));
+        }
+
+        const finalCheck = i === delays.length - 1;
+
+        try {
+          const result = await DesiMallAPI.reconcileRazorpayPayment({
+            order_id: internalId,
+            razorpay_order_id: rz.razorpayOrderId,
+            razorpay_payment_id: paymentId || '',
+            finalize: finalCheck
+          });
+
+          if (result?.state === 'paid') {
+            this.clearAlert();
+            return {
+              success:true,
+              state:'paid',
+              verified:true,
+              reconciliation:result
+            };
+          }
+
+          if (result?.state === 'cancelled') {
+            return {
+              success:false,
+              state:'cancelled',
+              message:
+                result?.message ||
+                'Payment was not captured. The unpaid order has been cancelled.',
+              reconciliation:result
+            };
+          }
+
+          if (!finalCheck) {
+            this.showAlert(
+              'Payment status pending. DesiMall is verifying with Razorpay…',
+              'warning'
+            );
+          } else {
+            return {
+              success:false,
+              state:'pending',
+              message:
+                result?.message ||
+                'Payment verification is still pending. Please do not retry payment.',
+              reconciliation:result
+            };
+          }
+        } catch (error) {
+          if (finalCheck) {
+            return {
+              success:false,
+              state:'pending',
+              message:
+                error?.message ||
+                'Payment verification could not be completed. Please do not retry yet.'
+            };
+          }
+        }
+      }
+
+      return {
+        success:false,
+        state:'pending',
+        message:'Payment verification is pending.'
+      };
+    };
 
     return await new Promise(resolve => {
       let completed = false;
+
       const finish = value => {
         if (completed) return;
         completed = true;
@@ -975,6 +1090,7 @@ const CheckoutApp = {
           contact: user.Mobile || user.Phone || ''
         },
         theme: { color: '#ff6500' },
+
         handler: async response => {
           try {
             const verified = await DesiMallAPI.verifyRazorpayPayment({
@@ -983,25 +1099,55 @@ const CheckoutApp = {
               razorpay_payment_id: response.razorpay_payment_id,
               razorpay_signature: response.razorpay_signature
             });
-            finish(verified?.success && verified?.verified
-              ? { success:true, verified }
-              : { success:false, message:verified?.message || 'Payment verification failed.' });
-          } catch (error) {
-            finish({ success:false, message:error?.message || 'Payment verification failed.' });
+
+            if (verified?.success && verified?.verified) {
+              this.clearAlert();
+              finish({
+                success:true,
+                state:'paid',
+                verified
+              });
+              return;
+            }
+
+            finish(
+              await reconcile(response.razorpay_payment_id || '', false)
+            );
+          } catch (_) {
+            finish(
+              await reconcile(response.razorpay_payment_id || '', false)
+            );
           }
         },
+
         modal: {
-          ondismiss: () => finish({ success:false, message:'Payment cancelled. Your order remains unpaid.' })
+          ondismiss: async () => {
+            this.showAlert(
+              'Payment status pending. DesiMall is checking whether any money was captured…',
+              'warning'
+            );
+            finish(await reconcile('', true));
+          }
         }
       };
 
       const instance = new Razorpay(options);
-      instance.on('payment.failed', response => {
-        finish({
-          success:false,
-          message:response?.error?.description || 'Payment failed. Please try again.'
-        });
+
+      instance.on('payment.failed', async response => {
+        const paymentId =
+          response?.error?.metadata?.payment_id ||
+          response?.error?.metadata?.paymentId ||
+          '';
+
+        this.showAlert(
+          'Payment failed in Checkout. Verifying with Razorpay before cancelling the order…',
+          'warning'
+        );
+
+        finish(await reconcile(paymentId, true));
       });
+
+      this.clearAlert();
       instance.open();
     });
   },

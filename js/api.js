@@ -695,6 +695,16 @@ const DesiMallAPI = {
     });
   },
 
+  async reconcileRazorpayPayment(payload) {
+    const token = this._customerAccessToken();
+    if (!token) throw new Error('Please login again.');
+    return this._rest('/api/v1/payments/razorpay/reconcile', {
+      method:'POST',
+      data:payload,
+      token
+    });
+  },
+
   placeOrder(data) {
     const token = this._customerAccessToken();
     if (!token) {
