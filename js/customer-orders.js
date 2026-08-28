@@ -122,14 +122,150 @@ const CustomerOrders = {
     return this.customerStatus(order.Status || order.status);
   },
 
+  paymentExperience(order) {
+    const paymentMethod = String(
+      order.PaymentMethod || order.payment_method || 'cod'
+    ).toLowerCase();
+    const paymentStatus = String(
+      order.PaymentStatus || order.payment_status || 'pending'
+    ).toLowerCase();
+    const attemptStatus = String(
+      order.PaymentAttemptStatus || order.payment_attempt_status || ''
+    ).toLowerCase();
+    const refundStatus = String(
+      order.RefundStatus || order.refund_status || 'none'
+    ).toLowerCase();
+    const rawOrderStatus = String(order.Status || order.status || '').toLowerCase();
+    const normalOrderStatus = this.normalizedStatus(order);
+    const refundAmount = Number(order.RefundAmount || order.refund_amount || 0);
+
+    const isRazorpay = paymentMethod === 'razorpay';
+    const isCancelled = ['cancelled','rejected'].includes(rawOrderStatus);
+    const isPaid = paymentStatus === 'paid';
+    const isPaymentFailed =
+      isRazorpay && !isPaid && attemptStatus === 'failed';
+    const isPaymentPending =
+      isRazorpay && !isPaid && !isCancelled && !isPaymentFailed;
+
+    if (isPaymentFailed) {
+      return {
+        kind:'not-placed',
+        orderLabel:'Order Not Placed',
+        paymentLabel:'Payment Failed',
+        note:
+          'Payment was not successful. If any amount was deducted, DesiMall will verify it with Razorpay before you are asked to pay again.',
+        canTrack:false,
+        canCancel:false,
+        buyAgain:true
+      };
+    }
+
+    if (isPaymentPending) {
+      return {
+        kind:'payment-pending',
+        orderLabel:'Payment Verification Pending',
+        paymentLabel:'Pending',
+        note:
+          'We are checking the payment with Razorpay. Please do not make another payment for this order until verification finishes.',
+        canTrack:false,
+        canCancel:false,
+        buyAgain:false
+      };
+    }
+
+    if (isPaid && isCancelled) {
+      if (['refunded','processed'].includes(refundStatus)) {
+        return {
+          kind:'refund-completed',
+          orderLabel:'Refund Completed',
+          paymentLabel: refundAmount > 0
+            ? `Refunded ${this.money(refundAmount)}`
+            : 'Refund Completed',
+          note:'Your cancelled order payment has been refunded.',
+          canTrack:false,
+          canCancel:false,
+          buyAgain:true
+        };
+      }
+
+      if (['failed','manual_required'].includes(refundStatus)) {
+        return {
+          kind:'refund-attention',
+          orderLabel:'Order Cancelled · Refund Pending',
+          paymentLabel:'Refund Needs Attention',
+          note:
+            'Your order is cancelled and the payment was captured. The refund needs attention from DesiMall support.',
+          canTrack:false,
+          canCancel:false,
+          buyAgain:true
+        };
+      }
+
+      return {
+        kind:'refund-pending',
+        orderLabel:'Order Cancelled · Refund Pending',
+        paymentLabel:'Refund Pending',
+        note:
+          'Your order is cancelled. The paid amount is being processed for refund.',
+        canTrack:false,
+        canCancel:false,
+        buyAgain:true
+      };
+    }
+
+    if (isPaid) {
+      return {
+        kind:'paid',
+        orderLabel:normalOrderStatus,
+        paymentLabel:'Paid',
+        note:'',
+        canTrack:!['Delivered','Cancelled'].includes(normalOrderStatus),
+        canCancel:!['Delivered','Cancelled'].includes(normalOrderStatus),
+        buyAgain:normalOrderStatus === 'Delivered'
+      };
+    }
+
+    if (isRazorpay && isCancelled) {
+      return {
+        kind:'not-placed',
+        orderLabel:'Order Not Placed',
+        paymentLabel:'Not Paid',
+        note:'No successful payment was confirmed for this order.',
+        canTrack:false,
+        canCancel:false,
+        buyAgain:true
+      };
+    }
+
+    return {
+      kind:'normal',
+      orderLabel:normalOrderStatus,
+      paymentLabel:paymentMethod === 'cod' ? 'Cash on Delivery' : paymentStatus,
+      note:'',
+      canTrack:!['Delivered','Cancelled'].includes(normalOrderStatus),
+      canCancel:!['Delivered','Cancelled'].includes(normalOrderStatus),
+      buyAgain:normalOrderStatus === 'Delivered'
+    };
+  },
+
   filteredOrders() {
     return this.orders.filter(order => {
       const status = this.normalizedStatus(order).toLowerCase();
+      const paymentUx = this.paymentExperience(order);
 
       if (this.filter === 'all') return true;
       if (this.filter === 'delivered') return status === 'delivered';
-      if (this.filter === 'cancelled') return status === 'cancelled';
-      if (this.filter === 'active') return !['delivered','cancelled'].includes(status);
+      if (this.filter === 'cancelled') {
+        return [
+          'not-placed','refund-pending','refund-completed','refund-attention'
+        ].includes(paymentUx.kind) || status === 'cancelled';
+      }
+      if (this.filter === 'active') {
+        return ![
+          'not-placed','refund-pending','refund-completed','refund-attention'
+        ].includes(paymentUx.kind) &&
+          !['delivered','cancelled'].includes(status);
+      }
 
       return true;
     });
@@ -154,7 +290,11 @@ const CustomerOrders = {
 
     set('sumTotal', this.orders.length);
     set('sumDelivered', this.orders.filter(o => this.normalizedStatus(o) === 'Delivered').length);
-    set('sumActive', this.orders.filter(o => !['Delivered','Cancelled'].includes(this.normalizedStatus(o))).length);
+    set('sumActive', this.orders.filter(o => {
+      const ux = this.paymentExperience(o);
+      return !['Delivered','Cancelled'].includes(this.normalizedStatus(o)) &&
+        !['not-placed','refund-pending','refund-completed','refund-attention'].includes(ux.kind);
+    }).length);
 
     const rows = this.filteredOrders();
     const container = document.getElementById('ordersContainer');
@@ -184,15 +324,11 @@ const CustomerOrders = {
 
     const total = Number(order.TotalAmount ?? order.total_amount ?? 0);
     const items = Array.isArray(order.Items) ? order.Items : [];
-    const showTrack = !['Delivered','Cancelled'].includes(status);
+    const paymentUx = this.paymentExperience(order);
+    const displayStatus = paymentUx.orderLabel;
+    const showTrack = Boolean(paymentUx.canTrack);
     const delivered = status === 'Delivered';
-
-    // Use the customer-facing normalized status for button visibility.
-    // The backend remains the final authority and will reject cancellation
-    // if pickup/delivery has already started.
-    // Always show Cancel Order for any active order.
-    // Backend is the final authority and blocks cancellation after pickup/delivery starts.
-    const canCancel = !['Delivered','Cancelled'].includes(status);
+    const canCancel = Boolean(paymentUx.canCancel);
 
     return `
       <article class="mo-order">
@@ -207,7 +343,7 @@ const CustomerOrders = {
               ? '<span class="mo-tez-badge"><i class="fa-solid fa-bolt"></i> Tez</span>'
               : ''}
             <span class="mo-order-count">${items.length} ${items.length === 1 ? 'item' : 'items'}</span>
-            <span class="mo-status ${this.statusClass(status)}">${this.esc(status)}</span>
+            <span class="mo-status ${this.statusClass(displayStatus, paymentUx.kind)}">${this.esc(displayStatus)}</span>
           </div>
         </header>
 
@@ -219,6 +355,20 @@ const CustomerOrders = {
           ${items.length > 3 ? `<div class="mo-no-items">+ ${items.length-3} more item${items.length-3===1?'':'s'}</div>` : ''}
         </div>
 
+        ${paymentUx.note ? `
+          <div class="mo-payment-note ${this.esc(paymentUx.kind)}">
+            <i class="${paymentUx.kind === 'payment-pending'
+              ? 'fa-solid fa-clock-rotate-left'
+              : paymentUx.kind === 'refund-completed'
+                ? 'fa-solid fa-circle-check'
+                : 'fa-solid fa-circle-exclamation'}"></i>
+            <div>
+              <strong>${this.esc(paymentUx.paymentLabel)}</strong>
+              <span>${this.esc(paymentUx.note)}</span>
+            </div>
+          </div>
+        ` : ''}
+
         ${items.length > 1 ? `
           <div class="mo-customer-note">
             <i class="fa-solid fa-circle-info"></i>
@@ -228,13 +378,18 @@ const CustomerOrders = {
 
         <footer class="mo-order-foot">
           <div>
-            <span>Payment</span>
+            <span>Payment Method</span>
             <strong>${this.esc(String(order.PaymentMethod || order.payment_method || 'COD').toUpperCase())}</strong>
           </div>
 
           <div>
-            <span>Status</span>
-            <strong>${this.esc(status)}</strong>
+            <span>Payment Status</span>
+            <strong>${this.esc(paymentUx.paymentLabel)}</strong>
+          </div>
+
+          <div>
+            <span>Order Status</span>
+            <strong>${this.esc(displayStatus)}</strong>
           </div>
 
           <div class="mo-total">
@@ -254,13 +409,17 @@ const CustomerOrders = {
                 <i class="fa-solid fa-xmark"></i> Cancel Order
               </button>
             ` : ''}
-            ${delivered ? `
+            ${paymentUx.buyAgain ? `
               <a class="mo-buy-again" href="../index.html">
                 <i class="fa-solid fa-rotate-right"></i> Buy Again
               </a>
             ` : ''}
             <a class="mo-help" href="support.html">
-              <i class="fa-solid fa-headset"></i> ${delivered ? 'Return / Help' : 'Get Help'}
+              <i class="fa-solid fa-headset"></i> ${
+                delivered ? 'Return / Help' :
+                ['refund-attention','not-placed'].includes(paymentUx.kind) ? 'Payment Help' :
+                'Get Help'
+              }
             </a>
           </div>
         </footer>
@@ -434,7 +593,11 @@ const CustomerOrders = {
     }
   },
 
-  statusClass(status) {
+  statusClass(status, kind = '') {
+    if (kind === 'not-placed' || kind === 'refund-attention') return 'cancelled';
+    if (kind === 'refund-completed') return 'delivered';
+    if (kind === 'payment-pending' || kind === 'refund-pending') return 'pending-payment';
+
     const value = String(status || '').toLowerCase();
     if (value === 'delivered') return 'delivered';
     if (value === 'cancelled') return 'cancelled';
@@ -454,6 +617,11 @@ const CustomerOrders = {
         OrderDate: order.CreatedAt || order.created_at || '',
         TotalAmount: Number(order.TotalAmount || order.total_amount || 0),
         PaymentMode: order.PaymentMethod || order.payment_method || 'cod',
+        PaymentStatus: order.PaymentStatus || order.payment_status || 'pending',
+        PaymentAttemptStatus: order.PaymentAttemptStatus || order.payment_attempt_status || '',
+        PaymentFailureReason: order.PaymentFailureReason || order.payment_failure_reason || '',
+        RefundStatus: order.RefundStatus || order.refund_status || 'none',
+        RefundAmount: Number(order.RefundAmount || order.refund_amount || 0),
         DeliveryAddress: order.DeliveryAddress || '',
         Items: order.Items || []
       };

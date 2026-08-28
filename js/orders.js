@@ -29,6 +29,61 @@ const DesiMallOrdersApp = {
         }
     },
 
+    paymentExperience(order) {
+        const method = String(order.PaymentMethod || order.payment_method || order.PaymentMode || 'cod').toLowerCase();
+        const payment = String(order.PaymentStatus || order.payment_status || 'pending').toLowerCase();
+        const attempt = String(order.PaymentAttemptStatus || order.payment_attempt_status || '').toLowerCase();
+        const refund = String(order.RefundStatus || order.refund_status || 'none').toLowerCase();
+        const status = String(order.Status || order.status || '').toLowerCase();
+        const refundAmount = Number(order.RefundAmount || order.refund_amount || 0);
+
+        if (method === 'razorpay' && payment !== 'paid' && attempt === 'failed') {
+            return {
+                label:'Order Not Placed',
+                payment:'Payment Failed',
+                message:'Payment was not successful. If any amount was deducted, DesiMall will verify it with Razorpay.',
+                kind:'failed'
+            };
+        }
+
+        if (method === 'razorpay' && payment !== 'paid' && !['cancelled','rejected'].includes(status)) {
+            return {
+                label:'Payment Verification Pending',
+                payment:'Pending',
+                message:'We are checking the payment with Razorpay. Please do not pay again yet.',
+                kind:'pending'
+            };
+        }
+
+        if (payment === 'paid' && ['cancelled','rejected'].includes(status)) {
+            if (['refunded','processed'].includes(refund)) {
+                return {
+                    label:'Refund Completed',
+                    payment:refundAmount > 0 ? `Refunded ₹${refundAmount}` : 'Refund Completed',
+                    message:'The cancelled order payment has been refunded.',
+                    kind:'refunded'
+                };
+            }
+            return {
+                label:'Order Cancelled · Refund Pending',
+                payment:'Refund Pending',
+                message:'The order is cancelled and the paid amount is being processed for refund.',
+                kind:'refund'
+            };
+        }
+
+        if (method === 'razorpay' && payment === 'paid') {
+            return { label:order.Status || 'Placed', payment:'Paid', message:'', kind:'paid' };
+        }
+
+        return {
+            label:order.Status || 'Pending',
+            payment:method === 'cod' ? 'Cash on Delivery' : payment,
+            message:'',
+            kind:'normal'
+        };
+    },
+
     // 1. MY ORDERS PAGE LOGIC
     async initMyOrders() {
         this.checkUserSession();
@@ -145,15 +200,33 @@ const DesiMallOrdersApp = {
         document.getElementById('displayDetailsOrderId').textContent = order.OrderID;
         document.getElementById('displayDetailsOrderDate').textContent = order.OrderDate;
 
-        const statusClass = (order.Status || 'Pending').toLowerCase().replace(/\s+/g, '-');
+        const paymentUx = this.paymentExperience(order);
+        const statusClass = String(paymentUx.label || 'Pending').toLowerCase().replace(/[^a-z0-9]+/g, '-');
         document.getElementById('displayDetailsStatusBadge').innerHTML = `
             <span class="status-badge ${statusClass}">
-                <i class="fa-solid fa-circle-dot"></i> ${order.Status || 'Pending'}
+                <i class="fa-solid fa-circle-dot"></i> ${paymentUx.label}
             </span>
         `;
 
-        // Render Timeline
-        this.updateTimeline(order.Status || 'Pending');
+        const timeline = document.getElementById('timelineContainer');
+        if (timeline && ['failed','pending','refund','refunded'].includes(paymentUx.kind)) {
+            const icon = paymentUx.kind === 'refunded'
+                ? 'fa-circle-check'
+                : paymentUx.kind === 'pending'
+                    ? 'fa-clock-rotate-left'
+                    : 'fa-circle-exclamation';
+            timeline.innerHTML = `
+                <div style="width:100%;padding:18px;border-radius:12px;background:#fff7ed;border:1px solid #fed7aa;text-align:left;">
+                    <div style="font-size:18px;font-weight:800;margin-bottom:6px;">
+                        <i class="fa-solid ${icon}" style="color:#ff6500;margin-right:7px;"></i>
+                        ${paymentUx.label}
+                    </div>
+                    <div style="color:#6b7280;line-height:1.5;">${paymentUx.message}</div>
+                </div>
+            `;
+        } else {
+            this.updateTimeline(order.Status || 'Pending');
+        }
 
         // Render Products
         const productsList = document.getElementById('detailsProductsList');
@@ -184,15 +257,35 @@ const DesiMallOrdersApp = {
         }
 
         // Render Payment & Total
-        document.getElementById('detailsPaymentMethod').textContent = order.PaymentMethod || 'COD';
+        document.getElementById('detailsPaymentMethod').textContent =
+            `${String(order.PaymentMethod || order.PaymentMode || 'COD').toUpperCase()} · ${this.paymentExperience(order).payment}`;
         document.getElementById('detailsGrandTotal').textContent = `₹${order.TotalAmount}`;
 
         // Render Actions (Cancel if Pending)
         const actionsBox = document.getElementById('detailsActionsBox');
         if (actionsBox) {
-            const invoiceButton = `<a href="invoice.html?id=${encodeURIComponent(order.OrderID)}" class="btn-order-action btn-outline" style="width:100%;justify-content:center;height:42px;"><i class="fa-solid fa-file-invoice"></i> View / Print Invoice</a>`;
-            const cancelButton = (order.Status === 'Pending' || !order.Status) ? `<button type="button" class="btn-order-action btn-danger-outline" style="width:100%;justify-content:center;height:42px;" onclick="DesiMallOrdersApp.cancelOrder('${order.OrderID}')"><i class="fa-regular fa-circle-xmark"></i> Cancel This Order</button>` : '';
-            actionsBox.innerHTML = invoiceButton + cancelButton;
+            const ux = this.paymentExperience(order);
+
+            if (ux.kind === 'failed') {
+                actionsBox.innerHTML = `
+                    <a href="../index.html" class="btn-order-action btn-outline" style="width:100%;justify-content:center;height:42px;">
+                        <i class="fa-solid fa-rotate-right"></i> Buy Again
+                    </a>
+                    <a href="support.html" class="btn-order-action btn-outline" style="width:100%;justify-content:center;height:42px;">
+                        <i class="fa-solid fa-headset"></i> Payment Help
+                    </a>
+                `;
+            } else if (ux.kind === 'pending') {
+                actionsBox.innerHTML = `
+                    <a href="my-orders.html" class="btn-order-action btn-outline" style="width:100%;justify-content:center;height:42px;">
+                        <i class="fa-solid fa-arrows-rotate"></i> Check Payment Status
+                    </a>
+                `;
+            } else {
+                const invoiceButton = `<a href="invoice.html?id=${encodeURIComponent(order.OrderID)}" class="btn-order-action btn-outline" style="width:100%;justify-content:center;height:42px;"><i class="fa-solid fa-file-invoice"></i> View / Print Invoice</a>`;
+                const cancelButton = (order.Status === 'Pending' || !order.Status) ? `<button type="button" class="btn-order-action btn-danger-outline" style="width:100%;justify-content:center;height:42px;" onclick="DesiMallOrdersApp.cancelOrder('${order.OrderID}')"><i class="fa-regular fa-circle-xmark"></i> Cancel This Order</button>` : '';
+                actionsBox.innerHTML = invoiceButton + cancelButton;
+            }
         }
     },
 

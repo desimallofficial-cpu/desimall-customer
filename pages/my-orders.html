@@ -55,6 +55,13 @@
     .mo-status.delivered{background:rgba(21,128,61,.12);color:var(--mo-green)}
     .mo-status.cancelled{background:rgba(190,18,60,.11);color:var(--mo-red)}
     .mo-status.moving{background:rgba(37,99,235,.10);color:var(--mo-blue)}
+    .mo-status.pending-payment{background:rgba(245,158,11,.13);color:#d97706}
+    html[data-theme="dark"] .mo-status.pending-payment{color:#fbbf24}
+    .mo-payment-note{margin:0 19px 14px;padding:12px 13px;border-radius:11px;display:flex;gap:10px;align-items:flex-start;border:1px solid var(--mo-border);font-size:10px;line-height:1.45}
+    .mo-payment-note>i{font-size:16px;margin-top:1px}.mo-payment-note strong{display:block;font-size:11px;margin-bottom:2px}.mo-payment-note span{display:block;color:var(--mo-muted)}
+    .mo-payment-note.not-placed,.mo-payment-note.refund-attention{background:rgba(190,18,60,.07);border-color:rgba(190,18,60,.18);color:var(--mo-red)}
+    .mo-payment-note.payment-pending,.mo-payment-note.refund-pending{background:rgba(245,158,11,.08);border-color:rgba(245,158,11,.22);color:#b45309}
+    .mo-payment-note.refund-completed{background:rgba(21,128,61,.08);border-color:rgba(21,128,61,.20);color:var(--mo-green)}
     .mo-items{padding:6px 19px}
     .mo-item{display:grid;grid-template-columns:38px minmax(0,1fr) auto;gap:10px;align-items:center;padding:12px 0;border-bottom:1px solid var(--mo-border)}
     .mo-item:last-child{border-bottom:0}
@@ -321,14 +328,14 @@
 <script src="../js/auth.js?v=1.0.2"></script>
 <script src="../js/api.js?v=1.0.2"></script>
   <script src="../js/product-image-resolver.js?v=1.0.2"></script>
-<script src="../js/customer-orders.js?v=1.0.2"></script>
+<script src="../js/customer-orders.js?v=1.0.8"></script>
 <script src="../js/pwa.js?v=1.0.2"></script>
 <script src="../js/ui-preferences.js?v=1.0.2"></script>
 
   <script src="../js/customer-footer.js?v=1.0.2"></script>
 <script>
-  window.DESIMALL_CUSTOMER_BUILD = 'v0.30.5';
-  console.info('DesiMall Customer build v0.30.5 - Order action UI polish');
+  window.DESIMALL_CUSTOMER_BUILD = 'v1.0.8';
+  console.info('DesiMall Customer v1.0.8 - Payment status UX');
 </script>
 </body>
 </html>
