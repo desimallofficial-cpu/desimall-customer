@@ -65,6 +65,10 @@ const CustomerOrders = {
       };
     });
 
+    document.getElementById('orderSort')?.addEventListener('change', () => {
+      this.render();
+    });
+
     closeReturnModal.onclick = () => this.closeReturn();
     returnModal.onclick = e => {
       if (e.target === returnModal) this.closeReturn();
@@ -290,7 +294,7 @@ const CustomerOrders = {
   },
 
   filteredOrders() {
-    return this.orders.filter(order => {
+    const rows = this.orders.filter(order => {
       const status = this.normalizedStatus(order).toLowerCase();
       const paymentUx = this.paymentExperience(order);
 
@@ -309,6 +313,20 @@ const CustomerOrders = {
       }
 
       return true;
+    });
+
+    const sort = String(document.getElementById('orderSort')?.value || 'newest');
+
+    return [...rows].sort((a, b) => {
+      const aDate = new Date(a.CreatedAt || a.created_at || 0).getTime() || 0;
+      const bDate = new Date(b.CreatedAt || b.created_at || 0).getTime() || 0;
+      const aTotal = Number(a.TotalAmount ?? a.total_amount ?? 0);
+      const bTotal = Number(b.TotalAmount ?? b.total_amount ?? 0);
+
+      if (sort === 'oldest') return aDate - bDate;
+      if (sort === 'high') return bTotal - aTotal;
+      if (sort === 'low') return aTotal - bTotal;
+      return bDate - aDate;
     });
   },
 
@@ -331,6 +349,11 @@ const CustomerOrders = {
 
     set('sumTotal', this.orders.length);
     set('sumDelivered', this.orders.filter(o => this.normalizedStatus(o) === 'Delivered').length);
+    set('sumCancelled', this.orders.filter(o => {
+      const ux = this.paymentExperience(o);
+      return ['Cancelled','Rejected'].includes(this.normalizedStatus(o)) ||
+        ['not-placed','refund-pending','refund-completed','refund-attention'].includes(ux.kind);
+    }).length);
     set('sumActive', this.orders.filter(o => {
       const ux = this.paymentExperience(o);
       return !['Delivered','Cancelled'].includes(this.normalizedStatus(o)) &&
@@ -362,7 +385,7 @@ const CustomerOrders = {
     const displayStatus = paymentUx.orderLabel;
     const dateValue = order.CreatedAt || order.created_at || '';
     const date = dateValue ? new Date(dateValue).toLocaleString('en-IN', {
-      day:'2-digit',month:'short',year:'numeric',hour:'2-digit',minute:'2-digit'
+      day:'2-digit', month:'short', year:'numeric', hour:'2-digit', minute:'2-digit'
     }) : '';
 
     const total = Number(order.TotalAmount ?? order.total_amount ?? 0);
@@ -374,121 +397,142 @@ const CustomerOrders = {
       ? ProductImageResolver.resolve(firstItem, { fallback: '../assets/products/noimage.jpg' })
       : String(firstItem.ImageURL || firstItem.image_url || firstItem.ProductImage || '../assets/products/noimage.jpg');
 
-    const showTrack = Boolean(paymentUx.canTrack);
-    const canCancel = Boolean(paymentUx.canCancel);
     const delivered = status === 'Delivered';
     const returnWindow = this.returnWindow(order);
     const internalId = order.OrderID || order.id || '';
+    const showTrack = Boolean(paymentUx.canTrack);
+    const canCancel = Boolean(paymentUx.canCancel);
+
+    const railKind = paymentUx.kind === 'not-placed'
+      ? 'failed'
+      : paymentUx.kind === 'payment-pending'
+        ? 'pending'
+        : delivered
+          ? 'delivered'
+          : 'active';
+
+    const railIcon = railKind === 'failed'
+      ? 'fa-solid fa-circle-xmark'
+      : railKind === 'pending'
+        ? 'fa-solid fa-clock'
+        : railKind === 'delivered'
+          ? 'fa-solid fa-circle-check'
+          : 'fa-solid fa-truck-fast';
 
     return `
-      <article class="mo-order mo-order-compact">
-        <div class="mo-compact-main">
-          <div class="mo-compact-id">
-            <small>ORDER</small>
-            <h2>${this.esc(code)}</h2>
-            <span>${this.esc(date)}</span>
-          </div>
+      <article class="mo-order mo-order-timeline">
+        <div class="mo-rail-node ${railKind}"><i class="${railIcon}"></i></div>
 
-          <div class="mo-compact-product">
-            <div class="mo-compact-product-img">
+        <div class="mo-order-grid">
+          <section class="mo-id-block">
+            <small>ORDER ID</small>
+            <h3>${this.esc(code)}</h3>
+            <span><i class="fa-regular fa-calendar"></i> ${this.esc(date)}</span>
+            <b class="mo-mini-badge ${this.statusClass(displayStatus, paymentUx.kind)}">${this.esc(displayStatus)}</b>
+          </section>
+
+          <section class="mo-product-block">
+            <div class="mo-product-thumb">
               <img src="${this.esc(image)}"
                 alt="${this.esc(firstItem.ProductName || firstItem.product_name || 'Product')}"
                 onerror="this.src='../assets/products/noimage.jpg'">
             </div>
-            <div>
+            <div class="mo-product-copy">
               <strong>${this.esc(firstItem.ProductName || firstItem.product_name || 'Order item')}</strong>
-              <span>Qty ${qty}${extraItems ? ` · +${extraItems} more` : ''}</span>
+              <span>Qty: ${qty}${extraItems ? ` · +${extraItems} more` : ''}</span>
+              <b>${this.money(total)}</b>
             </div>
-          </div>
+          </section>
 
-          <div class="mo-compact-meta">
-            <span>Payment Method</span>
+          <section class="mo-payment-block">
+            <small>Payment Method</small>
             <strong>${this.esc(String(order.PaymentMethod || order.payment_method || 'COD').toUpperCase())}</strong>
-            <span class="mo-meta-gap">Payment Status</span>
-            <b class="mo-pay-state ${this.statusClass(displayStatus, paymentUx.kind)}">${this.esc(paymentUx.paymentLabel)}</b>
-          </div>
+            <small>Payment Status</small>
+            <b class="mo-inline-state ${this.statusClass(displayStatus, paymentUx.kind)}">${this.esc(paymentUx.paymentLabel)}</b>
+          </section>
 
-          <div class="mo-compact-meta">
-            <span>Order Status</span>
-            <b class="mo-status ${this.statusClass(displayStatus, paymentUx.kind)}">${this.esc(displayStatus)}</b>
-          </div>
+          <section class="mo-status-block">
+            <small>Order Status</small>
+            <b class="mo-inline-state ${this.statusClass(displayStatus, paymentUx.kind)}">${this.esc(displayStatus)}</b>
+            ${delivered && order.DeliveredAt ? `
+              <span>Delivered on<br>${this.esc(new Date(order.DeliveredAt).toLocaleString('en-IN', {
+                day:'2-digit', month:'short', year:'numeric', hour:'2-digit', minute:'2-digit'
+              }))}</span>
+            ` : ''}
+          </section>
 
-          <div class="mo-compact-total">
-            <span>Total</span>
-            <strong>${this.money(total)}</strong>
-          </div>
-
-          <div class="mo-compact-actions">
-            <span class="mo-order-count">${items.length} ${items.length === 1 ? 'item' : 'items'}</span>
+          <section class="mo-actions-block">
+            <span>${items.length} ${items.length === 1 ? 'item' : 'items'}</span>
 
             ${showTrack ? `
-              <a class="mo-compact-btn" href="track-order.html?order=${encodeURIComponent(code)}">
+              <a class="mo-action-btn primary" href="track-order.html?order=${encodeURIComponent(code)}">
                 <i class="fa-solid fa-location-dot"></i> Track Order
               </a>
             ` : ''}
 
             ${canCancel ? `
-              <button type="button" class="mo-compact-btn danger"
-                onclick="CustomerOrders.openCancelOrder('${this.esc(order.OrderID || order.id || '')}','${this.esc(code)}')">
-                <i class="fa-solid fa-xmark"></i> Cancel
+              <button type="button" class="mo-action-btn danger"
+                onclick="CustomerOrders.openCancelOrder('${this.esc(internalId)}','${this.esc(code)}')">
+                <i class="fa-solid fa-xmark"></i> Cancel Order
               </button>
             ` : ''}
 
             ${delivered && returnWindow.active ? `
-              <a class="mo-compact-btn" href="returns.html">
-                <i class="fa-solid fa-rotate-left"></i> Return / Replacement
+              <a class="mo-action-btn success" href="returns.html">
+                <i class="fa-solid fa-rotate-left"></i> Return / Replace
               </a>
             ` : ''}
 
             ${delivered && returnWindow.expired ? `
-              <a class="mo-compact-btn invoice"
-                 href="invoice.html?id=${encodeURIComponent(internalId)}">
-                <i class="fa-solid fa-file-arrow-down"></i> Download Invoice
+              <a class="mo-action-btn invoice" href="invoice.html?id=${encodeURIComponent(internalId)}">
+                <i class="fa-solid fa-download"></i> Download Invoice
               </a>
             ` : ''}
 
             ${paymentUx.buyAgain ? `
-              <a class="mo-compact-btn" href="../index.html">
+              <a class="mo-action-btn" href="../index.html">
                 <i class="fa-solid fa-rotate-right"></i> Buy Again
               </a>
             ` : ''}
 
-            <a class="mo-compact-btn help" href="support.html">
+            <a class="mo-action-btn help" href="support.html">
               <i class="fa-solid fa-headset"></i> ${
-                delivered ? 'Return / Help' :
-                ['refund-attention','not-placed'].includes(paymentUx.kind) ? 'Payment Help' :
-                'Get Help'
+                ['refund-attention','not-placed'].includes(paymentUx.kind)
+                  ? 'Payment Help'
+                  : delivered
+                    ? 'View Details'
+                    : 'Get Help'
               }
             </a>
-          </div>
+          </section>
         </div>
 
         ${delivered && returnWindow.active ? `
-          <div class="mo-compact-note return-window">
-            <i class="fa-solid fa-rotate-left"></i>
-            <span>Return / replacement available until ${
+          <div class="mo-order-note success-note">
+            <i class="fa-solid fa-circle-info"></i>
+            Return / replacement available until ${
               returnWindow.endAt.toLocaleDateString('en-IN', {
                 day:'2-digit', month:'short', year:'numeric'
               })
-            }.</span>
+            }.
           </div>
         ` : ''}
 
         ${delivered && returnWindow.expired ? `
-          <div class="mo-compact-note invoice-ready">
-            <i class="fa-solid fa-file-invoice"></i>
-            <span>Return / replacement window has ended. Invoice is now available for download.</span>
+          <div class="mo-order-note invoice-note">
+            <i class="fa-solid fa-circle-info"></i>
+            Return window has ended. Invoice is now available for download.
           </div>
         ` : ''}
 
         ${paymentUx.note ? `
-          <div class="mo-compact-note ${this.esc(paymentUx.kind)}">
+          <div class="mo-order-note ${this.esc(paymentUx.kind)}">
             <i class="${paymentUx.kind === 'payment-pending'
-              ? 'fa-solid fa-clock-rotate-left'
+              ? 'fa-solid fa-arrows-rotate'
               : paymentUx.kind === 'refund-completed'
                 ? 'fa-solid fa-circle-check'
                 : 'fa-solid fa-circle-exclamation'}"></i>
-            <span>${this.esc(paymentUx.note)}</span>
+            ${this.esc(paymentUx.note)}
           </div>
         ` : ''}
       </article>

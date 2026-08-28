@@ -383,6 +383,154 @@
       .mo-hero-track,.mo-hero-help{flex:1}
     }
 
+
+    /* ================= v1.0.12 Timeline Orders UI ================= */
+    .mo-main{width:min(1380px,calc(100% - 36px));padding:16px 0 54px}
+    .mo-hero{
+      min-height:112px;padding:24px 30px;border-radius:18px;
+      background:
+        radial-gradient(circle at 70% 50%,rgba(141,62,255,.28),transparent 18%),
+        radial-gradient(circle at 88% 45%,rgba(255,101,0,.34),transparent 22%),
+        linear-gradient(110deg,#102039,#151b2d 62%,#3a1d2d);
+      border:1px solid rgba(255,255,255,.08);
+      box-shadow:0 16px 40px rgba(0,0,0,.16)
+    }
+    .mo-hero h1{font-size:31px}
+    .mo-hero p{font-size:13px}
+
+    .mo-summary{grid-template-columns:repeat(4,1fr);gap:14px;margin:14px 0 18px}
+    .mo-stat{
+      min-height:98px;padding:18px;border-radius:16px;
+      display:flex;align-items:center;gap:15px;
+      background:linear-gradient(145deg,var(--mo-card),color-mix(in srgb,var(--mo-card) 82%,#102038));
+      border:1px solid var(--mo-border)
+    }
+    .mo-stat .mo-stat-icon{
+      width:50px;height:50px;flex:0 0 50px;border-radius:50%;
+      display:grid;place-items:center;font-size:18px
+    }
+    .mo-stat.purple .mo-stat-icon{background:rgba(99,102,241,.22);color:#818cf8}
+    .mo-stat.blue .mo-stat-icon{background:rgba(37,99,235,.20);color:#60a5fa}
+    .mo-stat.green .mo-stat-icon{background:rgba(34,197,94,.18);color:#4ade80}
+    .mo-stat.pink .mo-stat-icon{background:rgba(244,63,94,.18);color:#fb7185}
+    .mo-stat small{font-size:11px;text-transform:none}
+    .mo-stat strong{font-size:24px;margin:2px 0}
+    .mo-stat span{font-size:9px;color:var(--mo-muted)}
+    .mo-stat>i{display:none}
+
+    .mo-toolbar{margin:14px 0 13px}
+    .mo-filter{gap:4px}
+    .mo-filter button{
+      background:transparent;border-color:transparent;border-radius:0;
+      padding:9px 14px;font-size:11px;position:relative
+    }
+    .mo-filter button.active{background:transparent;color:var(--mo-orange);border-color:transparent}
+    .mo-filter button.active:after{
+      content:"";position:absolute;left:10px;right:10px;bottom:-2px;height:2px;
+      background:var(--mo-orange);border-radius:2px
+    }
+    .mo-sort{display:flex;align-items:center;gap:8px;color:var(--mo-muted);font-size:10px}
+    .mo-sort select{
+      background:var(--mo-card);color:var(--mo-text);border:1px solid var(--mo-border);
+      border-radius:9px;padding:8px 10px;font:inherit;font-size:10px
+    }
+
+    .mo-orders{gap:10px;position:relative;padding-left:34px}
+    .mo-orders:before{
+      content:"";position:absolute;left:14px;top:10px;bottom:10px;width:1px;
+      background:linear-gradient(#ef4444,#22c55e,#f59e0b,#22c55e)
+    }
+    .mo-order-timeline{
+      position:relative;border-radius:15px;overflow:visible;
+      background:linear-gradient(135deg,var(--mo-card),color-mix(in srgb,var(--mo-card) 90%,#102038));
+      box-shadow:none;border:1px solid var(--mo-border)
+    }
+    .mo-rail-node{
+      position:absolute;left:-49px;top:28px;width:34px;height:34px;border-radius:50%;
+      display:grid;place-items:center;z-index:2;border:5px solid var(--mo-bg);font-size:13px
+    }
+    .mo-rail-node.failed{background:rgba(244,63,94,.20);color:#fb7185}
+    .mo-rail-node.pending{background:rgba(245,158,11,.20);color:#f59e0b}
+    .mo-rail-node.active{background:rgba(34,197,94,.20);color:#4ade80}
+    .mo-rail-node.delivered{background:rgba(34,197,94,.22);color:#4ade80}
+
+    .mo-order-grid{
+      min-height:135px;padding:18px 20px;
+      display:grid;grid-template-columns:1.15fr 1.15fr 1fr 1fr .9fr;
+      gap:0;align-items:center
+    }
+    .mo-order-grid>section{min-width:0;padding:0 20px;border-right:1px solid var(--mo-border)}
+    .mo-order-grid>section:first-child{padding-left:4px}
+    .mo-order-grid>section:last-child{border-right:0;padding-right:4px}
+    .mo-id-block small,.mo-payment-block small,.mo-status-block small{
+      display:block;color:var(--mo-muted);font-size:8px;font-weight:800;margin-bottom:4px
+    }
+    .mo-id-block h3{margin:0 0 5px;font-size:14px}
+    .mo-id-block>span,.mo-status-block>span{
+      display:block;color:var(--mo-muted);font-size:8.5px;line-height:1.35
+    }
+    .mo-mini-badge,.mo-inline-state{
+      margin-top:7px;display:inline-flex;width:max-content;max-width:100%;
+      padding:5px 8px;border-radius:999px;font-size:8.5px;font-weight:900
+    }
+    .mo-product-block{display:flex;align-items:center;gap:12px}
+    .mo-product-thumb{
+      width:58px;height:58px;flex:0 0 58px;border-radius:12px;overflow:hidden;
+      border:1px solid var(--mo-border);background:#fff
+    }
+    .mo-product-thumb img{width:100%;height:100%;object-fit:cover}
+    .mo-product-copy strong{display:block;font-size:11px}
+    .mo-product-copy span{display:block;margin:4px 0 7px;color:var(--mo-muted);font-size:9px}
+    .mo-product-copy b{font-size:12px}
+    .mo-payment-block strong{display:block;font-size:11px;margin-bottom:11px}
+    .mo-status-block .mo-inline-state{margin-top:2px}
+    .mo-actions-block{display:flex;flex-direction:column;gap:6px}
+    .mo-actions-block>span{text-align:right;color:var(--mo-muted);font-size:8px;margin-bottom:2px}
+    .mo-action-btn{
+      min-height:33px;border-radius:8px;border:1px solid var(--mo-border);
+      background:transparent;color:var(--mo-text);font:inherit;text-decoration:none;
+      display:flex;align-items:center;justify-content:center;gap:6px;
+      font-size:8.5px;font-weight:900;cursor:pointer
+    }
+    .mo-action-btn.primary{border-color:rgba(59,130,246,.35)}
+    .mo-action-btn.danger{border-color:rgba(244,63,94,.45);color:#fb7185}
+    .mo-action-btn.success{border-color:rgba(34,197,94,.40);color:#4ade80}
+    .mo-action-btn.invoice{border-color:rgba(96,165,250,.45);color:#60a5fa}
+    .mo-action-btn.help{border-color:rgba(255,101,0,.45);color:var(--mo-orange)}
+
+    .mo-order-note{
+      margin:0 18px 10px;padding:9px 12px;border-radius:8px;
+      display:flex;align-items:center;gap:8px;font-size:8.5px;line-height:1.35;
+      background:rgba(255,255,255,.03);color:var(--mo-muted)
+    }
+    .mo-order-note.not-placed,.mo-order-note.refund-attention{background:rgba(244,63,94,.08);color:#fb7185}
+    .mo-order-note.payment-pending,.mo-order-note.refund-pending{background:rgba(245,158,11,.08);color:#f59e0b}
+    .mo-order-note.refund-completed,.mo-order-note.success-note{background:rgba(34,197,94,.08);color:#4ade80}
+    .mo-order-note.invoice-note{background:rgba(59,130,246,.08);color:#60a5fa}
+
+    @media(max-width:1100px){
+      .mo-summary{grid-template-columns:repeat(2,1fr)}
+      .mo-order-grid{grid-template-columns:1fr 1fr 1fr}
+      .mo-order-grid>section{border-right:0;border-bottom:1px solid var(--mo-border);padding:14px}
+      .mo-actions-block{border-bottom:0!important}
+    }
+    @media(max-width:720px){
+      .mo-main{width:min(100% - 20px,1380px)}
+      .mo-summary{grid-template-columns:1fr 1fr}
+      .mo-toolbar{align-items:flex-start;flex-direction:column}
+      .mo-order-grid{grid-template-columns:1fr 1fr}
+      .mo-orders{padding-left:22px}
+      .mo-orders:before{left:7px}
+      .mo-rail-node{left:-33px;width:28px;height:28px;top:22px}
+    }
+    @media(max-width:520px){
+      .mo-summary{grid-template-columns:1fr}
+      .mo-order-grid{grid-template-columns:1fr}
+      .mo-order-grid>section{padding:13px 5px}
+      .mo-product-block{border-top:1px solid var(--mo-border)}
+      .mo-hero-actions{left:20px;right:20px}
+    }
+
 </style>
 
   <link rel="stylesheet" href="../css/customer-footer.css?v=1.0.2">
@@ -450,32 +598,40 @@
   </section>
 
   <section class="mo-summary">
-    <article class="mo-stat">
-      <small>TOTAL ORDERS</small>
-      <strong id="sumTotal">0</strong>
-      <i class="fa-solid fa-receipt"></i>
+    <article class="mo-stat purple">
+      <div class="mo-stat-icon"><i class="fa-solid fa-bag-shopping"></i></div>
+      <div><small>Total Orders</small><strong id="sumTotal">0</strong><span>All time orders placed</span></div>
     </article>
-    <article class="mo-stat">
-      <small>ACTIVE</small>
-      <strong id="sumActive">0</strong>
-      <i class="fa-solid fa-truck-fast"></i>
+    <article class="mo-stat blue">
+      <div class="mo-stat-icon"><i class="fa-solid fa-truck-fast"></i></div>
+      <div><small>Active Orders</small><strong id="sumActive">0</strong><span>Currently in progress</span></div>
     </article>
-    <article class="mo-stat">
-      <small>DELIVERED</small>
-      <strong id="sumDelivered">0</strong>
-      <i class="fa-solid fa-circle-check"></i>
+    <article class="mo-stat green">
+      <div class="mo-stat-icon"><i class="fa-solid fa-box-open"></i></div>
+      <div><small>Delivered</small><strong id="sumDelivered">0</strong><span>Orders delivered</span></div>
+    </article>
+    <article class="mo-stat pink">
+      <div class="mo-stat-icon"><i class="fa-solid fa-rotate-left"></i></div>
+      <div><small>Cancelled / Returns</small><strong id="sumCancelled">0</strong><span>Cancelled or returned</span></div>
     </article>
   </section>
 
   <div class="mo-toolbar">
-    <h2>Order History</h2>
-
     <div class="mo-filter">
-      <button class="active" data-order-filter="all">All</button>
+      <button class="active" data-order-filter="all">All Orders</button>
       <button data-order-filter="active">Active</button>
       <button data-order-filter="delivered">Delivered</button>
       <button data-order-filter="cancelled">Cancelled / Returns</button>
     </div>
+    <label class="mo-sort">
+      <span>Sort by:</span>
+      <select id="orderSort">
+        <option value="newest">Newest First</option>
+        <option value="oldest">Oldest First</option>
+        <option value="high">Amount: High to Low</option>
+        <option value="low">Amount: Low to High</option>
+      </select>
+    </label>
   </div>
 
   <section id="ordersContainer" class="mo-orders">
@@ -561,14 +717,14 @@
 <script src="../js/auth.js?v=1.0.2"></script>
 <script src="../js/api.js?v=1.0.2"></script>
   <script src="../js/product-image-resolver.js?v=1.0.2"></script>
-<script src="../js/customer-orders.js?v=1.0.10"></script>
+<script src="../js/customer-orders.js?v=1.0.12"></script>
 <script src="../js/pwa.js?v=1.0.2"></script>
 <script src="../js/ui-preferences.js?v=1.0.2"></script>
 
   <script src="../js/customer-footer.js?v=1.0.2"></script>
 <script>
-  window.DESIMALL_CUSTOMER_BUILD = 'v1.0.11';
-  console.info('DesiMall Customer v1.0.11 - Global Track Order');
+  window.DESIMALL_CUSTOMER_BUILD = 'v1.0.12';
+  console.info('DesiMall Customer v1.0.12 - Timeline Orders UI');
 </script>
 </body>
 </html>
