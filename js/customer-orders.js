@@ -122,6 +122,47 @@ const CustomerOrders = {
     return this.customerStatus(order.Status || order.status);
   },
 
+  returnWindow(order) {
+    const status = this.normalizedStatus(order);
+    const deliveredRaw =
+      order.DeliveredAt ||
+      order.delivered_at ||
+      '';
+
+    const explicitEnd =
+      order.ReturnWindowEndsAt ||
+      order.return_window_ends_at ||
+      '';
+
+    const deliveredAt = deliveredRaw ? new Date(deliveredRaw) : null;
+    const endAt = explicitEnd
+      ? new Date(explicitEnd)
+      : deliveredAt && Number.isFinite(deliveredAt.getTime())
+        ? new Date(deliveredAt.getTime() + (7 * 24 * 60 * 60 * 1000))
+        : null;
+
+    const validEnd = endAt && Number.isFinite(endAt.getTime());
+
+    if (status !== 'Delivered' || !validEnd) {
+      return {
+        eligible:false,
+        active:false,
+        expired:false,
+        endAt:null
+      };
+    }
+
+    const now = Date.now();
+    const active = now <= endAt.getTime();
+
+    return {
+      eligible:true,
+      active,
+      expired:!active,
+      endAt
+    };
+  },
+
   paymentExperience(order) {
     const paymentMethod = String(
       order.PaymentMethod || order.payment_method || 'cod'
@@ -336,6 +377,8 @@ const CustomerOrders = {
     const showTrack = Boolean(paymentUx.canTrack);
     const canCancel = Boolean(paymentUx.canCancel);
     const delivered = status === 'Delivered';
+    const returnWindow = this.returnWindow(order);
+    const internalId = order.OrderID || order.id || '';
 
     return `
       <article class="mo-order mo-order-compact">
@@ -391,6 +434,19 @@ const CustomerOrders = {
               </button>
             ` : ''}
 
+            ${delivered && returnWindow.active ? `
+              <a class="mo-compact-btn" href="returns.html">
+                <i class="fa-solid fa-rotate-left"></i> Return / Replacement
+              </a>
+            ` : ''}
+
+            ${delivered && returnWindow.expired ? `
+              <a class="mo-compact-btn invoice"
+                 href="invoice.html?id=${encodeURIComponent(internalId)}">
+                <i class="fa-solid fa-file-arrow-down"></i> Download Invoice
+              </a>
+            ` : ''}
+
             ${paymentUx.buyAgain ? `
               <a class="mo-compact-btn" href="../index.html">
                 <i class="fa-solid fa-rotate-right"></i> Buy Again
@@ -406,6 +462,24 @@ const CustomerOrders = {
             </a>
           </div>
         </div>
+
+        ${delivered && returnWindow.active ? `
+          <div class="mo-compact-note return-window">
+            <i class="fa-solid fa-rotate-left"></i>
+            <span>Return / replacement available until ${
+              returnWindow.endAt.toLocaleDateString('en-IN', {
+                day:'2-digit', month:'short', year:'numeric'
+              })
+            }.</span>
+          </div>
+        ` : ''}
+
+        ${delivered && returnWindow.expired ? `
+          <div class="mo-compact-note invoice-ready">
+            <i class="fa-solid fa-file-invoice"></i>
+            <span>Return / replacement window has ended. Invoice is now available for download.</span>
+          </div>
+        ` : ''}
 
         ${paymentUx.note ? `
           <div class="mo-compact-note ${this.esc(paymentUx.kind)}">
