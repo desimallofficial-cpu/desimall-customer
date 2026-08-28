@@ -365,6 +365,24 @@
     .mo-compact-note.return-window{color:#d97706}
     .mo-compact-note.invoice-ready{color:var(--mo-blue)}
 
+
+    .mo-hero-actions{
+      position:absolute;right:27px;top:50%;transform:translateY(-50%);
+      display:flex;gap:9px;align-items:center;z-index:2;
+    }
+    .mo-hero-track,.mo-hero-help{
+      min-height:38px;padding:0 14px;border-radius:10px;text-decoration:none;
+      display:inline-flex;align-items:center;justify-content:center;gap:7px;
+      font-size:10px;font-weight:900;
+    }
+    .mo-hero-track{background:#ff6500;color:#fff;border:1px solid #ff6500}
+    .mo-hero-help{background:rgba(255,255,255,.12);color:#fff;border:1px solid rgba(255,255,255,.18)}
+    @media(max-width:700px){
+      .mo-hero{padding-bottom:76px}
+      .mo-hero-actions{left:27px;right:27px;top:auto;bottom:18px;transform:none}
+      .mo-hero-track,.mo-hero-help{flex:1}
+    }
+
 </style>
 
   <link rel="stylesheet" href="../css/customer-footer.css?v=1.0.2">
@@ -404,6 +422,9 @@
       <a href="my-orders.html" class="active">
         <i class="fa-solid fa-box"></i><span>Orders</span>
       </a>
+      <a href="track-order.html" title="Track Order" aria-label="Track Order">
+        <i class="fa-solid fa-location-dot"></i><span>Track</span>
+      </a>
       <a href="support.html" title="Help & Support" aria-label="Help & Support"><i class="fa-solid fa-headset"></i><span>Support</span></a>
       <a href="cart.html">
         <i class="fa-solid fa-cart-shopping"></i><span>Cart</span>
@@ -418,7 +439,14 @@
       <h1>My Orders</h1>
       <p>Track purchases, delivery, returns and help from one place.</p>
     </div>
-    <a class="mo-hero-help" href="support.html"><i class="fa-solid fa-headset"></i> Get Help</a>
+    <div class="mo-hero-actions">
+      <a class="mo-hero-track" href="track-order.html">
+        <i class="fa-solid fa-location-dot"></i> Track Order
+      </a>
+      <a class="mo-hero-help" href="support.html">
+        <i class="fa-solid fa-headset"></i> Get Help
+      </a>
+    </div>
   </section>
 
   <section class="mo-summary">
@@ -539,8 +567,8 @@
 
   <script src="../js/customer-footer.js?v=1.0.2"></script>
 <script>
-  window.DESIMALL_CUSTOMER_BUILD = 'v1.0.10';
-  console.info('DesiMall Customer v1.0.10 - Invoice after return window');
+  window.DESIMALL_CUSTOMER_BUILD = 'v1.0.11';
+  console.info('DesiMall Customer v1.0.11 - Global Track Order');
 </script>
 </body>
 </html>
