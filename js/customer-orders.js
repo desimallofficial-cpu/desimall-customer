@@ -317,6 +317,8 @@ const CustomerOrders = {
   card(order) {
     const code = order.OrderCode || order.order_code || order.OrderID || order.id || '—';
     const status = this.normalizedStatus(order);
+    const paymentUx = this.paymentExperience(order);
+    const displayStatus = paymentUx.orderLabel;
     const dateValue = order.CreatedAt || order.created_at || '';
     const date = dateValue ? new Date(dateValue).toLocaleString('en-IN', {
       day:'2-digit',month:'short',year:'numeric',hour:'2-digit',minute:'2-digit'
@@ -324,97 +326,78 @@ const CustomerOrders = {
 
     const total = Number(order.TotalAmount ?? order.total_amount ?? 0);
     const items = Array.isArray(order.Items) ? order.Items : [];
-    const paymentUx = this.paymentExperience(order);
-    const displayStatus = paymentUx.orderLabel;
+    const firstItem = items[0] || {};
+    const extraItems = Math.max(0, items.length - 1);
+    const qty = Number(firstItem.Qty || firstItem.qty || 0);
+    const image = window.ProductImageResolver
+      ? ProductImageResolver.resolve(firstItem, { fallback: '../assets/products/noimage.jpg' })
+      : String(firstItem.ImageURL || firstItem.image_url || firstItem.ProductImage || '../assets/products/noimage.jpg');
+
     const showTrack = Boolean(paymentUx.canTrack);
-    const delivered = status === 'Delivered';
     const canCancel = Boolean(paymentUx.canCancel);
+    const delivered = status === 'Delivered';
 
     return `
-      <article class="mo-order">
-        <header class="mo-order-head">
-          <div>
+      <article class="mo-order mo-order-compact">
+        <div class="mo-compact-main">
+          <div class="mo-compact-id">
             <small>ORDER</small>
             <h2>${this.esc(code)}</h2>
             <span>${this.esc(date)}</span>
           </div>
-          <div class="mo-order-overview">
-            ${order.IsTez || String(order.FulfillmentMode||order.fulfillment_mode||'').toLowerCase()==='tez'
-              ? '<span class="mo-tez-badge"><i class="fa-solid fa-bolt"></i> Tez</span>'
-              : ''}
-            <span class="mo-order-count">${items.length} ${items.length === 1 ? 'item' : 'items'}</span>
-            <span class="mo-status ${this.statusClass(displayStatus, paymentUx.kind)}">${this.esc(displayStatus)}</span>
-          </div>
-        </header>
 
-        <div class="mo-items">
-          ${items.length
-            ? items.slice(0,3).map(item => this.item(item, order, status)).join('')
-            : '<div class="mo-no-items">Order item details are unavailable.</div>'
-          }
-          ${items.length > 3 ? `<div class="mo-no-items">+ ${items.length-3} more item${items.length-3===1?'':'s'}</div>` : ''}
-        </div>
-
-        ${paymentUx.note ? `
-          <div class="mo-payment-note ${this.esc(paymentUx.kind)}">
-            <i class="${paymentUx.kind === 'payment-pending'
-              ? 'fa-solid fa-clock-rotate-left'
-              : paymentUx.kind === 'refund-completed'
-                ? 'fa-solid fa-circle-check'
-                : 'fa-solid fa-circle-exclamation'}"></i>
+          <div class="mo-compact-product">
+            <div class="mo-compact-product-img">
+              <img src="${this.esc(image)}"
+                alt="${this.esc(firstItem.ProductName || firstItem.product_name || 'Product')}"
+                onerror="this.src='../assets/products/noimage.jpg'">
+            </div>
             <div>
-              <strong>${this.esc(paymentUx.paymentLabel)}</strong>
-              <span>${this.esc(paymentUx.note)}</span>
+              <strong>${this.esc(firstItem.ProductName || firstItem.product_name || 'Order item')}</strong>
+              <span>Qty ${qty}${extraItems ? ` · +${extraItems} more` : ''}</span>
             </div>
           </div>
-        ` : ''}
 
-        ${items.length > 1 ? `
-          <div class="mo-customer-note">
-            <i class="fa-solid fa-circle-info"></i>
-            Items may be fulfilled by different sellers and can arrive separately. This remains one DesiMall order for you.
-          </div>
-        ` : ''}
-
-        <footer class="mo-order-foot">
-          <div>
+          <div class="mo-compact-meta">
             <span>Payment Method</span>
             <strong>${this.esc(String(order.PaymentMethod || order.payment_method || 'COD').toUpperCase())}</strong>
+            <span class="mo-meta-gap">Payment Status</span>
+            <b class="mo-pay-state ${this.statusClass(displayStatus, paymentUx.kind)}">${this.esc(paymentUx.paymentLabel)}</b>
           </div>
 
-          <div>
-            <span>Payment Status</span>
-            <strong>${this.esc(paymentUx.paymentLabel)}</strong>
-          </div>
-
-          <div>
+          <div class="mo-compact-meta">
             <span>Order Status</span>
-            <strong>${this.esc(displayStatus)}</strong>
+            <b class="mo-status ${this.statusClass(displayStatus, paymentUx.kind)}">${this.esc(displayStatus)}</b>
           </div>
 
-          <div class="mo-total">
+          <div class="mo-compact-total">
             <span>Total</span>
             <strong>${this.money(total)}</strong>
           </div>
 
-          <div class="mo-order-actions">
+          <div class="mo-compact-actions">
+            <span class="mo-order-count">${items.length} ${items.length === 1 ? 'item' : 'items'}</span>
+
             ${showTrack ? `
-              <a class="mo-track" href="track-order.html?order=${encodeURIComponent(code)}">
+              <a class="mo-compact-btn" href="track-order.html?order=${encodeURIComponent(code)}">
                 <i class="fa-solid fa-location-dot"></i> Track Order
               </a>
             ` : ''}
+
             ${canCancel ? `
-              <button type="button" class="mo-cancel-order"
+              <button type="button" class="mo-compact-btn danger"
                 onclick="CustomerOrders.openCancelOrder('${this.esc(order.OrderID || order.id || '')}','${this.esc(code)}')">
-                <i class="fa-solid fa-xmark"></i> Cancel Order
+                <i class="fa-solid fa-xmark"></i> Cancel
               </button>
             ` : ''}
+
             ${paymentUx.buyAgain ? `
-              <a class="mo-buy-again" href="../index.html">
+              <a class="mo-compact-btn" href="../index.html">
                 <i class="fa-solid fa-rotate-right"></i> Buy Again
               </a>
             ` : ''}
-            <a class="mo-help" href="support.html">
+
+            <a class="mo-compact-btn help" href="support.html">
               <i class="fa-solid fa-headset"></i> ${
                 delivered ? 'Return / Help' :
                 ['refund-attention','not-placed'].includes(paymentUx.kind) ? 'Payment Help' :
@@ -422,7 +405,18 @@ const CustomerOrders = {
               }
             </a>
           </div>
-        </footer>
+        </div>
+
+        ${paymentUx.note ? `
+          <div class="mo-compact-note ${this.esc(paymentUx.kind)}">
+            <i class="${paymentUx.kind === 'payment-pending'
+              ? 'fa-solid fa-clock-rotate-left'
+              : paymentUx.kind === 'refund-completed'
+                ? 'fa-solid fa-circle-check'
+                : 'fa-solid fa-circle-exclamation'}"></i>
+            <span>${this.esc(paymentUx.note)}</span>
+          </div>
+        ` : ''}
       </article>
     `;
   },
