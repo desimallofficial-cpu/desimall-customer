@@ -875,6 +875,12 @@ const DesiMallAPI = {
     return this._rest(`/api/services/providers/${encodeURIComponent(String(providerId))}`,{method:'GET'});
   },
 
+  async getServiceAvailability(providerId,packageId,date='') {
+    const q=new URLSearchParams({packageId:String(packageId)});
+    if(date)q.set('date',String(date));
+    return this._rest(`/api/services/providers/${encodeURIComponent(String(providerId))}/availability?${q.toString()}`,{method:'GET'});
+  },
+
   async getServiceBookings() {
     const token=this._customerAccessToken();
     if(!token)throw Object.assign(new Error('Please login to view service bookings.'),{code:'AUTH_REQUIRED',status:401});

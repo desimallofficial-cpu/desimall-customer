@@ -11,6 +11,7 @@ const DesiMallServices={
     closeProvider.onclick=()=>providerModal.classList.remove('open');closeBooking.onclick=()=>bookingModal.classList.remove('open');
     bookingForm.onsubmit=e=>{e.preventDefault();this.submitBooking()};
     bookingEmergency.onchange=()=>this.updateSummary();
+    bookingDate.onchange=()=>this.loadSlots(bookingDate.value);
     await this.loadVerticals();await this.loadProviders();
     try{this.addresses=await DesiMallAPI.getAddresses()}catch(_){this.addresses=[]}
   },
@@ -61,21 +62,43 @@ const DesiMallServices={
     addressWrap.classList.toggle('hidden',this.selectedPackage.ServiceMode!=='home');
     bookingAddress.innerHTML=this.addresses.map(a=>`<option value="${this.esc(a.id||a.AddressID)}">${this.esc(a.name||a.Name||'Address')} · ${this.esc(a.address_line1||a.AddressLine1||'')} · ${this.esc(a.pincode||a.Pincode||'')}</option>`).join('');
     emergencyWrap.classList.toggle('hidden',!this.selectedPackage.EmergencyEligible);bookingEmergency.checked=false;
-    const now=new Date(Date.now()+Math.max(60,Number(this.selectedProvider.MinLeadMinutes||60))*60000);bookingDate.min=new Date().toISOString().slice(0,10);bookingDate.max=new Date(Date.now()+Number(this.selectedProvider.MaxAdvanceDays||30)*86400000).toISOString().slice(0,10);bookingDate.value=now.toISOString().slice(0,10);bookingTime.value=`${String(now.getHours()).padStart(2,'0')}:${String(Math.ceil(now.getMinutes()/30)*30%60).padStart(2,'0')}`;
+    bookingDate.innerHTML='<option value="">Loading available dates…</option>';bookingDate.disabled=true;bookingTime.innerHTML='<option value="">Choose date first</option>';bookingTime.disabled=true;bookingDateRange.textContent='';bookingSlotHelp.textContent='';
+    await this.loadAvailableDates();
     document.querySelector('input[name=servicePay][value=cod]').disabled=!this.selectedProvider.AcceptsCOD;document.querySelector('input[name=servicePay][value=razorpay]').disabled=!this.selectedProvider.AcceptsOnline;
     const available=[...document.querySelectorAll('input[name=servicePay]')].find(x=>!x.disabled);if(available)available.checked=true;
     this.updateSummary();providerModal.classList.remove('open');bookingModal.classList.add('open');
   },
+  dateLabel(dateStr){
+    const d=new Date(`${dateStr}T12:00:00Z`);return d.toLocaleDateString('en-IN',{weekday:'short',day:'2-digit',month:'short',year:'numeric'});
+  },
+  async loadAvailableDates(){
+    try{
+      const r=await DesiMallAPI.getServiceAvailability(this.selectedProvider.ProviderID,this.selectedPackage.PackageID);
+      const dates=r.dates||[];bookingDate.disabled=false;
+      bookingDateRange.textContent=r.range?`Booking range: ${this.dateLabel(r.range.MinDate)} to ${this.dateLabel(r.range.MaxDate)} (${r.range.AdvanceDays} days advance)`:'';
+      bookingDate.innerHTML=dates.length?'<option value="">Choose available date</option>'+dates.map(x=>`<option value="${this.esc(x.Date)}">${this.esc(this.dateLabel(x.Date))} · ${x.SlotCount} slot${x.SlotCount===1?'':'s'}</option>`).join(''):'<option value="">No bookable dates in current range</option>';
+      if(dates.length){bookingDate.value=dates[0].Date;await this.loadSlots(dates[0].Date)}else{bookingTime.innerHTML='<option value="">No slots available</option>';bookingTime.disabled=true;bookingSlotHelp.textContent='Provider may be closed, on leave, or fully booked in this date range.'}
+    }catch(e){bookingDate.innerHTML='<option value="">Could not load dates</option>';bookingDate.disabled=true;this.toast(e.message||'Could not load available dates')}
+  },
+  async loadSlots(date){
+    if(!date){bookingTime.innerHTML='<option value="">Choose date first</option>';bookingTime.disabled=true;return;}
+    bookingTime.innerHTML='<option value="">Loading slots…</option>';bookingTime.disabled=true;
+    try{
+      const r=await DesiMallAPI.getServiceAvailability(this.selectedProvider.ProviderID,this.selectedPackage.PackageID,date);const slots=r.slots||[];
+      bookingTime.disabled=false;bookingTime.innerHTML=slots.length?'<option value="">Choose available time</option>'+slots.map(x=>`<option value="${this.esc(x)}">${this.esc(this.timeLabel(x))}</option>`).join(''):'<option value="">No slots available</option>';bookingSlotHelp.textContent=slots.length?`${slots.length} available slot${slots.length===1?'':'s'} on ${this.dateLabel(date)}.`:'This date is closed, blocked or fully booked. Choose another available date.';
+    }catch(e){bookingTime.innerHTML='<option value="">Could not load slots</option>';bookingTime.disabled=true;this.toast(e.message||'Could not load slots')}
+  },
+  timeLabel(hm){const [h,m]=String(hm).split(':').map(Number);const d=new Date(Date.UTC(2000,0,1,h,m));return d.toLocaleTimeString('en-IN',{hour:'2-digit',minute:'2-digit',hour12:true,timeZone:'UTC'});},
   updateSummary(){
     const base=Number(this.selectedPackage?.BasePrice||0),visit=Math.max(Number(this.selectedPackage?.VisitCharge||0),Number(this.selectedProvider?.BaseVisitCharge||0));sumBase.textContent=this.money(base);sumVisit.textContent=this.money(visit);sumEmergencyRow.classList.toggle('hidden',!bookingEmergency.checked);sumTotal.textContent=this.money(base+visit+(bookingEmergency.checked?Math.max(50,base*.15):0));
   },
   async submitBooking(){
     if(!this.selectedPackage)return;
     if(this.selectedPackage.ServiceMode==='home'&&!bookingAddress.value)return this.toast('Choose a service address.');
-    const dt=new Date(`${bookingDate.value}T${bookingTime.value}:00`);if(!Number.isFinite(dt.getTime()))return this.toast('Choose a valid date and time.');
+    if(!bookingDate.value||!bookingTime.value)return this.toast('Choose an available date and time.');
     const pay=document.querySelector('input[name=servicePay]:checked')?.value||'cod';bookingSubmit.disabled=true;bookingSubmit.textContent='Creating booking…';
     try{
-      const r=await DesiMallAPI.createServiceBooking({PackageID:this.selectedPackage.PackageID,AddressID:this.selectedPackage.ServiceMode==='home'?bookingAddress.value:null,ScheduledStart:dt.toISOString(),CustomerNote:bookingNote.value.trim(),PaymentMethod:pay,Emergency:bookingEmergency.checked});
+      const r=await DesiMallAPI.createServiceBooking({PackageID:this.selectedPackage.PackageID,AddressID:this.selectedPackage.ServiceMode==='home'?bookingAddress.value:null,ScheduledDate:bookingDate.value,ScheduledTime:bookingTime.value,CustomerNote:bookingNote.value.trim(),PaymentMethod:pay,Emergency:bookingEmergency.checked});
       if(!r.success)throw new Error(r.message||'Booking failed');
       const booking=r.booking;
       if(pay==='razorpay'){
