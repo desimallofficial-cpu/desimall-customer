@@ -89,7 +89,9 @@ const DesiMallFood = {
   renderRestaurantHero(){
     const r=this.current;if(!r)return;
     const hero=document.getElementById('restaurantHero');
-    hero.style.setProperty('--restaurant-image',`url("${this.image(r.ImageURL)}")`);
+    const rawImage=String(r.ImageURL||'').trim();
+    hero.style.setProperty('--restaurant-image',rawImage?`url("${rawImage}")`:'none');
+    hero.classList.toggle('no-photo',!rawImage);
     hero.innerHTML=`<div><h2>${this.esc(r.Name)}</h2><p>${this.esc((r.CuisineTags||[]).join(' • '))}</p><div class="hero-pills"><span>${r.PrepMinMinutes}-${r.PrepMaxMinutes} min</span><span>Min order ${this.money(r.MinOrder)}</span><span>${r.DeliveryFee?this.money(r.DeliveryFee)+' delivery':'Free delivery'}</span></div></div>`;
   },
 
@@ -134,7 +136,7 @@ const DesiMallFood = {
 
   typeLabel(t){return ({veg:'🟢 Veg',nonveg:'🔴 Non-Veg',egg:'🟡 Egg',vegan:'🌿 Vegan'})[t]||t;},
 
-  add(productId){
+  async add(productId){
     const item=this.menu.find(x=>String(x.ProductID)===String(productId));
     if(!item||!item.IsAvailable)return;
 
@@ -145,7 +147,8 @@ const DesiMallFood = {
       return x.RestaurantID && String(x.RestaurantID)!==String(this.current.RestaurantID);
     });
     if(incompatible){
-      if(!confirm('Your cart has another delivery service or restaurant. Clear it and start this Food order?'))return;
+      const ok=await this.confirmCartSwitch();
+      if(!ok)return;
       CartManager.saveCart([]);
     }
 
@@ -169,6 +172,22 @@ const DesiMallFood = {
       FoodDeliveryFee:Number(this.current.DeliveryFee||0)
     },1);
     this.toast(`${item.ProductName} added to Food cart`);
+  },
+
+  confirmCartSwitch(){
+    return new Promise(resolve=>{
+      let modal=document.getElementById('foodCartSwitch');
+      if(!modal){
+        modal=document.createElement('div');
+        modal.id='foodCartSwitch';
+        modal.className='food-switch-modal';
+        modal.innerHTML=`<div class="food-switch-box"><span class="food-switch-icon"><i class="fa-solid fa-cart-arrow-down"></i></span><h3>Start a separate Food cart?</h3><p>Your current cart belongs to another DesiMall service or restaurant. Food orders stay separate.</p><div><button data-no>Keep current cart</button><button data-yes>Clear & start Food order</button></div></div>`;
+        document.body.appendChild(modal);
+      }
+      modal.classList.add('open');
+      modal.querySelector('[data-no]').onclick=()=>{modal.classList.remove('open');resolve(false)};
+      modal.querySelector('[data-yes]').onclick=()=>{modal.classList.remove('open');resolve(true)};
+    });
   },
 
   toast(msg){const el=document.getElementById('foodToast');el.textContent=msg;el.classList.add('show');clearTimeout(this.tt);this.tt=setTimeout(()=>el.classList.remove('show'),2200);}
