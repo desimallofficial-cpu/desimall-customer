@@ -16,13 +16,26 @@ const CartManager = {
       FulfilmentMode: String(
         item.FulfilmentMode ||
         item.FulfillmentMode ||
-        (item.IsTez || item.TezEligible ? 'tez' : 'marketplace')
+        (item.IsFood ? 'food' : (item.IsTez || item.TezEligible ? 'tez' : 'marketplace'))
+      ).toLowerCase(),
+      FulfillmentMode: String(
+        item.FulfillmentMode ||
+        item.FulfilmentMode ||
+        (item.IsFood ? 'food' : (item.IsTez || item.TezEligible ? 'tez' : 'marketplace'))
       ).toLowerCase(),
       IsTez: Boolean(
         item.IsTez ||
         item.TezEligible ||
         String(item.FulfilmentMode || item.FulfillmentMode || '').toLowerCase() === 'tez'
-      )
+      ),
+      IsFood: Boolean(
+        item.IsFood ||
+        String(item.FulfilmentMode || item.FulfillmentMode || '').toLowerCase() === 'food'
+      ),
+      RestaurantID: item.RestaurantID || item.restaurant_id || '',
+      FoodType: item.FoodType || item.food_type || '',
+      MenuCategory: item.MenuCategory || item.menu_category || '',
+      FoodDeliveryFee: Number(item.FoodDeliveryFee || item.food_delivery_fee || 0)
     };
   },
   lineKey(item) {

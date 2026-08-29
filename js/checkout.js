@@ -76,18 +76,24 @@ const CheckoutApp = {
     }
 
     const modes = new Set(
-      this.cart.map(item =>
-        item.IsTez ||
-        String(item.FulfilmentMode || item.FulfillmentMode || '').toLowerCase() === 'tez'
-          ? 'tez'
-          : 'marketplace'
-      )
+      this.cart.map(item => {
+        const mode = String(
+          item.FulfilmentMode ||
+          item.FulfillmentMode ||
+          (item.IsFood ? 'food' : (item.IsTez ? 'tez' : 'marketplace'))
+        ).toLowerCase();
+
+        if (mode === 'food' || item.IsFood) return 'food';
+        if (mode === 'tez' || item.IsTez) return 'tez';
+        return 'marketplace';
+      })
     );
 
     this.mixedFulfillment = modes.size > 1;
-    this.fulfillmentMode = modes.size === 1 && modes.has('tez')
-      ? 'tez'
-      : 'marketplace';
+    this.fulfillmentMode =
+      modes.size === 1 && modes.has('food') ? 'food' :
+      modes.size === 1 && modes.has('tez') ? 'tez' :
+      'marketplace';
 
     const firstTez = this.cart.find(item =>
       item.IsTez ||
@@ -102,7 +108,7 @@ const CheckoutApp = {
 
     if (this.mixedFulfillment) {
       this.showAlert(
-        'Your cart contains both Tez and standard items. For now they must be placed separately. Remove one delivery group before checkout.'
+        'Your cart contains items from different delivery services. Marketplace, Tez and Food orders must be placed separately.'
       );
     }
 
@@ -129,6 +135,15 @@ const CheckoutApp = {
         0,
         Number(firstTez?.TezDeliveryFee || 0)
       );
+      return;
+    }
+
+    if (this.fulfillmentMode === 'food') {
+      const firstFood = this.cart.find(item =>
+        item.IsFood ||
+        String(item.FulfilmentMode || item.FulfillmentMode || '').toLowerCase() === 'food'
+      );
+      this.deliveryFee = Math.max(0, Number(firstFood?.FoodDeliveryFee || 0));
       return;
     }
 
@@ -548,6 +563,7 @@ const CheckoutApp = {
 
   applyFulfillmentCopy(zone = null) {
     const isTez = this.fulfillmentMode === 'tez';
+    const isFood = this.fulfillmentMode === 'food';
 
     const cards = [...document.querySelectorAll('.ck-card')];
     const deliveryCard = cards.find(card =>
@@ -621,6 +637,28 @@ const CheckoutApp = {
         optionIcon.classList.remove('fa-truck', 'fa-truck-fast');
         optionIcon.classList.add('fa-bolt');
       }
+    } else if (isFood) {
+      const firstFood = this.cart.find(item =>
+        item.IsFood ||
+        String(item.FulfilmentMode || item.FulfillmentMode || '').toLowerCase() === 'food'
+      );
+      const restaurant = firstFood?.SellerName || firstFood?.ShopName || 'Restaurant';
+      const fee = Math.max(0, Number(firstFood?.FoodDeliveryFee || this.deliveryFee || 0));
+
+      if (heading) heading.textContent = 'Food Delivery';
+      if (subheading) {
+        subheading.textContent = `Freshly prepared by ${restaurant} and delivered by DesiMall.`;
+      }
+      if (optionTitle) optionTitle.textContent = 'Restaurant Delivery';
+      if (optionDesc) {
+        optionDesc.textContent = fee > 0
+          ? `${this.money(fee)} restaurant delivery fee for this order.`
+          : 'Free restaurant delivery for this order.';
+      }
+      if (optionIcon) {
+        optionIcon.classList.remove('fa-bolt','fa-truck','fa-truck-fast');
+        optionIcon.classList.add('fa-utensils');
+      }
     } else {
       if (heading) heading.textContent = 'Delivery Method';
 
@@ -637,7 +675,7 @@ const CheckoutApp = {
       }
 
       if (optionIcon) {
-        optionIcon.classList.remove('fa-bolt');
+        optionIcon.classList.remove('fa-bolt','fa-utensils');
         optionIcon.classList.add('fa-truck');
       }
     }
@@ -834,7 +872,7 @@ const CheckoutApp = {
 
     if (this.mixedFulfillment) {
       this.showAlert(
-        'Tez and standard items must be placed separately in this phase. Please remove one delivery group before checkout.'
+        'Marketplace, Tez and Food items must be placed separately. Please keep only one delivery service in this checkout.'
       );
       return;
     }

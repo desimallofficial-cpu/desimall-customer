@@ -443,6 +443,27 @@ const DesiMallAPI = {
     };
   },
 
+
+  // =========================================================
+  // DESIMALL FOOD
+  // =========================================================
+
+  async getFoodRestaurants(pincode = '', foodType = '') {
+    const q = new URLSearchParams();
+    if (pincode) q.set('pincode', String(pincode));
+    if (foodType) q.set('food_type', String(foodType));
+    const result = await this._rest(`/api/food/restaurants?${q.toString()}`, {
+      method:'GET'
+    });
+    return Array.isArray(result?.restaurants) ? result.restaurants : [];
+  },
+
+  async getFoodMenu(restaurantId) {
+    return this._rest(`/api/food/restaurants/${encodeURIComponent(String(restaurantId))}/menu`, {
+      method:'GET'
+    });
+  },
+
   // =========================================================
   // CUSTOMER / AUTH
   // =========================================================

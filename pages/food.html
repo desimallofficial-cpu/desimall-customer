@@ -1,0 +1,79 @@
+<!doctype html>
+<html lang="en" data-theme="dark">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>Food & Restaurants | DesiMall</title>
+  <link rel="stylesheet" href="../css/style.css">
+  <link rel="stylesheet" href="../css/food.css?v=1.1.0">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+</head>
+<body class="food-page">
+<header class="food-topbar">
+  <a class="food-brand" href="../index.html"><span>Desi</span>Mall</a>
+  <a class="food-location" href="address-book.html"><i class="fa-solid fa-location-dot"></i><span id="foodLocation">Select delivery location</span></a>
+  <nav>
+    <a href="../index.html"><i class="fa-solid fa-house"></i><span>Home</span></a>
+    <a href="my-orders.html"><i class="fa-solid fa-box"></i><span>Orders</span></a>
+    <a href="cart.html"><i class="fa-solid fa-cart-shopping"></i><span>Cart</span><b id="cartBadge">0</b></a>
+  </nav>
+</header>
+
+<main class="food-shell">
+  <section class="food-hero">
+    <div>
+      <span class="eyebrow"><i class="fa-solid fa-utensils"></i> DESIMALL FOOD</span>
+      <h1>What are you craving?</h1>
+      <p>Order from nearby restaurants. Veg, Non-Veg, Egg and Vegan choices in one place.</p>
+    </div>
+    <div class="food-search">
+      <i class="fa-solid fa-magnifying-glass"></i>
+      <input id="foodSearch" placeholder="Search restaurant, dish or cuisine">
+    </div>
+  </section>
+
+  <section class="food-type-strip" aria-label="Food filters">
+    <button class="active" data-food-type=""><span class="food-dot all"></span>All</button>
+    <button data-food-type="veg"><span class="food-dot veg"></span>Veg</button>
+    <button data-food-type="nonveg"><span class="food-dot nonveg"></span>Non-Veg</button>
+    <button data-food-type="egg"><span class="food-dot egg"></span>Egg</button>
+    <button data-food-type="vegan"><span class="food-dot vegan"></span>Vegan</button>
+  </section>
+
+  <section class="food-layout">
+    <aside class="restaurant-panel">
+      <div class="section-title">
+        <div><small>NEAR YOU</small><h2>Restaurants</h2></div>
+        <span id="restaurantCount">0</span>
+      </div>
+      <div id="restaurantList" class="restaurant-list"></div>
+    </aside>
+
+    <section class="menu-panel">
+      <div id="menuEmpty" class="food-empty">
+        <i class="fa-solid fa-bowl-food"></i>
+        <h2>Choose a restaurant</h2>
+        <p>Menu, prices and food type will appear here.</p>
+      </div>
+      <div id="menuView" class="hidden">
+        <div class="restaurant-hero" id="restaurantHero"></div>
+        <div class="menu-toolbar">
+          <div class="menu-categories" id="menuCategories"></div>
+          <label><input type="checkbox" id="onlyAvailable" checked> Available only</label>
+        </div>
+        <div id="menuItems" class="menu-items"></div>
+      </div>
+    </section>
+  </section>
+</main>
+
+<div class="food-toast" id="foodToast"></div>
+
+<script src="../js/config.js"></script>
+<script src="../js/api.js"></script>
+<script src="../js/auth.js"></script>
+<script src="../js/cart.js"></script>
+<script src="../js/product-image-resolver.js"></script>
+<script src="../js/food.js?v=1.1.0"></script>
+</body>
+</html>
