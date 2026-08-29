@@ -855,6 +855,41 @@ const DesiMallAPI = {
   },
 
 
+
+  // =========================================================
+  // TRY-ON AT HOME
+  // =========================================================
+
+  async getTryOnProducts(pincode='') {
+    const q=new URLSearchParams();
+    if(pincode)q.set('pincode',String(pincode));
+    return this._rest(`/api/tryon/products?${q.toString()}`,{method:'GET'});
+  },
+
+  async getTryOnAvailability(sellerId) {
+    return this._rest(`/api/tryon/availability?sellerId=${encodeURIComponent(String(sellerId))}`,{method:'GET'});
+  },
+
+  async getTryOnOrders() {
+    const token=this._customerAccessToken();
+    if(!token)throw Object.assign(new Error('Please login to view Try-On visits.'),{code:'AUTH_REQUIRED',status:401});
+    return this._rest('/api/v1/tryon/orders',{method:'GET',token});
+  },
+
+  async createTryOnOrder(data={}) {
+    const token=this._customerAccessToken();
+    if(!token)throw Object.assign(new Error('Please login before booking Try-On.'),{code:'AUTH_REQUIRED',status:401});
+    return this._rest('/api/v1/tryon/orders',{method:'POST',data,token});
+  },
+
+  async cancelTryOnOrder(orderRef,reason='') {
+    const token=this._customerAccessToken();
+    if(!token)throw Object.assign(new Error('Please login again.'),{code:'AUTH_REQUIRED',status:401});
+    return this._rest(`/api/v1/tryon/orders/${encodeURIComponent(String(orderRef))}/cancel`,{
+      method:'POST',data:{Reason:reason},token
+    });
+  },
+
   // =========================================================
   // DESIMALL SERVICES
   // =========================================================
