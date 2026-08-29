@@ -73,6 +73,10 @@
       location.href = 'pages/food.html';
       return;
     }
+    if (key === 'services') {
+      location.href = 'pages/services.html';
+      return;
+    }
     const data = SERVICES[key];
     if (!data) return;
     const back = document.getElementById('moduleSheetBackdrop');

@@ -854,6 +854,63 @@ const DesiMallAPI = {
     );
   },
 
+
+  // =========================================================
+  // DESIMALL SERVICES
+  // =========================================================
+
+  async getServiceVerticals() {
+    return this._rest('/api/services/verticals',{method:'GET'});
+  },
+
+  async getServiceProviders(pincode='',vertical='',search='') {
+    const q=new URLSearchParams();
+    if(pincode)q.set('pincode',String(pincode));
+    if(vertical)q.set('vertical',String(vertical));
+    if(search)q.set('search',String(search));
+    return this._rest(`/api/services/providers?${q.toString()}`,{method:'GET'});
+  },
+
+  async getServiceProvider(providerId) {
+    return this._rest(`/api/services/providers/${encodeURIComponent(String(providerId))}`,{method:'GET'});
+  },
+
+  async getServiceBookings() {
+    const token=this._customerAccessToken();
+    if(!token)throw Object.assign(new Error('Please login to view service bookings.'),{code:'AUTH_REQUIRED',status:401});
+    return this._rest('/api/v1/services/bookings',{method:'GET',token});
+  },
+
+  async createServiceBooking(data={}) {
+    const token=this._customerAccessToken();
+    if(!token)throw Object.assign(new Error('Please login before booking a service.'),{code:'AUTH_REQUIRED',status:401});
+    return this._rest('/api/v1/services/bookings',{method:'POST',data,token});
+  },
+
+  async cancelServiceBooking(bookingId,reason='') {
+    const token=this._customerAccessToken();
+    if(!token)throw Object.assign(new Error('Please login again.'),{code:'AUTH_REQUIRED',status:401});
+    return this._rest(`/api/v1/services/bookings/${encodeURIComponent(String(bookingId))}/cancel`,{method:'POST',data:{Reason:reason},token});
+  },
+
+  async reviewServiceBooking(bookingId,rating,review='') {
+    const token=this._customerAccessToken();
+    if(!token)throw Object.assign(new Error('Please login again.'),{code:'AUTH_REQUIRED',status:401});
+    return this._rest(`/api/v1/services/bookings/${encodeURIComponent(String(bookingId))}/review`,{method:'POST',data:{Rating:rating,Review:review},token});
+  },
+
+  async createServiceRazorpayOrder(bookingId) {
+    const token=this._customerAccessToken();
+    if(!token)throw Object.assign(new Error('Please login again.'),{code:'AUTH_REQUIRED',status:401});
+    return this._rest(`/api/v1/services/bookings/${encodeURIComponent(String(bookingId))}/razorpay/order`,{method:'POST',data:{},token});
+  },
+
+  async verifyServiceRazorpayPayment(bookingId,data={}) {
+    const token=this._customerAccessToken();
+    if(!token)throw Object.assign(new Error('Please login again.'),{code:'AUTH_REQUIRED',status:401});
+    return this._rest(`/api/v1/services/bookings/${encodeURIComponent(String(bookingId))}/razorpay/verify`,{method:'POST',data,token});
+  },
+
   // =========================================================
   // CUSTOMER ADDRESS BOOK — SUPABASE / RENDER API v0.5.0
   // =========================================================
