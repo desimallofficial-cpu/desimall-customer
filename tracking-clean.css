@@ -54,12 +54,322 @@ body{margin:0;background:var(--bg);color:var(--text);font-family:Inter,Arial,san
   #liveMap{height:330px}
 }
 
-.gps-repair{margin-top:14px;border:1px solid rgba(245,158,11,.55);background:rgba(245,158,11,.08);border-radius:12px;padding:13px;display:grid;grid-template-columns:1fr auto;gap:10px;align-items:center}
-.gps-repair strong{display:block;color:#f8fafc;font-size:13px}
-.gps-repair span{display:block;margin-top:4px;color:#b9c6d7;font-size:11px;line-height:1.45}
-.gps-repair button{border:0;border-radius:10px;background:#ff6b00;color:#fff;font-weight:900;padding:11px 14px;cursor:pointer}
+.gps-repair{
+  margin-top:14px;
+  padding:14px;
+  border:1px solid rgba(255,107,0,.55);
+  border-radius:12px;
+  background:rgba(255,107,0,.08);
+  display:grid;
+  grid-template-columns:1fr auto;
+  gap:10px;
+  align-items:center
+}
+.gps-repair strong{display:block;color:#fff;font-size:14px}
+.gps-repair span{display:block;margin-top:4px;color:#b9c6d7;font-size:12px;line-height:1.45}
+.gps-repair button{
+  border:0;border-radius:10px;background:#ff6b00;color:white;
+  padding:12px 15px;font-weight:900;cursor:pointer
+}
 .gps-repair button:disabled{opacity:.55;cursor:not-allowed}
 .gps-repair small{grid-column:1/-1;color:#fbbf24}
 .gps-repair.ok small{color:#34d399}
 .gps-repair.error small{color:#f87171}
-@media(max-width:700px){.gps-repair{grid-template-columns:1fr}.gps-repair button{width:100%}}
+@media(max-width:700px){
+  .gps-repair{grid-template-columns:1fr}
+  .gps-repair button{width:100%}
+}
+
+/* =========================================================
+   Classic connected timeline UI v1.0.4.2
+   Restores the earlier DesiMall look:
+   orange completed nodes + connector line + glowing current node
+   ========================================================= */
+.timeline{
+  position:relative;
+  display:grid;
+  grid-template-columns:repeat(6,1fr);
+  gap:0;
+  align-items:start;
+  margin-top:22px;
+  padding:0 12px 8px;
+}
+.timeline::before{
+  content:"";
+  position:absolute;
+  left:8%;
+  right:8%;
+  top:22px;
+  height:3px;
+  background:#5f6b7a;
+  border-radius:999px;
+  z-index:0;
+}
+.timeline::after{
+  content:"";
+  position:absolute;
+  left:8%;
+  top:22px;
+  height:3px;
+  width:var(--timeline-progress,0%);
+  background:#ff6b00;
+  border-radius:999px;
+  z-index:1;
+  transition:width .3s ease;
+}
+.timeline-step{
+  position:relative;
+  z-index:2;
+  text-align:center;
+  min-width:0;
+}
+.timeline-step .step-dot,
+.timeline-step .timeline-dot,
+.timeline-step > .dot,
+.timeline-step > div:first-child{
+  width:44px;
+  height:44px;
+  margin:0 auto 8px;
+  border-radius:50%;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  background:#eef2f6;
+  color:#d4dbe3;
+  border:0;
+  box-shadow:none;
+  font-size:17px;
+  font-weight:900;
+}
+.timeline-step.done .step-dot,
+.timeline-step.done .timeline-dot,
+.timeline-step.done > .dot,
+.timeline-step.done > div:first-child{
+  background:#ff6b00;
+  color:#fff;
+}
+.timeline-step.current .step-dot,
+.timeline-step.current .timeline-dot,
+.timeline-step.current > .dot,
+.timeline-step.current > div:first-child{
+  background:#ff6b00;
+  color:#fff;
+  box-shadow:0 0 0 6px rgba(255,107,0,.18);
+}
+.timeline-step .step-label,
+.timeline-step .timeline-label,
+.timeline-step strong{
+  display:block;
+  color:#f8fafc;
+  font-size:12px;
+  font-weight:800;
+  line-height:1.25;
+}
+.timeline-step.pending .step-label,
+.timeline-step.pending .timeline-label,
+.timeline-step.pending strong{
+  color:#c5cfda;
+}
+.timeline-step .timeline-state,
+.timeline-step small{
+  display:block;
+  margin-top:5px;
+  color:#8fa3b8;
+  font-size:10px;
+  line-height:1.2;
+}
+@media(max-width:700px){
+  .timeline{
+    overflow-x:auto;
+    grid-template-columns:repeat(6,minmax(105px,1fr));
+    padding-bottom:12px;
+  }
+  .timeline::before{left:52px;right:52px}
+  .timeline::after{left:52px}
+}
+
+/* Reference timeline polish v1.0.4.3 */
+.timeline-step .step-dot,
+.timeline-step .timeline-dot,
+.timeline-step > .dot,
+.timeline-step > div:first-child{
+  position:relative;
+  font-size:0;
+}
+.timeline-step.done .step-dot::after,
+.timeline-step.done .timeline-dot::after,
+.timeline-step.done > .dot::after,
+.timeline-step.done > div:first-child::after{
+  content:"✓";
+  font-size:22px;
+  line-height:1;
+  font-weight:900;
+  color:#fff;
+}
+.timeline-step.current .step-dot::after,
+.timeline-step.current .timeline-dot::after,
+.timeline-step.current > .dot::after,
+.timeline-step.current > div:first-child::after{
+  content:"♨";
+  font-size:20px;
+  line-height:1;
+  font-weight:900;
+  color:#fff;
+  transform:rotate(-12deg);
+}
+.timeline-step.current .step-dot,
+.timeline-step.current .timeline-dot,
+.timeline-step.current > .dot,
+.timeline-step.current > div:first-child{
+  box-shadow:0 0 0 6px rgba(255,107,0,.20), 0 0 0 11px rgba(255,107,0,.08);
+}
+.timeline-step.pending .step-dot::after,
+.timeline-step.pending .timeline-dot::after,
+.timeline-step.pending > .dot::after,
+.timeline-step.pending > div:first-child::after{
+  content:"✓";
+  font-size:14px;
+  color:#fff;
+  opacity:.8;
+}
+.timeline-step .timeline-state,
+.timeline-step small{
+  min-height:14px;
+}
+
+/* Exact old-style timeline, based on actual #timeline > .step markup */
+#timeline{
+ position:relative;display:grid;grid-template-columns:repeat(6,1fr);
+ align-items:start;gap:0;margin-top:24px;padding:0 10px 10px;
+}
+#timeline::before{
+ content:"";position:absolute;left:8.5%;right:8.5%;top:25px;height:3px;
+ background:#687381;border-radius:999px;z-index:0;
+}
+#timeline .step{position:relative;z-index:1;text-align:center;min-width:0}
+#timeline .dm-step-dot{
+ width:50px;height:50px;border-radius:50%;margin:0 auto 10px;
+ display:flex;align-items:center;justify-content:center;box-sizing:border-box;
+ background:#eef2f6;color:#fff;font-size:24px;font-weight:900;line-height:1;
+ position:relative;
+}
+#timeline .step.done .dm-step-dot,
+#timeline .step.current .dm-step-dot{background:#ff6b00}
+#timeline .step.done:not(:first-child)::before,
+#timeline .step.current:not(:first-child)::before{
+ content:"";position:absolute;right:50%;top:24px;width:100%;height:3px;
+ background:#ff6b00;z-index:-1;
+}
+#timeline .step.current .dm-step-dot{
+ box-shadow:0 0 0 6px rgba(255,107,0,.22),0 0 0 10px rgba(255,107,0,.08);
+}
+#timeline .step.current .dm-step-dot{font-size:21px;transform:none}
+#timeline .dm-step-label{
+ display:block;color:#fff;font-size:12px;font-weight:800;line-height:1.25;
+}
+#timeline .step.pending .dm-step-label{color:#b8c3d0}
+#timeline .dm-step-state{
+ display:block;margin-top:7px;color:#8fa4bc;font-size:10px;font-weight:500;
+ line-height:1.2;white-space:nowrap;
+}
+@media(max-width:700px){
+ #timeline{overflow-x:auto;grid-template-columns:repeat(6,minmax(105px,1fr));padding-bottom:14px}
+}
+
+/* =========================================================
+   v1.0.4.5 SINGLE TIMELINE FIX
+   Disable every legacy timeline circle/pseudo visual.
+   Keep only .dm-step-dot row.
+   ========================================================= */
+#timeline .step::before,
+#timeline .step::after{
+  content:none!important;
+  display:none!important;
+}
+
+#timeline .step > span:not(.dm-step-label),
+#timeline .step > b:not(.dm-step-dot){
+  display:none!important;
+}
+
+/* Reset legacy circle styling that was applied directly to .step */
+#timeline .step{
+  background:transparent!important;
+  border:0!important;
+  box-shadow:none!important;
+  width:auto!important;
+  height:auto!important;
+  border-radius:0!important;
+  padding:0!important;
+}
+
+/* One connector only */
+#timeline::before{
+  content:""!important;
+  display:block!important;
+  position:absolute!important;
+  left:8.5%!important;
+  right:8.5%!important;
+  top:25px!important;
+  height:3px!important;
+  background:#687381!important;
+  border-radius:999px!important;
+  z-index:0!important;
+}
+#timeline::after{
+  content:none!important;
+  display:none!important;
+}
+
+/* Completed orange line segments behind the single row */
+#timeline .step.done:not(:first-child) .dm-step-dot::before,
+#timeline .step.current:not(:first-child) .dm-step-dot::before{
+  content:"";
+  position:absolute;
+  right:50%;
+  top:50%;
+  width:calc(100% + 70px);
+  height:3px;
+  transform:translateY(-50%);
+  background:#ff6b00;
+  z-index:-1;
+}
+
+/* Ensure exactly one circle per step */
+#timeline .dm-step-dot{
+  position:relative!important;
+  z-index:2!important;
+  width:50px!important;
+  height:50px!important;
+  border-radius:50%!important;
+  margin:0 auto 10px!important;
+  display:flex!important;
+  align-items:center!important;
+  justify-content:center!important;
+  box-sizing:border-box!important;
+}
+
+#timeline .step.done .dm-step-dot,
+#timeline .step.current .dm-step-dot{
+  background:#ff6b00!important;
+  color:#fff!important;
+}
+#timeline .step.pending .dm-step-dot{
+  background:#eef2f6!important;
+  color:#fff!important;
+}
+
+#timeline .step.current .dm-step-dot{
+  box-shadow:0 0 0 6px rgba(255,107,0,.22),
+             0 0 0 10px rgba(255,107,0,.08)!important;
+}
+
+/* Labels stay directly under the single circle row */
+#timeline .dm-step-label{
+  display:block!important;
+  margin-top:0!important;
+}
+#timeline .dm-step-state{
+  display:block!important;
+  margin-top:7px!important;
+}

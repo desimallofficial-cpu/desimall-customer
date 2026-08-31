@@ -56,6 +56,8 @@
     .ck-title i{color:var(--ck-orange)}
     .checkout-alert{padding:13px 15px;margin-bottom:16px;border:1px solid #fecaca;border-radius:11px;background:#fff1f2;color:#b91c1c;font-size:13px;font-weight:700}
     .checkout-alert.success{background:#ecfdf3;border-color:#bbf7d0;color:#15803d}
+.checkout-alert.warning{background:#fff7ed;border-color:#fdba74;color:#c2410c}
+html[data-theme="dark"] .checkout-alert.warning{background:rgba(234,88,12,.14);border-color:rgba(251,146,60,.32);color:#fdba74}
     html[data-theme="dark"] .checkout-alert{background:rgba(190,24,93,.14);border-color:rgba(251,113,133,.28);color:var(--ck-red)}
     .hidden{display:none!important}
     .ck-grid{display:grid;grid-template-columns:minmax(0,1.45fr) minmax(320px,.75fr);gap:22px;align-items:start}
@@ -318,6 +320,18 @@ html[data-theme="dark"] .coupon-chip{
 })();
 </script>
 
+
+<style id="razorpayCheckoutV106">
+.dm-pay-options{display:grid;gap:10px}
+.dm-pay-option{display:grid;grid-template-columns:auto auto 1fr auto;align-items:center;gap:12px;padding:14px;border:1px solid #32465f;border-radius:12px;background:var(--ck-card);cursor:pointer}
+.dm-pay-option.selected{border-color:#ff6500;box-shadow:0 0 0 2px rgba(255,101,0,.10)}
+.dm-pay-option input{accent-color:#ff6500}
+.dm-pay-option>i{width:34px;height:34px;border-radius:9px;background:rgba(255,101,0,.12);color:#ff6500;display:grid;place-items:center}
+.dm-pay-option strong{display:block;color:var(--ck-text)}
+.dm-pay-option span{display:block;margin-top:3px;color:var(--ck-muted);font-size:10px}
+.dm-pay-option>b{font-size:10px;color:#9fb2c8}
+</style>
+
 </head>
 <body>
 
@@ -409,8 +423,21 @@ html[data-theme="dark"] .coupon-chip{
           <div class="ck-head-title">
             <span class="ck-step">3</span>
             <div>
-              <h2>Payment Method</h2>
-              <p>Online payment will be enabled in a later phase.</p>
+              <h2>Payment Method</h2><div class="dm-pay-options" id="dmPaymentOptions">
+            <label class="dm-pay-option selected">
+              <input type="radio" name="paymentMethod" value="cod" checked>
+              <i class="fa-solid fa-money-bill-wave"></i>
+              <div><strong>Cash on Delivery</strong><span>Pay when your order is delivered.</span></div>
+              <b>COD</b>
+            </label>
+            <label class="dm-pay-option">
+              <input type="radio" name="paymentMethod" value="razorpay">
+              <i class="fa-solid fa-shield-halved"></i>
+              <div><strong>Pay Online</strong><span>UPI, QR, cards and supported payment methods via Razorpay.</span></div>
+              <b>Secure</b>
+            </label>
+          </div>
+              <p>Choose Cash on Delivery or secure online payment.</p>
             </div>
           </div>
         </header>
@@ -501,7 +528,8 @@ html[data-theme="dark"] .coupon-chip{
 <script src="../js/cart.js?v=1.0.2"></script>
 <script src="../js/coupons.js?v=1.0.2"></script>
 <script src="../js/product-image-resolver.js?v=1.0.2"></script>
-<script src="../js/checkout.js?v=1.0.2"></script>
+<script src="https://checkout.razorpay.com/v1/checkout.js"></script>
+<script src="../js/checkout.js?v=1.0.6"></script>
 <script src="../js/pwa.js?v=1.0.2"></script>
 <script src="../js/ui-preferences.js?v=1.0.2"></script>
 <script src="../js/analytics.js?v=1.0.2"></script>
