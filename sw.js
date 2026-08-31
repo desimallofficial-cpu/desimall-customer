@@ -1,4 +1,4 @@
-const CACHE_NAME = 'desimall-customer-clean-v1-0-3';
+const CACHE_NAME = 'desimall-customer-clean-v1-4-0';
 
 self.addEventListener('install', () => self.skipWaiting());
 

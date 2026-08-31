@@ -2,8 +2,8 @@
 
 <script id="dmCleanV1Bootstrap">
 (() => {
-  const RELEASE = '1.0.0';
-  window.DESIMALL_CUSTOMER_BUILD = 'clean-v1.0.1';
+  const RELEASE = '1.4.0';
+  window.DESIMALL_CUSTOMER_BUILD = 'v1.4.0-ui-polish';
 
   try {
     const key = 'desimall_customer_release';
@@ -21,6 +21,7 @@
   } catch (_) {}
 })();
 </script>
-
+  <link rel="stylesheet" href="../css/customer-unified-header.css?v=1.4.0">
 </head><body><main class="customer-return-shell"><header class="customer-return-header"><div><h1>My Return Requests</h1><p>Delivered Item में समस्या हो तो 7 दिन के भीतर वापसी दर्ज करें।</p></div><div class="customer-top-actions"><a href="my-orders.html"><i class="fa-solid fa-bag-shopping"></i> My Orders</a><a href="../index.html">Shop</a></div></header><div class="return-tabs"><button class="active" data-view="orders">Return-Eligible Orders</button><button data-view="returns">My Returns</button></div><section id="eligibleOrders"></section><section id="myReturns" hidden></section></main><div class="modal" id="returnModal"><div class="modal-box"><h2>Return Item अनुरोध</h2><form id="returnForm" class="return-form-grid"><input type="hidden" id="returnOrderId"><input type="hidden" id="returnProductId"><div class="field full"><label>Item</label><strong id="returnProductName"></strong></div><div class="field"><label>Reason</label><select id="returnReason" required><option value="">Select</option><option>Wrong item received</option><option>Item is damaged or defective</option><option>Incorrect size</option><option>Quality issue</option><option>Different from description</option><option>Other</option></select></div><div class="field"><label>Pickup Address</label><input id="returnPickupAddress" required></div><div class="field full"><label>Issue Description</label><textarea id="returnDescription" rows="5" required></textarea></div><div class="field full"><label>Photo (Optional)</label><input id="returnPhoto" type="file" accept="image/*"><div id="returnPhotoPreview"></div></div><div class="field"><button type="button" onclick="CustomerReturns.closeModal()">Close</button></div><div class="field"><button class="btn-primary">Submit Request</button></div></form></div></div><div id="returnToast" style="position:fixed;right:20px;bottom:20px;background:#fff2dc;color:#222;padding:14px 18px;border-radius:12px;display:none"></div><script src="../js/auth.js?v=1.0.2"></script><script src="../js/api.js?v=1.0.2"></script><script src="../js/customer-returns.js?v=1.0.2"></script>  <script src="../js/customer-footer.js?v=1.0.2"></script>
+  <script src="../js/customer-unified-header.js?v=1.4.0"></script>
 </body></html>

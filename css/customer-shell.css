@@ -88,3 +88,19 @@ html[data-theme="light"] .mobile-bottom-nav .active{color:var(--cs-orange)}
 @media(max-width:1050px){
   .compact-customer-action{display:none!important}
 }
+/* v1.3.1: keep all customer utility actions consistent; compact labels instead of hiding actions */
+@media(max-width:1050px){
+  .customer-header-main{grid-template-columns:auto minmax(180px,1fr) auto;gap:10px}
+  .customer-header-actions{gap:2px}
+  .customer-header-actions .customer-action{min-width:42px;padding:7px 5px}
+  .customer-header-actions .customer-action span{display:none}
+  .customer-header-actions .customer-action{display:flex!important}
+  .customer-header-actions .customer-theme-toggle{display:flex!important}
+}
+@media(max-width:760px){
+  .customer-header-main{grid-template-columns:auto 1fr;grid-template-rows:auto auto;}
+  .customer-header-actions{grid-column:1/-1;order:4;display:flex;overflow-x:auto;scrollbar-width:none;padding:2px 0 3px}
+  .customer-header-actions::-webkit-scrollbar{display:none}
+  .customer-header-actions .customer-action{flex:0 0 44px;min-width:44px}
+  .customer-search{position:static;grid-column:2;grid-row:1;display:flex!important}
+}

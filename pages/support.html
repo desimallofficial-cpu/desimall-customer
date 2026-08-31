@@ -158,8 +158,8 @@ button[type="submit"].send-btn,.send-btn{
 
 <script id="dmCleanV1Bootstrap">
 (() => {
-  const RELEASE = '1.0.0';
-  window.DESIMALL_CUSTOMER_BUILD = 'clean-v1.0.1';
+  const RELEASE = '1.4.0';
+  window.DESIMALL_CUSTOMER_BUILD = 'v1.4.0-ui-polish';
 
   try {
     const key = 'desimall_customer_release';
@@ -177,7 +177,7 @@ button[type="submit"].send-btn,.send-btn{
   } catch (_) {}
 })();
 </script>
-
+  <link rel="stylesheet" href="../css/customer-unified-header.css?v=1.4.0">
 </head><body>
 
 <header class="customer-support-header">
@@ -197,4 +197,5 @@ button[type="submit"].send-btn,.send-btn{
 </main>
 <div class="modal" id="customerTicketModal"><div class="modal-box support-modal"><div class="modal-head"><h2>New Support Ticket</h2><button class="close-btn" id="closeCustomerTicket">×</button></div><form id="customerTicketForm" class="cs-form"><select id="customerCategory" required><option value="">Select category</option><option>Order</option><option>Payment / Refund</option><option>Return</option><option>Delivery</option><option>Product</option><option>Account</option><option>Other</option></select><select id="customerPriority"><option>Low</option><option selected>Medium</option><option>High</option><option>Urgent</option></select><input id="customerOrderCode" placeholder="Order ID (optional)"><input id="customerReturnCode" placeholder="Return ID (optional)"><input id="customerSubject" maxlength="160" placeholder="Subject" required><textarea id="customerDescription" rows="6" maxlength="5000" placeholder="Describe the problem" required></textarea><button class="cs-btn primary">Submit Ticket</button></form></div></div>
 <script src="../js/api.js?v=1.0.2"></script><script src="../js/auth.js?v=1.0.2"></script><script src="../js/customer-support.js?v=1.0.2"></script>  <script src="../js/customer-footer.js?v=1.0.2"></script>
+  <script src="../js/customer-unified-header.js?v=1.4.0"></script>
 </body></html>
