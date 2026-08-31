@@ -35,7 +35,7 @@ const NotificationCenter = {
   async load() {
     const list = document.getElementById('notificationList');
     if (list) {
-      list.innerHTML = '<div class="empty-panel"><i class="fa-solid fa-spinner fa-spin"></i> Loading notifications...</div>';
+      list.innerHTML = '<div class="notification-empty"><i class="fa-solid fa-spinner fa-spin"></i><div>Loading notifications...</div></div>';
     }
 
     try {
@@ -44,7 +44,7 @@ const NotificationCenter = {
       this.render();
     } catch (error) {
       if (list) {
-        list.innerHTML = `<div class="empty-panel">${this.esc(error?.message || 'Could not load notifications.')}</div>`;
+        list.innerHTML = `<div class="notification-empty">${this.esc(error?.message || 'Could not load notifications.')}</div>`;
       }
     }
   },
@@ -79,7 +79,7 @@ const NotificationCenter = {
     if (!list) return;
 
     if (!this.items.length) {
-      list.innerHTML = '<div class="empty-panel"><i class="fa-regular fa-bell"></i><br>No notifications yet.</div>';
+      list.innerHTML = '<div class="notification-empty"><i class="fa-regular fa-bell"></i><div>No notifications yet.</div></div>';
       return;
     }
 
@@ -92,16 +92,13 @@ const NotificationCenter = {
     };
 
     list.innerHTML = this.items.map(n => `
-      <button type="button" class="list-row notification-row" data-id="${this.esc(n.id)}"
-        style="width:100%;text-align:left;opacity:${n.is_read ? .72 : 1};cursor:pointer">
-        <div style="display:flex;gap:13px;align-items:center">
-          <span class="stat-icon"><i class="fa-solid ${icons[n.type] || 'fa-bell'}"></i></span>
-          <div>
-            <strong>${this.esc(n.title || 'DesiMall update')}</strong>
-            <div class="muted">${this.esc(n.body || '')}</div>
-            <small class="muted">${n.created_at ? new Date(n.created_at).toLocaleString('en-IN') : ''}</small>
-          </div>
-        </div>
+      <button type="button" class="notification-item notification-row ${n.is_read ? '' : 'unread'}" data-id="${this.esc(n.id)}">
+        <span class="notification-icon"><i class="fa-solid ${icons[n.type] || 'fa-bell'}"></i></span>
+        <span class="notification-content">
+          <strong>${this.esc(n.title || 'DesiMall update')}</strong>
+          <p>${this.esc(n.body || '')}</p>
+          <small>${n.created_at ? new Date(n.created_at).toLocaleString('en-IN') : ''}</small>
+        </span>
         ${n.is_read ? '' : '<span class="status warn">New</span>'}
       </button>
     `).join('');
