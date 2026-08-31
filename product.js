@@ -161,7 +161,10 @@ const ProductDetailsApp={
     }));
 
     document.getElementById('btnTezOption')?.addEventListener('click',()=>location.href='tez.html');
-    document.getElementById('btnTryOnOption')?.addEventListener('click',()=>this.toast('Try-On rules and checkout will be enabled after final business approval.'));
+    document.getElementById('btnTryOnOption')?.addEventListener('click',()=>{
+      const id=this.state.product?.ProductID||this.state.product?.ID||this.state.product?.id||'';
+      location.href=`try-on.html${id?`?product=${encodeURIComponent(id)}`:''}`;
+    });
   },
 
   setQty(q){

@@ -69,6 +69,18 @@
       location.href = 'pages/tez.html';
       return;
     }
+    if (key === 'food') {
+      location.href = 'pages/food.html';
+      return;
+    }
+    if (key === 'services') {
+      location.href = 'pages/services.html';
+      return;
+    }
+    if (key === 'tryon') {
+      location.href = 'pages/try-on.html';
+      return;
+    }
     const data = SERVICES[key];
     if (!data) return;
     const back = document.getElementById('moduleSheetBackdrop');

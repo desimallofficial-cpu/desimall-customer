@@ -19,6 +19,7 @@ const CheckoutApp = {
   tezStatus: null,
   mixedFulfillment: false,
   busy: false,
+  paymentMethod: 'cod',
 
   money(value) {
     return `₹${Number(value || 0).toLocaleString('en-IN', {
@@ -61,6 +62,9 @@ const CheckoutApp = {
       return;
     }
 
+    // Never carry an old Razorpay/checkout error into a fresh checkout view.
+    this.clearAlert();
+
     this.cart = CartManager
       .getCart()
       .map(item => CartManager.normalize(item))
@@ -72,18 +76,24 @@ const CheckoutApp = {
     }
 
     const modes = new Set(
-      this.cart.map(item =>
-        item.IsTez ||
-        String(item.FulfilmentMode || item.FulfillmentMode || '').toLowerCase() === 'tez'
-          ? 'tez'
-          : 'marketplace'
-      )
+      this.cart.map(item => {
+        const mode = String(
+          item.FulfilmentMode ||
+          item.FulfillmentMode ||
+          (item.IsFood ? 'food' : (item.IsTez ? 'tez' : 'marketplace'))
+        ).toLowerCase();
+
+        if (mode === 'food' || item.IsFood) return 'food';
+        if (mode === 'tez' || item.IsTez) return 'tez';
+        return 'marketplace';
+      })
     );
 
     this.mixedFulfillment = modes.size > 1;
-    this.fulfillmentMode = modes.size === 1 && modes.has('tez')
-      ? 'tez'
-      : 'marketplace';
+    this.fulfillmentMode =
+      modes.size === 1 && modes.has('food') ? 'food' :
+      modes.size === 1 && modes.has('tez') ? 'tez' :
+      'marketplace';
 
     const firstTez = this.cart.find(item =>
       item.IsTez ||
@@ -98,7 +108,7 @@ const CheckoutApp = {
 
     if (this.mixedFulfillment) {
       this.showAlert(
-        'Your cart contains both Tez and standard items. For now they must be placed separately. Remove one delivery group before checkout.'
+        'Your cart contains items from different delivery services. Marketplace, Tez and Food orders must be placed separately.'
       );
     }
 
@@ -125,6 +135,15 @@ const CheckoutApp = {
         0,
         Number(firstTez?.TezDeliveryFee || 0)
       );
+      return;
+    }
+
+    if (this.fulfillmentMode === 'food') {
+      const firstFood = this.cart.find(item =>
+        item.IsFood ||
+        String(item.FulfilmentMode || item.FulfillmentMode || '').toLowerCase() === 'food'
+      );
+      this.deliveryFee = Math.max(0, Number(firstFood?.FoodDeliveryFee || 0));
       return;
     }
 
@@ -162,6 +181,16 @@ const CheckoutApp = {
         }
       }
     );
+    document.querySelectorAll('input[name="paymentMethod"]').forEach(input => {
+      input.addEventListener('change', () => {
+        this.clearAlert();
+        this.paymentMethod = input.checked ? input.value : this.paymentMethod;
+        document.querySelectorAll('.dm-pay-option').forEach(label => {
+          label.classList.toggle('selected', Boolean(label.querySelector('input')?.checked));
+        });
+        this.renderTotals();
+      });
+    });
   },
 
   renderItems() {
@@ -305,7 +334,9 @@ const CheckoutApp = {
 
     const placeButton = document.getElementById('btnPlaceOrder');
     if (placeButton && !this.busy) {
-      placeButton.innerHTML = `<i class="fa-solid fa-lock"></i> Place Order ${this.money(totals.total)}`;
+      placeButton.innerHTML = this.paymentMethod === 'razorpay'
+        ? `<i class="fa-solid fa-shield-halved"></i> Pay ${this.money(totals.total)}`
+        : `<i class="fa-solid fa-lock"></i> Place Order ${this.money(totals.total)}`;
     }
 
     document
@@ -532,6 +563,7 @@ const CheckoutApp = {
 
   applyFulfillmentCopy(zone = null) {
     const isTez = this.fulfillmentMode === 'tez';
+    const isFood = this.fulfillmentMode === 'food';
 
     const cards = [...document.querySelectorAll('.ck-card')];
     const deliveryCard = cards.find(card =>
@@ -605,6 +637,28 @@ const CheckoutApp = {
         optionIcon.classList.remove('fa-truck', 'fa-truck-fast');
         optionIcon.classList.add('fa-bolt');
       }
+    } else if (isFood) {
+      const firstFood = this.cart.find(item =>
+        item.IsFood ||
+        String(item.FulfilmentMode || item.FulfillmentMode || '').toLowerCase() === 'food'
+      );
+      const restaurant = firstFood?.SellerName || firstFood?.ShopName || 'Restaurant';
+      const fee = Math.max(0, Number(firstFood?.FoodDeliveryFee || this.deliveryFee || 0));
+
+      if (heading) heading.textContent = 'Food Delivery';
+      if (subheading) {
+        subheading.textContent = `Freshly prepared by ${restaurant} and delivered by DesiMall.`;
+      }
+      if (optionTitle) optionTitle.textContent = 'Restaurant Delivery';
+      if (optionDesc) {
+        optionDesc.textContent = fee > 0
+          ? `${this.money(fee)} restaurant delivery fee for this order.`
+          : 'Free restaurant delivery for this order.';
+      }
+      if (optionIcon) {
+        optionIcon.classList.remove('fa-bolt','fa-truck','fa-truck-fast');
+        optionIcon.classList.add('fa-utensils');
+      }
     } else {
       if (heading) heading.textContent = 'Delivery Method';
 
@@ -621,7 +675,7 @@ const CheckoutApp = {
       }
 
       if (optionIcon) {
-        optionIcon.classList.remove('fa-bolt');
+        optionIcon.classList.remove('fa-bolt','fa-utensils');
         optionIcon.classList.add('fa-truck');
       }
     }
@@ -683,6 +737,13 @@ const CheckoutApp = {
       behavior: 'smooth',
       block: 'center'
     });
+  },
+
+  clearAlert() {
+    const alertBox = document.getElementById('checkoutAlert');
+    if (!alertBox) return;
+    alertBox.textContent = '';
+    alertBox.className = 'checkout-alert hidden';
   },
 
   validAddressGps(address) {
@@ -783,6 +844,8 @@ const CheckoutApp = {
   async placeOrder() {
     if (this.busy) return;
 
+    this.clearAlert();
+
     const user = this.getUser();
 
     if (!user?.UserID || !DesiMallAuth?.getAccessToken?.()) {
@@ -809,7 +872,7 @@ const CheckoutApp = {
 
     if (this.mixedFulfillment) {
       this.showAlert(
-        'Tez and standard items must be placed separately in this phase. Please remove one delivery group before checkout.'
+        'Marketplace, Tez and Food items must be placed separately. Please keep only one delivery service in this checkout.'
       );
       return;
     }
@@ -828,7 +891,7 @@ const CheckoutApp = {
     try {
       const result = await DesiMallAPI.placeOrder({
         delivery_address_id: this.selectedAddressId,
-        payment_method: 'cod',
+        payment_method: this.paymentMethod,
         coupon_code: this.coupon?.code || '',
         client_request_id: clientRequestId,
         fulfillment_mode: this.fulfillmentMode,
@@ -843,6 +906,34 @@ const CheckoutApp = {
       }
 
       const order = result.order;
+
+      if (this.paymentMethod === 'razorpay') {
+        const paymentResult = await this.payWithRazorpay(order, user);
+
+        if (paymentResult?.state === 'paid' || paymentResult?.success) {
+          this.clearAlert();
+          order.PaymentStatus = 'paid';
+          order.payment_status = 'paid';
+        } else if (paymentResult?.state === 'cancelled') {
+          throw new Error(
+            paymentResult?.message ||
+            'Payment was not captured. The unpaid order has been cancelled.'
+          );
+        } else if (paymentResult?.state === 'pending') {
+          this.showAlert(
+            paymentResult?.message ||
+            'Payment verification is pending. Please do not pay again for this order.',
+            'warning'
+          );
+          return;
+        } else {
+          throw new Error(
+            paymentResult?.message ||
+            'Online payment was not completed.'
+          );
+        }
+      }
+
       const selectedAddress = this.addresses.find(
         a => String(a.AddressID || a.id) === String(this.selectedAddressId)
       );
@@ -918,6 +1009,185 @@ const CheckoutApp = {
     } finally {
       this.setBusy(false);
     }
+  },
+
+
+  async payWithRazorpay(order, user) {
+    if (typeof Razorpay === 'undefined') {
+      return {
+        success:false,
+        state:'pending',
+        message:'Razorpay Checkout could not load. Payment has not been confirmed.'
+      };
+    }
+
+    const internalId = order.OrderID || order.id;
+    const rz = await DesiMallAPI.createRazorpayOrder(internalId);
+
+    if (!rz?.success || !rz?.razorpayOrderId || !rz?.keyId) {
+      return {
+        success:false,
+        state:'pending',
+        message:rz?.message || 'Could not start online payment.'
+      };
+    }
+
+    const reconcile = async (paymentId = '', immediateFinal = false) => {
+      const delays = immediateFinal ? [0, 1800, 3500] : [700, 2200, 4500];
+
+      for (let i = 0; i < delays.length; i += 1) {
+        if (delays[i]) {
+          await new Promise(resolve => setTimeout(resolve, delays[i]));
+        }
+
+        const finalCheck = i === delays.length - 1;
+
+        try {
+          const result = await DesiMallAPI.reconcileRazorpayPayment({
+            order_id: internalId,
+            razorpay_order_id: rz.razorpayOrderId,
+            razorpay_payment_id: paymentId || '',
+            finalize: finalCheck
+          });
+
+          if (result?.state === 'paid') {
+            this.clearAlert();
+            return {
+              success:true,
+              state:'paid',
+              verified:true,
+              reconciliation:result
+            };
+          }
+
+          if (result?.state === 'cancelled') {
+            return {
+              success:false,
+              state:'cancelled',
+              message:
+                result?.message ||
+                'Payment was not captured. The unpaid order has been cancelled.',
+              reconciliation:result
+            };
+          }
+
+          if (!finalCheck) {
+            this.showAlert(
+              'Payment status pending. DesiMall is verifying with Razorpay…',
+              'warning'
+            );
+          } else {
+            return {
+              success:false,
+              state:'pending',
+              message:
+                result?.message ||
+                'Payment verification is still pending. Please do not retry payment.',
+              reconciliation:result
+            };
+          }
+        } catch (error) {
+          if (finalCheck) {
+            return {
+              success:false,
+              state:'pending',
+              message:
+                error?.message ||
+                'Payment verification could not be completed. Please do not retry yet.'
+            };
+          }
+        }
+      }
+
+      return {
+        success:false,
+        state:'pending',
+        message:'Payment verification is pending.'
+      };
+    };
+
+    return await new Promise(resolve => {
+      let completed = false;
+
+      const finish = value => {
+        if (completed) return;
+        completed = true;
+        resolve(value);
+      };
+
+      const options = {
+        key: rz.keyId,
+        amount: rz.amount,
+        currency: rz.currency || 'INR',
+        name: 'DesiMall',
+        description: `Order ${rz.orderCode || ''}`,
+        order_id: rz.razorpayOrderId,
+        prefill: {
+          name: user.FullName || user.Name || '',
+          email: user.Email || '',
+          contact: user.Mobile || user.Phone || ''
+        },
+        theme: { color: '#ff6500' },
+
+        handler: async response => {
+          try {
+            const verified = await DesiMallAPI.verifyRazorpayPayment({
+              order_id: internalId,
+              razorpay_order_id: response.razorpay_order_id,
+              razorpay_payment_id: response.razorpay_payment_id,
+              razorpay_signature: response.razorpay_signature
+            });
+
+            if (verified?.success && verified?.verified) {
+              this.clearAlert();
+              finish({
+                success:true,
+                state:'paid',
+                verified
+              });
+              return;
+            }
+
+            finish(
+              await reconcile(response.razorpay_payment_id || '', false)
+            );
+          } catch (_) {
+            finish(
+              await reconcile(response.razorpay_payment_id || '', false)
+            );
+          }
+        },
+
+        modal: {
+          ondismiss: async () => {
+            this.showAlert(
+              'Payment status pending. DesiMall is checking whether any money was captured…',
+              'warning'
+            );
+            finish(await reconcile('', true));
+          }
+        }
+      };
+
+      const instance = new Razorpay(options);
+
+      instance.on('payment.failed', async response => {
+        const paymentId =
+          response?.error?.metadata?.payment_id ||
+          response?.error?.metadata?.paymentId ||
+          '';
+
+        this.showAlert(
+          'Payment failed in Checkout. Verifying with Razorpay before cancelling the order…',
+          'warning'
+        );
+
+        finish(await reconcile(paymentId, true));
+      });
+
+      this.clearAlert();
+      instance.open();
+    });
   },
 
   customerStatus(status) {

@@ -65,6 +65,10 @@ const CustomerOrders = {
       };
     });
 
+    document.getElementById('orderSort')?.addEventListener('change', () => {
+      this.render();
+    });
+
     closeReturnModal.onclick = () => this.closeReturn();
     returnModal.onclick = e => {
       if (e.target === returnModal) this.closeReturn();
@@ -122,16 +126,207 @@ const CustomerOrders = {
     return this.customerStatus(order.Status || order.status);
   },
 
+  returnWindow(order) {
+    const status = this.normalizedStatus(order);
+    const deliveredRaw =
+      order.DeliveredAt ||
+      order.delivered_at ||
+      '';
+
+    const explicitEnd =
+      order.ReturnWindowEndsAt ||
+      order.return_window_ends_at ||
+      '';
+
+    const deliveredAt = deliveredRaw ? new Date(deliveredRaw) : null;
+    const endAt = explicitEnd
+      ? new Date(explicitEnd)
+      : deliveredAt && Number.isFinite(deliveredAt.getTime())
+        ? new Date(deliveredAt.getTime() + (7 * 24 * 60 * 60 * 1000))
+        : null;
+
+    const validEnd = endAt && Number.isFinite(endAt.getTime());
+
+    if (status !== 'Delivered' || !validEnd) {
+      return {
+        eligible:false,
+        active:false,
+        expired:false,
+        endAt:null
+      };
+    }
+
+    const now = Date.now();
+    const active = now <= endAt.getTime();
+
+    return {
+      eligible:true,
+      active,
+      expired:!active,
+      endAt
+    };
+  },
+
+  paymentExperience(order) {
+    const paymentMethod = String(
+      order.PaymentMethod || order.payment_method || 'cod'
+    ).toLowerCase();
+    const paymentStatus = String(
+      order.PaymentStatus || order.payment_status || 'pending'
+    ).toLowerCase();
+    const attemptStatus = String(
+      order.PaymentAttemptStatus || order.payment_attempt_status || ''
+    ).toLowerCase();
+    const refundStatus = String(
+      order.RefundStatus || order.refund_status || 'none'
+    ).toLowerCase();
+    const rawOrderStatus = String(order.Status || order.status || '').toLowerCase();
+    const normalOrderStatus = this.normalizedStatus(order);
+    const refundAmount = Number(order.RefundAmount || order.refund_amount || 0);
+
+    const isRazorpay = paymentMethod === 'razorpay';
+    const isCancelled = ['cancelled','rejected'].includes(rawOrderStatus);
+    const isPaid = paymentStatus === 'paid';
+    const isPaymentFailed =
+      isRazorpay && !isPaid && attemptStatus === 'failed';
+    const isPaymentPending =
+      isRazorpay && !isPaid && !isCancelled && !isPaymentFailed;
+
+    if (isPaymentFailed) {
+      return {
+        kind:'not-placed',
+        orderLabel:'Order Not Placed',
+        paymentLabel:'Payment Failed',
+        note:
+          'Payment was not successful. If any amount was deducted, DesiMall will verify it with Razorpay before you are asked to pay again.',
+        canTrack:false,
+        canCancel:false,
+        buyAgain:true
+      };
+    }
+
+    if (isPaymentPending) {
+      return {
+        kind:'payment-pending',
+        orderLabel:'Payment Verification Pending',
+        paymentLabel:'Pending',
+        note:
+          'We are checking the payment with Razorpay. Please do not make another payment for this order until verification finishes.',
+        canTrack:false,
+        canCancel:false,
+        buyAgain:false
+      };
+    }
+
+    if (isPaid && isCancelled) {
+      if (['refunded','processed'].includes(refundStatus)) {
+        return {
+          kind:'refund-completed',
+          orderLabel:'Refund Completed',
+          paymentLabel: refundAmount > 0
+            ? `Refunded ${this.money(refundAmount)}`
+            : 'Refund Completed',
+          note:'Your cancelled order payment has been refunded.',
+          canTrack:false,
+          canCancel:false,
+          buyAgain:true
+        };
+      }
+
+      if (['failed','manual_required'].includes(refundStatus)) {
+        return {
+          kind:'refund-attention',
+          orderLabel:'Order Cancelled · Refund Pending',
+          paymentLabel:'Refund Needs Attention',
+          note:
+            'Your order is cancelled and the payment was captured. The refund needs attention from DesiMall support.',
+          canTrack:false,
+          canCancel:false,
+          buyAgain:true
+        };
+      }
+
+      return {
+        kind:'refund-pending',
+        orderLabel:'Order Cancelled · Refund Pending',
+        paymentLabel:'Refund Pending',
+        note:
+          'Your order is cancelled. The paid amount is being processed for refund.',
+        canTrack:false,
+        canCancel:false,
+        buyAgain:true
+      };
+    }
+
+    if (isPaid) {
+      return {
+        kind:'paid',
+        orderLabel:normalOrderStatus,
+        paymentLabel:'Paid',
+        note:'',
+        canTrack:!['Delivered','Cancelled'].includes(normalOrderStatus),
+        canCancel:!['Delivered','Cancelled'].includes(normalOrderStatus),
+        buyAgain:normalOrderStatus === 'Delivered'
+      };
+    }
+
+    if (isRazorpay && isCancelled) {
+      return {
+        kind:'not-placed',
+        orderLabel:'Order Not Placed',
+        paymentLabel:'Not Paid',
+        note:'No successful payment was confirmed for this order.',
+        canTrack:false,
+        canCancel:false,
+        buyAgain:true
+      };
+    }
+
+    return {
+      kind:'normal',
+      orderLabel:normalOrderStatus,
+      paymentLabel:paymentMethod === 'cod' ? 'Cash on Delivery' : paymentStatus,
+      note:'',
+      canTrack:!['Delivered','Cancelled'].includes(normalOrderStatus),
+      canCancel:!['Delivered','Cancelled'].includes(normalOrderStatus),
+      buyAgain:normalOrderStatus === 'Delivered'
+    };
+  },
+
   filteredOrders() {
-    return this.orders.filter(order => {
+    const rows = this.orders.filter(order => {
       const status = this.normalizedStatus(order).toLowerCase();
+      const paymentUx = this.paymentExperience(order);
 
       if (this.filter === 'all') return true;
       if (this.filter === 'delivered') return status === 'delivered';
-      if (this.filter === 'cancelled') return status === 'cancelled';
-      if (this.filter === 'active') return !['delivered','cancelled'].includes(status);
+      if (this.filter === 'cancelled') {
+        return [
+          'not-placed','refund-pending','refund-completed','refund-attention'
+        ].includes(paymentUx.kind) || status === 'cancelled';
+      }
+      if (this.filter === 'active') {
+        return ![
+          'not-placed','refund-pending','refund-completed','refund-attention'
+        ].includes(paymentUx.kind) &&
+          !['delivered','cancelled'].includes(status);
+      }
 
       return true;
+    });
+
+    const sort = String(document.getElementById('orderSort')?.value || 'newest');
+
+    return [...rows].sort((a, b) => {
+      const aDate = new Date(a.CreatedAt || a.created_at || 0).getTime() || 0;
+      const bDate = new Date(b.CreatedAt || b.created_at || 0).getTime() || 0;
+      const aTotal = Number(a.TotalAmount ?? a.total_amount ?? 0);
+      const bTotal = Number(b.TotalAmount ?? b.total_amount ?? 0);
+
+      if (sort === 'oldest') return aDate - bDate;
+      if (sort === 'high') return bTotal - aTotal;
+      if (sort === 'low') return aTotal - bTotal;
+      return bDate - aDate;
     });
   },
 
@@ -154,7 +349,16 @@ const CustomerOrders = {
 
     set('sumTotal', this.orders.length);
     set('sumDelivered', this.orders.filter(o => this.normalizedStatus(o) === 'Delivered').length);
-    set('sumActive', this.orders.filter(o => !['Delivered','Cancelled'].includes(this.normalizedStatus(o))).length);
+    set('sumCancelled', this.orders.filter(o => {
+      const ux = this.paymentExperience(o);
+      return ['Cancelled','Rejected'].includes(this.normalizedStatus(o)) ||
+        ['not-placed','refund-pending','refund-completed','refund-attention'].includes(ux.kind);
+    }).length);
+    set('sumActive', this.orders.filter(o => {
+      const ux = this.paymentExperience(o);
+      return !['Delivered','Cancelled'].includes(this.normalizedStatus(o)) &&
+        !['not-placed','refund-pending','refund-completed','refund-attention'].includes(ux.kind);
+    }).length);
 
     const rows = this.filteredOrders();
     const container = document.getElementById('ordersContainer');
@@ -177,93 +381,160 @@ const CustomerOrders = {
   card(order) {
     const code = order.OrderCode || order.order_code || order.OrderID || order.id || '—';
     const status = this.normalizedStatus(order);
+    const paymentUx = this.paymentExperience(order);
+    const displayStatus = paymentUx.orderLabel;
     const dateValue = order.CreatedAt || order.created_at || '';
     const date = dateValue ? new Date(dateValue).toLocaleString('en-IN', {
-      day:'2-digit',month:'short',year:'numeric',hour:'2-digit',minute:'2-digit'
+      day:'2-digit', month:'short', year:'numeric', hour:'2-digit', minute:'2-digit'
     }) : '';
 
     const total = Number(order.TotalAmount ?? order.total_amount ?? 0);
     const items = Array.isArray(order.Items) ? order.Items : [];
-    const showTrack = !['Delivered','Cancelled'].includes(status);
-    const delivered = status === 'Delivered';
+    const firstItem = items[0] || {};
+    const extraItems = Math.max(0, items.length - 1);
+    const qty = Number(firstItem.Qty || firstItem.qty || 0);
+    const image = window.ProductImageResolver
+      ? ProductImageResolver.resolve(firstItem, { fallback: '../assets/products/noimage.jpg' })
+      : String(firstItem.ImageURL || firstItem.image_url || firstItem.ProductImage || '../assets/products/noimage.jpg');
 
-    // Use the customer-facing normalized status for button visibility.
-    // The backend remains the final authority and will reject cancellation
-    // if pickup/delivery has already started.
-    // Always show Cancel Order for any active order.
-    // Backend is the final authority and blocks cancellation after pickup/delivery starts.
-    const canCancel = !['Delivered','Cancelled'].includes(status);
+    const delivered = status === 'Delivered';
+    const returnWindow = this.returnWindow(order);
+    const internalId = order.OrderID || order.id || '';
+    const showTrack = Boolean(paymentUx.canTrack);
+    const canCancel = Boolean(paymentUx.canCancel);
+
+    const railKind = paymentUx.kind === 'not-placed'
+      ? 'failed'
+      : paymentUx.kind === 'payment-pending'
+        ? 'pending'
+        : delivered
+          ? 'delivered'
+          : 'active';
+
+    const railIcon = railKind === 'failed'
+      ? 'fa-solid fa-circle-xmark'
+      : railKind === 'pending'
+        ? 'fa-solid fa-clock'
+        : railKind === 'delivered'
+          ? 'fa-solid fa-circle-check'
+          : 'fa-solid fa-truck-fast';
 
     return `
-      <article class="mo-order">
-        <header class="mo-order-head">
-          <div>
-            <small>ORDER</small>
-            <h2>${this.esc(code)}</h2>
-            <span>${this.esc(date)}</span>
-          </div>
-          <div class="mo-order-overview">
-            ${order.IsTez || String(order.FulfillmentMode||order.fulfillment_mode||'').toLowerCase()==='tez'
-              ? '<span class="mo-tez-badge"><i class="fa-solid fa-bolt"></i> Tez</span>'
-              : ''}
-            <span class="mo-order-count">${items.length} ${items.length === 1 ? 'item' : 'items'}</span>
-            <span class="mo-status ${this.statusClass(status)}">${this.esc(status)}</span>
-          </div>
-        </header>
+      <article class="mo-order mo-order-timeline">
+        <div class="mo-rail-node ${railKind}"><i class="${railIcon}"></i></div>
 
-        <div class="mo-items">
-          ${items.length
-            ? items.slice(0,3).map(item => this.item(item, order, status)).join('')
-            : '<div class="mo-no-items">Order item details are unavailable.</div>'
-          }
-          ${items.length > 3 ? `<div class="mo-no-items">+ ${items.length-3} more item${items.length-3===1?'':'s'}</div>` : ''}
-        </div>
+        <div class="mo-order-grid">
+          <section class="mo-id-block">
+            <small>ORDER ID</small>
+            <h3>${this.esc(code)}</h3>
+            <span><i class="fa-regular fa-calendar"></i> ${this.esc(date)}</span>
+            <b class="mo-mini-badge ${this.statusClass(displayStatus, paymentUx.kind)}">${this.esc(displayStatus)}</b>
+          </section>
 
-        ${items.length > 1 ? `
-          <div class="mo-customer-note">
-            <i class="fa-solid fa-circle-info"></i>
-            Items may be fulfilled by different sellers and can arrive separately. This remains one DesiMall order for you.
-          </div>
-        ` : ''}
+          <section class="mo-product-block">
+            <div class="mo-product-thumb">
+              <img src="${this.esc(image)}"
+                alt="${this.esc(firstItem.ProductName || firstItem.product_name || 'Product')}"
+                onerror="this.src='../assets/products/noimage.jpg'">
+            </div>
+            <div class="mo-product-copy">
+              <strong>${this.esc(firstItem.ProductName || firstItem.product_name || 'Order item')}</strong>
+              <span>Qty: ${qty}${extraItems ? ` · +${extraItems} more` : ''}</span>
+              <b>${this.money(total)}</b>
+            </div>
+          </section>
 
-        <footer class="mo-order-foot">
-          <div>
-            <span>Payment</span>
+          <section class="mo-payment-block">
+            <small>Payment Method</small>
             <strong>${this.esc(String(order.PaymentMethod || order.payment_method || 'COD').toUpperCase())}</strong>
-          </div>
+            <small>Payment Status</small>
+            <b class="mo-inline-state ${this.statusClass(displayStatus, paymentUx.kind)}">${this.esc(paymentUx.paymentLabel)}</b>
+          </section>
 
-          <div>
-            <span>Status</span>
-            <strong>${this.esc(status)}</strong>
-          </div>
+          <section class="mo-status-block">
+            <small>Order Status</small>
+            <b class="mo-inline-state ${this.statusClass(displayStatus, paymentUx.kind)}">${this.esc(displayStatus)}</b>
+            ${delivered && order.DeliveredAt ? `
+              <span>Delivered on<br>${this.esc(new Date(order.DeliveredAt).toLocaleString('en-IN', {
+                day:'2-digit', month:'short', year:'numeric', hour:'2-digit', minute:'2-digit'
+              }))}</span>
+            ` : ''}
+          </section>
 
-          <div class="mo-total">
-            <span>Total</span>
-            <strong>${this.money(total)}</strong>
-          </div>
+          <section class="mo-actions-block">
+            <span>${items.length} ${items.length === 1 ? 'item' : 'items'}</span>
 
-          <div class="mo-order-actions">
             ${showTrack ? `
-              <a class="mo-track" href="track-order.html?order=${encodeURIComponent(code)}">
+              <a class="mo-action-btn primary" href="track-order.html?order=${encodeURIComponent(code)}">
                 <i class="fa-solid fa-location-dot"></i> Track Order
               </a>
             ` : ''}
+
             ${canCancel ? `
-              <button type="button" class="mo-cancel-order"
-                onclick="CustomerOrders.openCancelOrder('${this.esc(order.OrderID || order.id || '')}','${this.esc(code)}')">
+              <button type="button" class="mo-action-btn danger"
+                onclick="CustomerOrders.openCancelOrder('${this.esc(internalId)}','${this.esc(code)}')">
                 <i class="fa-solid fa-xmark"></i> Cancel Order
               </button>
             ` : ''}
-            ${delivered ? `
-              <a class="mo-buy-again" href="../index.html">
+
+            ${delivered && returnWindow.active ? `
+              <a class="mo-action-btn success" href="returns.html">
+                <i class="fa-solid fa-rotate-left"></i> Return / Replace
+              </a>
+            ` : ''}
+
+            ${delivered && returnWindow.expired ? `
+              <a class="mo-action-btn invoice" href="invoice.html?id=${encodeURIComponent(internalId)}">
+                <i class="fa-solid fa-download"></i> Download Invoice
+              </a>
+            ` : ''}
+
+            ${paymentUx.buyAgain ? `
+              <a class="mo-action-btn" href="../index.html">
                 <i class="fa-solid fa-rotate-right"></i> Buy Again
               </a>
             ` : ''}
-            <a class="mo-help" href="support.html">
-              <i class="fa-solid fa-headset"></i> ${delivered ? 'Return / Help' : 'Get Help'}
+
+            <a class="mo-action-btn help" href="support.html">
+              <i class="fa-solid fa-headset"></i> ${
+                ['refund-attention','not-placed'].includes(paymentUx.kind)
+                  ? 'Payment Help'
+                  : delivered
+                    ? 'View Details'
+                    : 'Get Help'
+              }
             </a>
+          </section>
+        </div>
+
+        ${delivered && returnWindow.active ? `
+          <div class="mo-order-note success-note">
+            <i class="fa-solid fa-circle-info"></i>
+            Return / replacement available until ${
+              returnWindow.endAt.toLocaleDateString('en-IN', {
+                day:'2-digit', month:'short', year:'numeric'
+              })
+            }.
           </div>
-        </footer>
+        ` : ''}
+
+        ${delivered && returnWindow.expired ? `
+          <div class="mo-order-note invoice-note">
+            <i class="fa-solid fa-circle-info"></i>
+            Return window has ended. Invoice is now available for download.
+          </div>
+        ` : ''}
+
+        ${paymentUx.note ? `
+          <div class="mo-order-note ${this.esc(paymentUx.kind)}">
+            <i class="${paymentUx.kind === 'payment-pending'
+              ? 'fa-solid fa-arrows-rotate'
+              : paymentUx.kind === 'refund-completed'
+                ? 'fa-solid fa-circle-check'
+                : 'fa-solid fa-circle-exclamation'}"></i>
+            ${this.esc(paymentUx.note)}
+          </div>
+        ` : ''}
       </article>
     `;
   },
@@ -434,7 +705,11 @@ const CustomerOrders = {
     }
   },
 
-  statusClass(status) {
+  statusClass(status, kind = '') {
+    if (kind === 'not-placed' || kind === 'refund-attention') return 'cancelled';
+    if (kind === 'refund-completed') return 'delivered';
+    if (kind === 'payment-pending' || kind === 'refund-pending') return 'pending-payment';
+
     const value = String(status || '').toLowerCase();
     if (value === 'delivered') return 'delivered';
     if (value === 'cancelled') return 'cancelled';
@@ -454,6 +729,11 @@ const CustomerOrders = {
         OrderDate: order.CreatedAt || order.created_at || '',
         TotalAmount: Number(order.TotalAmount || order.total_amount || 0),
         PaymentMode: order.PaymentMethod || order.payment_method || 'cod',
+        PaymentStatus: order.PaymentStatus || order.payment_status || 'pending',
+        PaymentAttemptStatus: order.PaymentAttemptStatus || order.payment_attempt_status || '',
+        PaymentFailureReason: order.PaymentFailureReason || order.payment_failure_reason || '',
+        RefundStatus: order.RefundStatus || order.refund_status || 'none',
+        RefundAmount: Number(order.RefundAmount || order.refund_amount || 0),
         DeliveryAddress: order.DeliveryAddress || '',
         Items: order.Items || []
       };

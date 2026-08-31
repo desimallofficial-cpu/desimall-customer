@@ -120,7 +120,14 @@ const TrackingClean = {
     state?.classList.remove('hidden');
 
     const id = order.OrderID || order.order_id || this.orderId;
-    const status = String(order.Status || order.status || data?.status || 'Placed');
+    const rawOrderStatus = String(order.Status || order.status || 'Placed');
+    const resolvedTimelineStatus = String(
+      data?.status ||
+      data?.Status ||
+      this.resolveTimelineStatus(data) ||
+      rawOrderStatus
+    );
+    const status = resolvedTimelineStatus;
     const modeRaw = String(order.FulfillmentMode || order.fulfillment_mode || data?.fulfillmentMode || data?.mode || 'desimall').toLowerCase();
     const mode = this.modeLabel(modeRaw);
 
@@ -159,9 +166,9 @@ const TrackingClean = {
       return;
     }
 
-    btn.disabled = true;
+    if (btn) btn.disabled = true;
     if (msg) msg.textContent = 'Getting precise location…';
-    box?.classList.remove('ok','error');
+    box?.classList.remove('ok', 'error');
 
     try {
       const pos = await new Promise((resolve, reject) => {
@@ -191,7 +198,7 @@ const TrackingClean = {
         }
       );
 
-      if (msg) msg.textContent = 'Exact delivery GPS saved. Reloading live tracking…';
+      if (msg) msg.textContent = 'Exact delivery GPS saved. Loading live route…';
       box?.classList.add('ok');
 
       await this.track(this.orderId);
@@ -203,8 +210,164 @@ const TrackingClean = {
       if (msg) msg.textContent = message;
       box?.classList.add('error');
     } finally {
-      btn.disabled = false;
+      if (btn) btn.disabled = false;
     }
+  },
+
+
+
+  ensureTimelineClasses() {
+    const wanted = [
+      'Order placed',
+      'Seller accepted',
+      'Preparing',
+      'Picked up',
+      'On the way',
+      'Delivered'
+    ];
+
+    wanted.forEach(label => {
+      const all = [...document.querySelectorAll('div,li')];
+      const host = all.find(el => {
+        if (el.classList.contains('timeline-step')) return false;
+        const txt = (el.textContent || '').trim();
+        return txt.startsWith(label) && el.children.length <= 4;
+      });
+      if (host) host.classList.add('timeline-step');
+    });
+  },
+
+
+  resolveTimelineStatus(data) {
+    // Exact backend tracking response confirmed in DevTools:
+    // data.status = "out_for_delivery"
+    const exactTopLevelStatus = data?.status ?? data?.Status;
+
+    if (exactTopLevelStatus) {
+      return exactTopLevelStatus;
+    }
+
+    const candidates = [
+      data?.riderStatus,
+      data?.RiderStatus,
+      data?.deliveryStatus,
+      data?.DeliveryStatus,
+      data?.fulfillmentStatus,
+      data?.FulfillmentStatus,
+      data?.trackingStatus,
+      data?.TrackingStatus,
+      data?.orderStatus,
+      data?.OrderStatus,
+      data?.order?.rider_status,
+      data?.order?.delivery_status,
+      data?.order?.fulfillment_status,
+      data?.order?.status,
+      data?.Order?.Status
+    ].filter(Boolean);
+
+    let best = candidates[0] || 'pending';
+    let bestRank = this.timelineStageIndex(best);
+
+    for (const status of candidates.slice(1)) {
+      const rank = this.timelineStageIndex(status);
+      if (rank > bestRank) {
+        best = status;
+        bestRank = rank;
+      }
+    }
+
+    return best;
+  },
+
+
+  normalizeOrderStatus(status) {
+    const raw = String(status || '')
+      .trim()
+      .toLowerCase()
+      .replace(/[\s-]+/g, '_');
+
+    // Canonicalize backend statuses so timeline mapping is deterministic.
+    const canonical = {
+      placed: 'order_placed',
+      pending: 'order_placed',
+      created: 'order_placed',
+      order_placed: 'order_placed',
+
+      accepted: 'seller_accepted',
+      confirmed: 'seller_accepted',
+      seller_accepted: 'seller_accepted',
+
+      preparing: 'preparing',
+      processing: 'preparing',
+      ready: 'preparing',
+      ready_for_pickup: 'preparing',
+
+      picked_up: 'picked_up',
+      pickedup: 'picked_up',
+      rider_picked_up: 'picked_up',
+      pickup_completed: 'picked_up',
+
+      out_for_delivery: 'on_the_way',
+      on_the_way: 'on_the_way',
+      on_theway: 'on_the_way',
+      on_way: 'on_the_way',
+      in_transit: 'on_the_way',
+      reached_customer: 'on_the_way',
+
+      delivered: 'delivered',
+      completed: 'delivered'
+    };
+
+    return canonical[raw] || raw;
+  },
+
+
+  timelineStageIndex(status) {
+    const s = this.normalizeOrderStatus(status);
+
+    const map = {
+      order_placed: 0,
+      seller_accepted: 1,
+      preparing: 2,
+      picked_up: 3,
+      on_the_way: 4,
+      delivered: 5
+    };
+
+    return Object.prototype.hasOwnProperty.call(map, s) ? map[s] : 0;
+  },
+
+
+  renderTimelineFromStatus(status) {
+    this.ensureTimelineClasses();
+    const stage = this.timelineStageIndex(status);
+    const nodes = [...document.querySelectorAll('.timeline-step')];
+    const timeline = document.querySelector('.timeline');
+
+    if (!nodes.length) return;
+
+    if (timeline) {
+      const maxStage = Math.max(nodes.length - 1, 1);
+      const progress = Math.max(0, Math.min(100, (stage / maxStage) * 84));
+      timeline.style.setProperty('--timeline-progress', `${progress}%`);
+    }
+
+    nodes.forEach((node, index) => {
+      node.classList.remove('done', 'current', 'active', 'pending');
+
+      const label = node.querySelector('.timeline-state');
+
+      if (index < stage) {
+        node.classList.add('done');
+        if (label) label.textContent = 'Completed';
+      } else if (index === stage) {
+        node.classList.add('current');
+        if (label) label.textContent = stage === 5 ? 'Completed' : 'Current status';
+      } else {
+        node.classList.add('pending');
+        if (label) label.textContent = 'Pending';
+      }
+    });
   },
 
   modeLabel(mode) {
@@ -373,7 +536,7 @@ const TrackingClean = {
       /accepted|approved/,
       /preparing|ready/,
       /picked/,
-      /on the way|reached/,
+      /out_for_delivery|on[_ ]the[_ ]way|reached/,
       /delivered|completed/
     ];
 
@@ -390,11 +553,17 @@ const TrackingClean = {
     rules.forEach((r,i) => { if (r.test(normalized)) current = Math.max(current,i); });
 
     const timeline = document.getElementById('timeline');
-    timeline.innerHTML = labels.map((label,i) =>
-      `<div class="step ${i<current?'done':i===current?'current':''}">
-        <span>${this.escape(label)}</span>
-      </div>`
-    ).join('');
+    const currentIcon = service ? '⌖' : '♨';
+    timeline.innerHTML = labels.map((label,i) => {
+      const state = i < current ? 'done' : i === current ? 'current' : 'pending';
+      const sub = i < current ? 'Completed' : i === current ? (current === 5 ? 'Completed' : 'Current status') : 'Pending';
+      const icon = i < current ? '✓' : i === current ? currentIcon : '✓';
+      return `<div class="step ${state}">
+        <b class="dm-step-dot" aria-hidden="true">${icon}</b>
+        <span class="dm-step-label">${this.escape(label)}</span>
+        <small class="dm-step-state">${sub}</small>
+      </div>`;
+    }).join('');
   },
 
   validCoord(lat, lon) {

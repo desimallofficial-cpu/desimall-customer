@@ -22,6 +22,15 @@ const DesiMallApp = {
   getLocalCategoryImg(name) { const n=String(name||'').toLowerCase(); if(n.includes('women'))return'assets/categories/women.jpg';if(n.includes('kid'))return'assets/categories/kids.jpg';if(n.includes('foot'))return'assets/categories/footwear.jpg';if(n.includes('elect'))return'assets/categories/electronics.jpg';if(n.includes('men'))return'assets/categories/men.jpg';return''; },
   categoryIcon(name) { const n=String(name||'').toLowerCase(); if(n.includes('grocery'))return'fa-basket-shopping';if(n.includes('fruit')||n.includes('vegetable'))return'fa-carrot';if(n.includes('health')||n.includes('wellness'))return'fa-heart-pulse';if(n.includes('hardware'))return'fa-screwdriver-wrench';if(n.includes('station'))return'fa-pen-ruler';if(n.includes('elect'))return'fa-laptop';if(n.includes('foot'))return'fa-shoe-prints';if(n.includes('women'))return'fa-person-dress';if(n.includes('men'))return'fa-shirt';if(n.includes('kid'))return'fa-child-reaching';return'fa-box-open'; },
   getLocalProductImg(name) { return 'assets/products/noimage.jpg'; },
+  isFoodProduct(product) {
+    const attrs = product?.attributes || product?.Attributes || {};
+    return Boolean(
+      product?.IsFood ||
+      attrs?.Food === true ||
+      String(product?.FulfillmentMode || product?.FulfilmentMode || '').toLowerCase() === 'food'
+    );
+  },
+
   productImage(product) {
     const image = String(
       product?.ImageURL ||
@@ -78,6 +87,7 @@ const DesiMallApp = {
       Array.isArray(products.value)
         ? products.value
         : [];
+    this.state.products = (this.state.products || []).filter(p => !this.isFoodProduct(p));
 
     this.renderBanners();
     this.renderCategories();

@@ -443,6 +443,27 @@ const DesiMallAPI = {
     };
   },
 
+
+  // =========================================================
+  // DESIMALL FOOD
+  // =========================================================
+
+  async getFoodRestaurants(pincode = '', foodType = '') {
+    const q = new URLSearchParams();
+    if (pincode) q.set('pincode', String(pincode));
+    if (foodType) q.set('food_type', String(foodType));
+    const result = await this._rest(`/api/food/restaurants?${q.toString()}`, {
+      method:'GET'
+    });
+    return Array.isArray(result?.restaurants) ? result.restaurants : [];
+  },
+
+  async getFoodMenu(restaurantId) {
+    return this._rest(`/api/food/restaurants/${encodeURIComponent(String(restaurantId))}/menu`, {
+      method:'GET'
+    });
+  },
+
   // =========================================================
   // CUSTOMER / AUTH
   // =========================================================
@@ -668,6 +689,43 @@ const DesiMallAPI = {
   // CUSTOMER CHECKOUT / ORDERS — SUPABASE / RENDER API v0.6.0
   // =========================================================
 
+
+  async getRazorpayConfig() {
+    const token = this._customerAccessToken();
+    if (!token) throw new Error('Please login again.');
+    return this._rest('/api/v1/payments/razorpay/config', { method:'GET', token });
+  },
+
+  async createRazorpayOrder(orderId) {
+    const token = this._customerAccessToken();
+    if (!token) throw new Error('Please login again.');
+    return this._rest('/api/v1/payments/razorpay/order', {
+      method:'POST',
+      data:{ order_id:orderId },
+      token
+    });
+  },
+
+  async verifyRazorpayPayment(payload) {
+    const token = this._customerAccessToken();
+    if (!token) throw new Error('Please login again.');
+    return this._rest('/api/v1/payments/razorpay/verify', {
+      method:'POST',
+      data:payload,
+      token
+    });
+  },
+
+  async reconcileRazorpayPayment(payload) {
+    const token = this._customerAccessToken();
+    if (!token) throw new Error('Please login again.');
+    return this._rest('/api/v1/payments/razorpay/reconcile', {
+      method:'POST',
+      data:payload,
+      token
+    });
+  },
+
   placeOrder(data) {
     const token = this._customerAccessToken();
     if (!token) {
@@ -794,6 +852,104 @@ const DesiMallAPI = {
         token
       }
     );
+  },
+
+
+
+  // =========================================================
+  // TRY-ON AT HOME
+  // =========================================================
+
+  async getTryOnProducts(pincode='') {
+    const q=new URLSearchParams();
+    if(pincode)q.set('pincode',String(pincode));
+    return this._rest(`/api/tryon/products?${q.toString()}`,{method:'GET'});
+  },
+
+  async getTryOnAvailability(sellerId) {
+    return this._rest(`/api/tryon/availability?sellerId=${encodeURIComponent(String(sellerId))}`,{method:'GET'});
+  },
+
+  async getTryOnOrders() {
+    const token=this._customerAccessToken();
+    if(!token)throw Object.assign(new Error('Please login to view Try-On visits.'),{code:'AUTH_REQUIRED',status:401});
+    return this._rest('/api/v1/tryon/orders',{method:'GET',token});
+  },
+
+  async createTryOnOrder(data={}) {
+    const token=this._customerAccessToken();
+    if(!token)throw Object.assign(new Error('Please login before booking Try-On.'),{code:'AUTH_REQUIRED',status:401});
+    return this._rest('/api/v1/tryon/orders',{method:'POST',data,token});
+  },
+
+  async cancelTryOnOrder(orderRef,reason='') {
+    const token=this._customerAccessToken();
+    if(!token)throw Object.assign(new Error('Please login again.'),{code:'AUTH_REQUIRED',status:401});
+    return this._rest(`/api/v1/tryon/orders/${encodeURIComponent(String(orderRef))}/cancel`,{
+      method:'POST',data:{Reason:reason},token
+    });
+  },
+
+  // =========================================================
+  // DESIMALL SERVICES
+  // =========================================================
+
+  async getServiceVerticals() {
+    return this._rest('/api/services/verticals',{method:'GET'});
+  },
+
+  async getServiceProviders(pincode='',vertical='',search='') {
+    const q=new URLSearchParams();
+    if(pincode)q.set('pincode',String(pincode));
+    if(vertical)q.set('vertical',String(vertical));
+    if(search)q.set('search',String(search));
+    return this._rest(`/api/services/providers?${q.toString()}`,{method:'GET'});
+  },
+
+  async getServiceProvider(providerId) {
+    return this._rest(`/api/services/providers/${encodeURIComponent(String(providerId))}`,{method:'GET'});
+  },
+
+  async getServiceAvailability(providerId,packageId,date='') {
+    const q=new URLSearchParams({packageId:String(packageId)});
+    if(date)q.set('date',String(date));
+    return this._rest(`/api/services/providers/${encodeURIComponent(String(providerId))}/availability?${q.toString()}`,{method:'GET'});
+  },
+
+  async getServiceBookings() {
+    const token=this._customerAccessToken();
+    if(!token)throw Object.assign(new Error('Please login to view service bookings.'),{code:'AUTH_REQUIRED',status:401});
+    return this._rest('/api/v1/services/bookings',{method:'GET',token});
+  },
+
+  async createServiceBooking(data={}) {
+    const token=this._customerAccessToken();
+    if(!token)throw Object.assign(new Error('Please login before booking a service.'),{code:'AUTH_REQUIRED',status:401});
+    return this._rest('/api/v1/services/bookings',{method:'POST',data,token});
+  },
+
+  async cancelServiceBooking(bookingId,reason='') {
+    const token=this._customerAccessToken();
+    if(!token)throw Object.assign(new Error('Please login again.'),{code:'AUTH_REQUIRED',status:401});
+    return this._rest(`/api/v1/services/bookings/${encodeURIComponent(String(bookingId))}/cancel`,{method:'POST',data:{Reason:reason},token});
+  },
+
+  async reviewServiceBooking(bookingId,rating,review='') {
+    const token=this._customerAccessToken();
+    if(!token)throw Object.assign(new Error('Please login again.'),{code:'AUTH_REQUIRED',status:401});
+    return this._rest(`/api/v1/services/bookings/${encodeURIComponent(String(bookingId))}/review`,{method:'POST',data:{Rating:rating,Review:review},token});
+  },
+
+  async createServiceRazorpayOrder(bookingId) {
+    const token=this._customerAccessToken();
+    if(!token)throw Object.assign(new Error('Please login again.'),{code:'AUTH_REQUIRED',status:401});
+    return this._rest(`/api/v1/services/bookings/${encodeURIComponent(String(bookingId))}/razorpay/order`,{method:'POST',data:{},token});
+  },
+
+  async verifyServiceRazorpayPayment(bookingId,data={}) {
+    const token=this._customerAccessToken();
+    if(!token)throw Object.assign(new Error('Please login again.'),{code:'AUTH_REQUIRED',status:401});
+    return this._rest(`/api/v1/services/bookings/${encodeURIComponent(String(bookingId))}/razorpay/verify`,{method:'POST',data,token});
   },
 
   // =========================================================
